@@ -221,7 +221,7 @@ h1{font-size:28px;letter-spacing:-.03em}
 .stack i:nth-child(2){background:linear-gradient(135deg,#3a4a94,#222e66);opacity:.6;transform:translate(9px,-6.5px) scale(.93)}
 .stack i:nth-child(3){background:linear-gradient(135deg,#3a4a94,#222e66);box-shadow:0 6px 14px rgba(34,46,102,.22);transform:none}
 .stack b{position:absolute;left:10px;border-radius:99px;display:block}
-.s-tag{top:12px;width:24px;height:7px;background:var(--orange)}
+.s-tag{top:12px;width:24px;height:7px;background:#d6def2}
 .s-l1{top:30px;width:52px;height:4px;background:rgba(255,255,255,.8)}
 .s-l2{top:39px;width:34px;height:4px;background:rgba(255,255,255,.35)}
 @keyframes sh1{to{transform:translate(22px,-12px) rotate(6deg) scale(.9)}}
@@ -499,31 +499,161 @@ h1{font-size:34px}
 .deck{gap:36px}
 .stack{margin-left:6px}
 @media (max-width:560px){.deck{gap:24px;padding:14px 16px}.stack{margin:0 4px 0 6px;transform:scale(.8);transform-origin:center}.deck-meta{display:none}.how li{padding:10px 12px}.how .ill{margin-bottom:0}}
+
+/* Neuer Kopf: Block 1 Erklärung, Block 2 Ziehen */
+.top{display:flex;flex-direction:column;gap:28px}
+.sec-h{font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--muted);margin:0 0 12px}
+.how-sec .how li{background:transparent;border:0;padding:0 8px 0 0;cursor:default}
+.how-sec .how{gap:24px}
+.draw-sec{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;align-items:center;background:var(--white);border:1px solid #e4ded3;border-radius:8px;padding:32px 36px;box-shadow:0 2px 0 rgba(34,46,102,.04)}
+.draw-sec .stack{width:150px;height:200px;margin:0 auto;transform:none}
+.draw-sec .stack i{border-radius:12px}
+.draw-sec .stack i:nth-child(1){transform:rotate(-12deg) translate(-26px,8px)}
+.draw-sec .stack i:nth-child(2){transform:rotate(9deg) translate(24px,4px)}
+.draw-sec .stack b{left:20px}
+.draw-sec .s-tag{top:22px;width:44px;height:12px}
+.draw-sec .s-l1{top:56px;width:100px;height:8px}
+.draw-sec .s-l2{top:74px;width:76px;height:8px}
+.draw-sec .s-l3{top:112px;width:100px;height:6px}
+.draw-sec .s-l4{top:128px;width:62px;height:6px}
+.draw-sec .stack.shuffle i:nth-child(1){animation:sh1b .16s ease-in-out infinite alternate}
+.draw-sec .stack.shuffle i:nth-child(2){animation:sh2b .16s ease-in-out infinite alternate}
+@keyframes sh1b{to{transform:rotate(-20deg) translate(-46px,10px)}}
+@keyframes sh2b{to{transform:rotate(17deg) translate(44px,4px)}}
+.draw-body{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sec-h.big{font-size:26px;letter-spacing:-.01em;text-transform:none;color:var(--ink);font-weight:700;margin:0}
+.draw-lead{font-size:17px;color:var(--ink);margin:-6px 0 2px}
+.draw-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+.draw-hint{font-size:14px;color:var(--muted)}
+@media (max-width:560px){
+ .top{gap:22px}
+ .sec-h{font-size:11px;margin-bottom:8px}
+ .how-sec .how{gap:12px}
+ .how-sec .how li{padding:0}
+ .draw-sec{grid-template-columns:minmax(0,1fr);gap:18px;padding:20px 16px;justify-items:stretch}
+ .draw-sec .stack{width:84px;height:112px;margin:6px auto 8px}
+ .draw-sec .stack i:nth-child(1){transform:rotate(-12deg) translate(-16px,5px)}
+ .draw-sec .stack i:nth-child(2){transform:rotate(9deg) translate(15px,3px)}
+ .draw-sec .stack i{border-radius:9px}
+ .draw-sec .s-tag{top:12px;width:24px;height:7px}.draw-sec .stack b{left:11px}
+ .draw-sec .s-l1{top:30px;width:56px;height:5px}.draw-sec .s-l2{top:40px;width:42px;height:5px}
+ .draw-sec .s-l3{top:60px;width:56px;height:4px}.draw-sec .s-l4{top:69px;width:34px;height:4px}
+ .draw-sec .chips{margin:0 -16px;padding:0 16px 6px}
+ .sec-h.big{font-size:22px}
+ .draw-lead{font-size:15px}
+ .draw-row .draw{width:100%;justify-content:center}
+ .draw-hint{width:100%;text-align:center}
+}
+
+.stack .s-tag{background:#d6def2}
+/* Icons: gleiche Höhe, sauber ausgerichtet */
+.how .ill,.how-sec .how .ill{height:34px;width:auto;max-width:72px;margin:0 0 12px;display:block;overflow:visible}
+@media (max-width:560px){.how-sec .how li{grid-template-columns:52px minmax(0,1fr)}.how-sec .how .ill{height:26px;max-width:52px;margin:0;justify-self:center;align-self:center}}
+
+/* Icons in gleich großen Kacheln: optisch ausgerichtet */
+.how-sec .how .ill{width:52px;height:52px;max-width:none;box-sizing:border-box;padding:9px;background:#eef1fb;border-radius:12px;overflow:hidden;margin:0 0 14px}
+@media (max-width:560px){.how-sec .how li{grid-template-columns:44px minmax(0,1fr);column-gap:14px}.how-sec .how .ill{width:44px;height:44px;padding:7px;border-radius:10px;margin:0;justify-self:start}}
+
+/* Karten wieder neben dem Button: Spielgefühl */
+.draw-sec{grid-template-columns:minmax(0,1fr);gap:0;padding:32px 36px}
+.draw-row{display:flex;align-items:center;gap:40px;margin-top:14px;padding:22px 26px;background:#f6f3ee;border-radius:8px}
+.draw-row .stack{width:96px;height:128px;margin:0 6px;flex:none}
+.draw-row .stack i:nth-child(1){transform:rotate(-12deg) translate(-18px,6px)}
+.draw-row .stack i:nth-child(2){transform:rotate(9deg) translate(17px,3px)}
+.draw-row .stack i{border-radius:10px}
+.draw-row .stack b{left:13px}
+.draw-row .s-tag{top:14px;width:28px;height:8px}
+.draw-row .s-l1{top:34px;width:64px;height:6px}
+.draw-row .s-l2{top:46px;width:48px;height:6px}
+.draw-row .s-l3{top:70px;width:64px;height:5px}
+.draw-row .s-l4{top:81px;width:40px;height:5px}
+.draw-row .stack.shuffle i:nth-child(1){animation:sh1c .16s ease-in-out infinite alternate}
+.draw-row .stack.shuffle i:nth-child(2){animation:sh2c .16s ease-in-out infinite alternate}
+@keyframes sh1c{to{transform:rotate(-20deg) translate(-32px,8px)}}
+@keyframes sh2c{to{transform:rotate(17deg) translate(30px,3px)}}
+.draw-act{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0}
+@media (max-width:560px){
+ .draw-sec{padding:20px 16px}
+ .draw-row{gap:26px;padding:18px 16px 18px 22px}
+ .draw-row .stack{width:70px;height:94px;margin:0 4px}
+ .draw-row .stack i:nth-child(1){transform:rotate(-12deg) translate(-13px,4px)}
+ .draw-row .stack i:nth-child(2){transform:rotate(9deg) translate(12px,2px)}
+ .draw-row .stack b{left:9px}
+ .draw-row .s-tag{top:10px;width:20px;height:6px}
+ .draw-row .s-l1{top:25px;width:46px;height:4px}
+ .draw-row .s-l2{top:34px;width:34px;height:4px}
+ .draw-row .s-l3{top:52px;width:46px;height:3px}
+ .draw-row .s-l4{top:60px;width:28px;height:3px}
+ .draw-act{flex:1;min-width:0}
+ .draw-act .draw{width:100%;justify-content:center}
+ .draw-act .draw-hint{width:auto;text-align:left;font-size:13px}
+}
+/* Button kompakter */
+.draw-row .draw{font-size:15px;padding:10px 18px;min-height:0;gap:8px}
+.draw-row .draw svg{width:16px;height:16px}
+@media (max-width:560px){
+ .draw-act .draw{width:auto;font-size:15px;padding:9px 14px;min-height:40px}
+}
+/* Fächer */
+.draw-row{flex-direction:column;align-items:center;gap:22px;margin-top:10px;padding:6px 0 0;background:none}
+.draw-act{align-items:center;text-align:center}
+.fan{position:relative;width:240px;height:128px;cursor:pointer}
+.fan i{position:absolute;left:calc(50% - 39px);bottom:0;width:78px;height:106px;border-radius:8px;border:2px solid var(--white);
+ background:linear-gradient(135deg,#3a4a94,#222e66);box-shadow:0 6px 14px rgba(34,46,102,.2);transform-origin:50% 120%;transition:transform .25s ease}
+.fan i:nth-child(1){transform:rotate(-24deg);z-index:0}
+.fan i:nth-child(2){transform:rotate(-12deg);z-index:1}
+.fan i:nth-child(3){transform:rotate(12deg);z-index:1}
+.fan i:nth-child(4){transform:rotate(24deg);z-index:0}
+.fan i:nth-child(5){transform:translateY(-4px);z-index:2}
+.fan:hover i:nth-child(5){transform:translateY(-10px)}
+.fan b{position:absolute;left:12%;height:5px;border-radius:9px;background:rgba(255,255,255,.75)}
+.fan .f-t{top:14%;width:30%;background:#d6def2}.fan .f-a{top:30%;width:70%}.fan .f-c{top:40%;width:52%}
+.fan.shuffle i:nth-child(1),.fan.shuffle i:nth-child(2),.fan.shuffle i:nth-child(3),.fan.shuffle i:nth-child(4){transform:rotate(0)}
+.fan.shuffle i:nth-child(5){animation:fanup .32s ease-in-out infinite alternate}
+@keyframes fanup{to{transform:translateY(-16px) rotate(4deg)}}
+@media (max-width:560px){
+ .draw-row{gap:18px;margin-top:18px;padding:4px 0 0}
+ .draw-act{flex:none;width:100%}
+ .draw-act .draw-hint{text-align:center}
+ .fan{width:190px;height:102px}
+ .fan i{width:62px;height:84px;left:calc(50% - 31px);border-radius:7px}
+ .fan b{height:4px}
+}
+@media (prefers-reduced-motion:reduce){.fan i{transition:none}}
+/* Schritte kleiner */
+.how-sec .how b{font-size:15px;line-height:1.3}
+.how-sec .how span{font-size:13px;line-height:1.4}
+@media (max-width:560px){.how-sec .how b{font-size:14px}.how-sec .how span{font-size:12.5px}}
+/* Icons kleiner */
+.how-sec .how .ill{width:40px;height:40px;padding:7px;border-radius:10px}
+@media (max-width:560px){.how-sec .how li{grid-template-columns:36px minmax(0,1fr);column-gap:12px}.how-sec .how .ill{width:36px;height:36px;padding:6px;border-radius:9px}}
 </style>
 
 <div class="wrap">
   <div class="top">
-    <header class="head">
-      <h1>Pitch-Runde</h1>
-      <ol class="how" aria-label="So läuft die Pitch-Runde">
-        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh1" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4a94"/><stop offset="1" stop-color="#222e66"/></linearGradient><linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1fb"/><stop offset="1" stop-color="#d6def2"/></linearGradient></defs><rect x="22" y="6" width="50" height="34" rx="6" fill="url(#g1b)"/><rect x="16" y="13" width="56" height="36" rx="6" fill="url(#g1)"/><g filter="url(#sh1)"><rect x="8" y="22" width="60" height="36" rx="6" fill="#ffffff"/></g><rect x="15" y="29" width="18" height="6" rx="3" fill="#fc6526"/><rect x="15" y="40" width="40" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="15" y="47" width="28" height="3.5" rx="1.75" fill="#d6def2"/><circle cx="60" cy="32" r="3" fill="#d6def2"/></svg><b>Thema ziehen</b><span>Bereich wählen, Karte ziehen.</span></li>
-        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#ff9a5c"/><stop offset="1" stop-color="#fc6526"/></linearGradient></defs><g transform="translate(40 32) scale(.8) translate(-43 -31)"><g filter="url(#sh2)"><rect x="3" y="3" width="80" height="56" rx="7" fill="#ffffff"/></g><rect x="10.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.45"/><rect x="19.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.45"/><rect x="28.8" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.6"/><rect x="38.2" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.6"/><rect x="47.6" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.75"/><rect x="57.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.75"/><rect x="66.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.9"/><rect x="10.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.9"/><rect x="19.4" y="19.4" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="1"/><rect x="28.8" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="38.2" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="47.6" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="57.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="66.9" y="19.9" width="6.4" height="6.4" rx="1.8" fill="#ffffff" stroke="#222e66" stroke-width="1.2"/><rect x="10" y="36" width="66" height="4" rx="2" fill="#d6def2"/><rect x="10" y="36" width="42" height="4" rx="2" fill="url(#g2)"/><rect x="10" y="46" width="22" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="62" y="46" width="14" height="3.5" rx="1.75" fill="#d6def2"/></g></svg><b>2 Wochen vorbereiten</b><span>Recherchieren, Phrasen lernen.</span></li>
-        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh3" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb07f"/><stop offset="1" stop-color="#fc6526"/></linearGradient></defs><g filter="url(#sh3)"><circle cx="26" cy="32" r="24" fill="#ffffff"/></g><circle cx="26" cy="32" r="17" fill="none" stroke="#d6def2" stroke-width="5"/><circle cx="26" cy="32" r="17" fill="none" stroke="url(#g3)" stroke-width="5" stroke-linecap="round" stroke-dasharray="66.2 106.8" transform="rotate(-90 26 32)"/><text x="26" y="35.5" text-anchor="middle" font-family="Geist,Helvetica,Arial,sans-serif" font-size="10" font-weight="600" fill="#222e66">5:00</text><rect x="52" y="28.0" width="2.8" height="8" rx="1.4" fill="#fc6526" opacity="1"/><rect x="57" y="24.0" width="2.8" height="16" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="62" y="20.0" width="2.8" height="24" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="67" y="26.0" width="2.8" height="12" rx="1.4" fill="#fc6526" opacity="1"/><rect x="72" y="22.0" width="2.8" height="20" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="77" y="27.0" width="2.8" height="10" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="82" y="29.0" width="2.8" height="6" rx="1.4" fill="#fc6526" opacity="1"/></svg><b>Max. 5 Minuten pitchen</b><span>Vor der Gruppe, dann eine Frage.</span></li>
-      </ol>
-    </header>
+    <h1>Pitch-Runde</h1>
 
-    <section class="pick" aria-labelledby="pickH">
-      <div class="pick-in">
-        <p class="pick-label" id="pickH">Bereich wählen oder alles dem Zufall überlassen.</p>
+    <section class="how-sec" aria-labelledby="howH">
+      <h2 class="sec-h" id="howH">So funktioniert's</h2>
+      <ol class="how">
+        <li><svg class="ill" viewBox="5.0 3.0 70.0 61.0" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh1" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4a94"/><stop offset="1" stop-color="#222e66"/></linearGradient><linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1fb"/><stop offset="1" stop-color="#d6def2"/></linearGradient></defs><rect x="22" y="6" width="50" height="34" rx="6" fill="url(#g1b)"/><rect x="16" y="13" width="56" height="36" rx="6" fill="url(#g1)"/><g filter="url(#sh1)"><rect x="8" y="22" width="60" height="36" rx="6" fill="#ffffff"/></g><rect x="15" y="29" width="18" height="6" rx="3" fill="#3a4a94"/><rect x="15" y="40" width="40" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="15" y="47" width="28" height="3.5" rx="1.75" fill="#d6def2"/><circle cx="60" cy="32" r="3" fill="#d6def2"/></svg><b>Thema ziehen</b><span>Bereich wählen, Karte ziehen.</span></li>
+        <li><svg class="ill" viewBox="5.0 6.6 70.0 53.8" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g transform="translate(40 32) scale(.8) translate(-43 -31)"><g filter="url(#sh2)"><rect x="3" y="3" width="80" height="56" rx="7" fill="#ffffff"/></g><rect x="10.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="19.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="28.8" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="38.2" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="47.6" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="57.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="66.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="10.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="19.4" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="1"/><rect x="28.8" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="38.2" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="47.6" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="57.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="66.9" y="19.9" width="6.4" height="6.4" rx="1.8" fill="#ffffff" stroke="#222e66" stroke-width="1.2"/><rect x="10" y="36" width="66" height="4" rx="2" fill="#d6def2"/><rect x="10" y="36" width="42" height="4" rx="2" fill="url(#g2)"/><rect x="10" y="46" width="22" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="62" y="46" width="14" height="3.5" rx="1.75" fill="#d6def2"/></g></svg><b>2 Wochen vorbereiten</b><span>Recherchieren, Phrasen lernen.</span></li>
+        <li><svg class="ill" viewBox="-1 5 54 56" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh3" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g filter="url(#sh3)"><circle cx="26" cy="32" r="24" fill="#ffffff"/></g><circle cx="26" cy="32" r="17" fill="none" stroke="#d6def2" stroke-width="5"/><circle cx="26" cy="32" r="17" fill="none" stroke="url(#g3)" stroke-width="5" stroke-linecap="round" stroke-dasharray="66.2 106.8" transform="rotate(-90 26 32)"/><text x="26" y="35.5" text-anchor="middle" font-family="Geist,Helvetica,Arial,sans-serif" font-size="10" font-weight="600" fill="#222e66">5:00</text></svg><b>3-5 Minuten pitchen</b><span>Vor der Gruppe, dann eine Frage.</span></li>
+      </ol>
+    </section>
+
+    <section class="draw-sec" aria-labelledby="pickH">
+      <div class="draw-body">
+        <h2 class="sec-h big" id="pickH">Zieh dein Thema</h2>
+        <p class="draw-lead">Bereich wählen oder alles dem Zufall überlassen.</p>
         <div class="chips" id="chips" role="group" aria-label="Bereich"></div>
-      </div>
-      <div class="deck">
-        <div class="stack" aria-hidden="true"><i></i><i></i><i><b class="s-tag"></b><b class="s-l1"></b><b class="s-l2"></b><b class="s-l3"></b><b class="s-l4"></b></i></div>
-        <div class="deck-txt">
-          <p id="deckHint">Deine Karte liegt noch verdeckt.</p>
-          <button class="draw" id="drawBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg><span id="drawLbl">Thema ziehen</span></button>
+        <div class="draw-row">
+          <div class="fan" aria-hidden="true"><i><b class="f-t"></b><b class="f-a"></b><b class="f-c"></b></i><i><b class="f-t"></b><b class="f-a"></b><b class="f-c"></b></i><i><b class="f-t"></b><b class="f-a"></b><b class="f-c"></b></i><i><b class="f-t"></b><b class="f-a"></b><b class="f-c"></b></i><i><b class="f-t"></b><b class="f-a"></b><b class="f-c"></b></i></div>
+          <div class="draw-act">
+            <button class="draw" id="drawBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg><span id="drawLbl">Thema ziehen</span></button>
+            <span class="draw-hint" id="deckHint"></span>
+          </div>
         </div>
-        <p class="deck-meta" id="deckMeta"></p>
       </div>
     </section>
   </div>
@@ -922,18 +1052,18 @@ function render(i){
 function draw(){
  const p=pool();if(!p.length)return;
  let pick;do{pick=p[Math.floor(Math.random()*p.length)]}while(pick===cur&&p.length>1);
- const btn=$("drawBtn"),st=document.querySelector(".stack"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ const btn=$("drawBtn"),st=document.querySelector(".fan"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
  btn.disabled=true;st.classList.add("shuffle");
  setTimeout(()=>{
   st.classList.remove("shuffle");btn.disabled=false;
   render(pick);
-  $("deckHint").textContent="Nicht dein Thema? Zieh eine neue Karte.";$("drawLbl").textContent="Neu ziehen";
+  $("deckHint").textContent="Nicht dein Thema? Zieh einfach neu.";$("drawLbl").textContent="Neu ziehen";
   const c=$("card");c.hidden=false;c.classList.remove("flip");void c.offsetWidth;c.classList.add("flip");
   c.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
  },reduce?0:900);
 }
 $("drawBtn").addEventListener("click",draw);
-$("deckMeta").innerHTML=`<b>${T.length}</b> Themen<br><b>${Object.keys(R).length}</b> Bereiche`;
+$("deckHint").textContent=T.length+" Themen in "+Object.keys(R).length+" Bereichen";
 
 $("vThumb").addEventListener("error",e=>e.target.parentNode.classList.add("noimg"));
 
@@ -1000,3 +1130,4 @@ $("pdfBtn").addEventListener("click",async e=>{
  }finally{btn.disabled=false}
 });
 </script>
+<script>document.querySelector(".fan").addEventListener("click",()=>{const b=document.getElementById("drawBtn");if(!b.disabled)b.click()});</script>
