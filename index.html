@@ -1,0 +1,1002 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Zungenlöser Pitch-Runde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+/* Layout nach Figma «Pitch-Runde · Desktop» (49:3621): Kopf, Bereiche, Button, dann Themenkarte aus zwei Flächen (Pfirsich + Blau). Nur helles Theme wie die App. */
+:root{
+  --paper:#f7f4ef;
+  --ink:#222e66;
+  --muted:#5a5d5a;
+  --orange:#fc6526;
+  --orange-text:#a83d16;
+  --orange-btn:#c4471a;
+  --peach:#fde8dc;
+  --peach-line:#f6daca;
+  --blue:#d6def2;
+  --blue-line:#d8dff2;
+  --strike:#5f625f;
+  --white:#fffefa;
+  --f-ui:"Geist","Helvetica Neue",Arial,sans-serif;
+  --f-hand:"Caveat","Bradley Hand",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:normal;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,li:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+p,h1,h2,h3,ul,ol{margin:0}
+ul,ol{list-style:none;padding:0}
+
+.wrap{max-width:860px;margin:0 auto;padding:32px 20px 56px;display:flex;flex-direction:column;gap:28px}
+
+/* Kopf + Auswahl */
+.top{display:flex;flex-direction:column;gap:38px}
+.head{display:flex;flex-direction:column;gap:10px}
+h1{font-size:48px;line-height:1;letter-spacing:-.06em;font-weight:700;color:var(--ink)}
+.head{gap:20px}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:s}
+.how li{display:flex;flex-direction:column;gap:4px;counter-increment:s;border-top:2px solid var(--ink);padding-top:10px}
+.how li::before{content:counter(s);font-size:13px;font-weight:700;color:var(--orange-text)}
+.how b{font-size:18px;font-weight:600;line-height:1.2;color:var(--ink)}
+.how span{font-size:14px;color:var(--muted)}
+@media (max-width:640px){.how{grid-template-columns:minmax(0,1fr);gap:12px}}
+.pick{display:flex;flex-direction:column;gap:28px;align-items:flex-start}
+.pick-in{display:flex;flex-direction:column;gap:18px;width:100%}
+.pick-label{font-size:18px;font-weight:600;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:transparent;border:1px solid var(--blue-line);border-radius:999px;padding:6px 12px;font-size:14px;color:var(--ink);white-space:nowrap}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.draw{background:var(--orange-btn);color:#fff;border:0;border-radius:16px;padding:18px 26px;font-size:18px;font-weight:600;transition:transform .12s ease}
+.draw:hover{transform:translateY(-2px)}
+.draw:active{transform:translateY(1px)}
+.draw:disabled{opacity:.7;cursor:default;transform:none}
+
+/* Themenkarte */
+.card{display:flex;flex-direction:column;gap:10px;padding:10px 0;border-radius:28px}
+.card[hidden]{display:none!important}
+.card.flip{animation:in .4s ease}
+@keyframes in{from{opacity:.3;transform:translateY(10px)}to{opacity:1;transform:none}}
+.panel{border-radius:26px;padding:40px 60px;display:flex;flex-direction:column;gap:30px;min-width:0}
+.panel.peach{background:var(--peach)}
+.panel.blue{background:var(--blue)}
+@media (max-width:640px){.panel{padding:28px 22px}}
+
+.card h2{font-size:44px;line-height:1.1;letter-spacing:-.05em;font-weight:700;color:var(--ink);text-wrap:balance}
+@media (max-width:640px){.card h2{font-size:34px}}
+.card-head{display:flex;flex-direction:column;gap:10px}
+.worum{font-size:16px;line-height:24px;color:var(--ink)}
+
+.block{display:flex;flex-direction:column;gap:14px}
+.label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--orange-text)}
+
+.check{display:flex;flex-direction:column;gap:14px}
+.check li{display:flex;gap:10px;align-items:flex-start;color:var(--ink)}
+.check li::before{content:"";flex:none;width:16px;height:16px;border:2px solid var(--ink);border-radius:5px;margin-top:1px}
+
+.vocab{display:flex;flex-direction:column;gap:14px}
+.vocab li{display:flex;gap:12px;align-items:flex-start;border-bottom:1px solid var(--peach-line);padding-bottom:7px;cursor:pointer}
+.vocab .de{font-weight:600;color:var(--ink)}
+.vocab .ru{flex:1;min-width:0;text-align:right;font-size:14px;color:var(--muted)}
+.vocab li.ok .de{color:var(--orange-text)}
+
+.steps{display:flex;flex-direction:column;gap:14px}
+.steps li{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--peach-line);padding-bottom:10px;color:var(--ink)}
+.steps li:last-child{border-bottom:0}
+.steps b{display:block;font-weight:600}
+.steps .time{flex:none;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.say{display:flex;flex-direction:column;gap:12px}
+.say button{background:none;border:0;padding:0;text-align:left;display:flex;flex-direction:column;gap:4px}
+.say .de{font-weight:600;color:var(--ink)}
+.say .ru{font-size:14px;color:var(--muted)}
+.say button.ok .de{color:var(--orange-text)}
+
+.q{display:flex;flex-direction:column;gap:14px}
+.q li{display:flex;gap:8px;color:var(--ink)}
+.q li::before{content:"?";font-weight:700;color:var(--orange-text)}
+
+.fehler-sub{font-size:14px;color:var(--muted);margin-top:-6px}
+.sosagt{display:flex;flex-direction:column;gap:18px}
+.sosagt li{display:flex;flex-direction:column;gap:6px;padding-bottom:18px;border-bottom:1px solid rgba(34,46,102,.14)}
+.sosagt li:last-child{border-bottom:0;padding-bottom:0}
+.sosagt .richtig{font-family:var(--f-hand);font-size:30px;line-height:1.05;font-weight:700;color:var(--ink)}
+.sosagt del{font-size:17px;color:var(--strike)}
+.sosagt .warum{font-size:14px;color:var(--muted)}
+
+
+/* Minimal: eine Typo-Skala. 28 Titel · 22 Kartentitel · 15 Text · 13 Nebentext · 11 Label */
+body{font-size:15px;line-height:1.45}
+.wrap{gap:24px;padding:28px 20px 48px}
+.top{gap:24px}
+h1{font-size:28px;letter-spacing:-.03em}
+.head{gap:16px}
+.how{gap:12px}
+.how li{border-top-width:1px;padding-top:8px;gap:2px}
+.how li::before{font-size:11px}
+.how b{font-size:15px}
+.how span{font-size:13px}
+.pick{gap:16px}
+.pick-in{gap:10px}
+.pick-label{font-size:15px;font-weight:500}
+.chip{font-size:13px;padding:4px 10px}
+.draw{font-size:15px;padding:10px 18px;border-radius:10px}
+.card{padding:0;gap:8px}
+.panel{padding:28px 32px;gap:24px;border-radius:18px}
+@media (max-width:640px){.panel{padding:22px 18px}}
+.card h2,.card h2{font-size:22px;letter-spacing:-.02em;line-height:1.2}
+@media (max-width:640px){.card h2{font-size:22px}}
+.worum{font-size:15px;line-height:1.5}
+.block{gap:10px}
+.check,.vocab,.steps,.q{gap:8px}
+.check li::before{width:14px;height:14px;border-width:1.5px;border-radius:4px;margin-top:2px}
+.vocab li{padding-bottom:6px}
+.vocab .de,.say .de,.steps b{font-weight:500}
+.vocab .ru,.say .ru,.steps .time,.sosagt .warum,.fehler-sub{font-size:13px}
+.steps li{padding-bottom:8px}
+.say{gap:8px}
+.say button{gap:1px}
+.fehler-sub{margin-top:-4px}
+.sosagt{gap:12px}
+.sosagt li{gap:2px;padding-bottom:12px}
+.sosagt .richtig{font-family:var(--f-ui);font-size:15px;font-weight:500;line-height:1.45}
+.sosagt del{font-size:15px}
+
+.vocab li{flex-wrap:wrap;row-gap:0}
+.vocab .de{min-width:0;overflow-wrap:anywhere}
+.vocab .ru{flex:1 1 120px}
+.label-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.copy-all{background:none;border:0;padding:0;font-size:13px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--peach-line)}
+.copy-all.ok{color:var(--orange-text)}
+.how{gap:8px}
+.how li{background:var(--white);border:1px solid #ece7de;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.how li::before{margin-bottom:8px;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--peach);color:var(--orange-text);font-size:11px;font-weight:600}
+.how b{font-size:15px;line-height:22px}
+.deck{display:flex;align-items:center;gap:28px;background:var(--white);border:1px solid #ece7de;border-radius:14px;padding:22px 24px 22px 32px;width:100%}
+.deck-txt{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.deck-txt p{font-size:13px;color:var(--muted)}
+.draw{display:inline-flex;align-items:center;gap:8px}
+.draw svg{width:18px;height:18px;flex:none}
+.stack{position:relative;width:58px;height:76px;flex:none}
+.stack i{position:absolute;inset:0;border-radius:9px;background:var(--ink);border:2px solid var(--white);box-shadow:0 1px 0 #ece7de}
+.stack i:nth-child(1){transform:rotate(-9deg) translateX(-8px);opacity:.45}
+.stack i:nth-child(2){transform:rotate(6deg) translateX(7px);opacity:.75}
+.stack i:nth-child(3){background:repeating-linear-gradient(45deg,var(--ink) 0 6px,#2c3a7a 6px 12px)}
+.stack.shuffle i:nth-child(1){animation:sh1 .16s ease-in-out infinite alternate}
+.stack.shuffle i:nth-child(2){animation:sh2 .16s ease-in-out infinite alternate}
+@keyframes sh1{to{transform:rotate(-15deg) translateX(-20px)}}
+@keyframes sh2{to{transform:rotate(13deg) translateX(20px)}}
+.how li{position:relative}
+.how li::before{margin-bottom:32px}
+.how .ill{position:absolute;top:12px;right:14px;width:62px;height:52px}
+/* Formen: kleine Radien, eckige Chips, Nummern ohne Kreise */
+.chip{border-radius:4px}
+.draw{border-radius:6px}
+.card{border-radius:6px}
+.panel{border-radius:6px}
+.how li,.deck{border-radius:6px}
+.check li::before{border-radius:2px}
+.stack i{border-radius:4px}
+.how li::before{content:counter(s,decimal-leading-zero);display:block;width:auto;height:auto;background:none;border-radius:0;font-size:13px;font-weight:600;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--orange-text);margin-bottom:28px}
+/* Karteikarten statt Spielkarten */
+:root{--f-serif:"Newsreader",Georgia,"Times New Roman",serif}
+.stack{width:96px;height:64px}
+.stack i{border-radius:2px;border:1px solid #d9d2c4;box-shadow:0 1px 2px rgba(34,46,102,.08);opacity:1;
+ background:linear-gradient(var(--orange),var(--orange)) 0 15px/100% 1px no-repeat,
+ repeating-linear-gradient(to bottom,transparent 0 9px,#e3e7f3 9px 10px) 0 16px/100% calc(100% - 20px) no-repeat,var(--white)}
+.stack i:nth-child(1){transform:rotate(-6deg) translate(-6px,4px)}
+.stack i:nth-child(2){transform:rotate(4deg) translate(5px,2px)}
+.stack i:nth-child(3){transform:none;background:linear-gradient(var(--orange),var(--orange)) 0 15px/100% 1px no-repeat,repeating-linear-gradient(to bottom,transparent 0 9px,#e3e7f3 9px 10px) 0 16px/100% calc(100% - 20px) no-repeat,var(--white)}
+.stack i em{position:absolute;left:8px;top:2px;font-family:var(--f-serif);font-style:italic;font-size:11px;color:var(--ink)}
+@keyframes sh1{to{transform:rotate(-12deg) translate(-16px,6px)}}
+@keyframes sh2{to{transform:rotate(10deg) translate(16px,2px)}}
+.deck{gap:32px}
+/* Schritte: keine Nummern, Illustration oben links */
+.how li::before{content:none;display:none}
+.how .ill{position:static;width:66px;height:48px;margin:0 0 14px -2px;overflow:visible}
+/* Video zum Thema */
+.video{display:flex;gap:16px;align-items:center;background:var(--white);border:1px solid var(--peach-line);border-radius:6px;padding:10px;text-decoration:none;color:var(--ink);max-width:560px}
+.video[hidden]{display:none!important}
+.video:hover{border-color:var(--orange)}
+.v-thumb{position:relative;flex:none;width:160px;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:var(--ink)}
+.v-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.v-thumb.noimg img{display:none}
+.v-play{position:absolute;left:50%;top:50%;width:36px;height:26px;margin:-13px 0 0 -18px;border-radius:6px;background:var(--orange)}
+.v-play::after{content:"";position:absolute;left:14px;top:7px;border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.v-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.v-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--orange-text)}
+.v-title{font-weight:500;line-height:1.35}
+.v-src{font-size:13px;color:var(--muted)}
+@media (max-width:520px){.video{flex-direction:column;align-items:stretch}.v-thumb{width:100%}}
+.plan{background:var(--white);border:1px solid #ece7de;border-radius:6px;padding:22px 24px}
+.plan[hidden]{display:none!important}
+.plan.flip{animation:in .4s ease}
+.plan .steps li{border-bottom-color:#ece7de}
+/* Stapel im Stil der UI-Illustrationen */
+.stack{width:92px;height:62px}
+.stack i{border:0;border-radius:7px;opacity:1}
+.stack i:nth-child(1){background:linear-gradient(135deg,#eef1fb,#d6def2);transform:translate(18px,-13px) scale(.86)}
+.stack i:nth-child(2){background:linear-gradient(135deg,#3a4a94,#222e66);opacity:.6;transform:translate(9px,-6.5px) scale(.93)}
+.stack i:nth-child(3){background:linear-gradient(135deg,#3a4a94,#222e66);box-shadow:0 6px 14px rgba(34,46,102,.22);transform:none}
+.stack b{position:absolute;left:10px;border-radius:99px;display:block}
+.s-tag{top:12px;width:24px;height:7px;background:var(--orange)}
+.s-l1{top:30px;width:52px;height:4px;background:rgba(255,255,255,.8)}
+.s-l2{top:39px;width:34px;height:4px;background:rgba(255,255,255,.35)}
+@keyframes sh1{to{transform:translate(22px,-12px) rotate(6deg) scale(.9)}}
+@keyframes sh2{to{transform:translate(-12px,-6px) rotate(-6deg) scale(.95)}}
+/* Hochformat statt Bankkarte */
+.stack{width:58px;height:78px;margin:6px 14px 0 10px}
+.stack i:nth-child(1){transform:rotate(-12deg) translate(-10px,3px);opacity:1}
+.stack i:nth-child(2){transform:rotate(9deg) translate(10px,2px);opacity:.75}
+.stack i:nth-child(3){transform:none}
+.stack b{left:8px}
+.s-tag{top:9px;width:18px;height:6px}
+.s-l1{top:24px;width:40px;height:4px}
+.s-l2{top:33px;width:32px;height:4px;background:rgba(255,255,255,.8)}
+.s-l3{top:48px;width:40px;height:3px;background:rgba(255,255,255,.3)}
+.s-l4{top:56px;width:26px;height:3px;background:rgba(255,255,255,.3)}
+@keyframes sh1{to{transform:rotate(-20deg) translate(-20px,4px)}}
+@keyframes sh2{to{transform:rotate(17deg) translate(20px,2px)}}
+/* Kontrast: durchgestrichene Fehler bleiben lesbar, Linie in Orange */
+.sosagt del{text-decoration-color:var(--orange);text-decoration-thickness:1.5px}
+.draw:hover{background:#b03f17}
+/* Zweite Fläche: weiß statt blau */
+.panel.blue{background:var(--blue);border:0}
+.panel.blue .sosagt li,.panel.blue .say button{border-bottom-color:rgba(34,46,102,.14)}
+
+/* Phrasen mit Trennlinien wie im Wortschatz */
+.say{gap:0}
+.say button{padding:10px 0;border-bottom:1px solid #ece7de;width:100%}
+.say button:first-child{padding-top:0}
+.say button:last-child{border-bottom:0;padding-bottom:0}
+
+/* Wortschatz-Gruppen nach Schritten */
+.vocab li.v-step{cursor:default;border-bottom:0;padding:10px 0 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink);display:flex;justify-content:space-between}
+.vocab li.v-step:first-child{padding-top:0}
+.vocab li.v-step:hover{background:none}
+.v-time{color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:0;font-weight:500}
+
+/* Beispielsatz für den Pitch */
+.vocab .bsp{flex-basis:100%;font-size:14px;color:var(--muted);padding-left:12px;border-left:2px solid var(--peach-line);margin-top:4px;line-height:1.4}
+
+
+.v-actions{display:flex;gap:16px;flex-wrap:wrap}
+.v-actions{padding-top:4px}
+.v-msg{font-size:13px;color:var(--muted);margin-top:-4px}
+.v-msg:empty{display:none}
+
+/* Blaue Fläche: Graphit statt Rost */
+.panel.blue .label,.panel.blue .q li::before{color:#33363a}
+.panel.blue .sosagt del{text-decoration-color:#33363a;text-decoration-thickness:1px}
+
+/* Plan als Rückgrat */
+.plan.panel{background:var(--white);border:1px solid #ece7de}
+.pitch{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.pitch > li.st{display:flex;flex-direction:column;gap:8px;padding:20px 0;border-bottom:1px solid #ece7de}
+.pitch > li.st:first-child{padding-top:4px}
+.pitch > li.st:last-child{border-bottom:0;padding-bottom:4px}
+.st-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.st-head b{font-size:17px;font-weight:600;color:var(--ink)}
+.st-head .time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.st-say{color:var(--ink)}
+.st-note{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;font-size:14px;color:var(--ink);background:#f6f3ee;border-radius:4px;padding:8px 10px}
+.st-note span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);padding-top:2px}
+.st-note a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--blue-line)}
+.st .vocab{margin-top:4px}
+.st .vocab li{border-bottom-color:#ece7de}
+.st .vocab li:last-child{border-bottom:0}
+.st .vocab .bsp{border-left-color:var(--blue-line)}
+@media (max-width:560px){.st-note{grid-template-columns:minmax(0,1fr);gap:2px}}
+
+/* Plan: Zeitleiste links, klare Ebenen */
+.pitch > li.st{display:grid;grid-template-columns:58px minmax(0,1fr);gap:0 18px;padding:0;border:0;position:relative}
+.pitch > li.st::before{content:"";position:absolute;left:28px;top:30px;bottom:0;width:1px;background:#e4ded3}
+.pitch > li.st:last-child::before{display:none}
+.st-time{position:relative;z-index:1;align-self:start;justify-self:start;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--blue);border-radius:4px;padding:4px 8px;margin-top:1px}
+.st-body{display:flex;flex-direction:column;gap:10px;padding-bottom:32px;min-width:0}
+.pitch > li.st:last-child .st-body{padding-bottom:4px}
+.st-body h4{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.st-say{font-size:15px;color:var(--ink);margin-top:-4px}
+.st-lab{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);margin-top:6px}
+.st-prep{background:#f6f3ee;border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.st-prep .st-lab{margin:0 0 2px}
+.st-prep p{margin:0;font-size:14px;color:var(--ink);padding-left:22px;position:relative;line-height:1.45}
+.pr-q::before{content:"?";position:absolute;left:0;top:0;width:15px;height:15px;border-radius:50%;background:var(--white);border:1px solid #d9d2c4;font-size:10px;font-weight:700;display:grid;place-items:center;line-height:1;top:2px}
+.pr-v::before{content:"";position:absolute;left:3px;top:5px;border-left:9px solid var(--orange-btn);border-top:5.5px solid transparent;border-bottom:5.5px solid transparent}
+.pr-v a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--blue-line)}
+.st-body .st-lab + .vocab{margin-top:-6px}
+.st .vocab li{padding:8px 0}
+.st .vocab li:first-child{padding-top:2px}
+.st-body .q{gap:6px}
+@media (max-width:560px){
+ .pitch > li.st{grid-template-columns:minmax(0,1fr);gap:6px}
+ .pitch > li.st::before{display:none}
+ .st-body{padding-bottom:24px;border-bottom:1px solid #ece7de;margin-bottom:18px}
+ .pitch > li.st:last-child .st-body{border-bottom:0;margin-bottom:0}
+ .st .vocab li{flex-direction:column;flex-wrap:nowrap;gap:1px}
+ .st .vocab .ru{text-align:left;flex:none}
+ .st .vocab .bsp{margin-top:6px;flex-basis:auto}
+}
+
+/* Mobil: Chips scrollen, größere Tippflächen, feste Leiste unten */
+.mbar{display:none}
+@media (max-width:560px){
+ .chips{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px;padding:0 14px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .chips::-webkit-scrollbar{display:none}
+ .chip{flex:none;min-height:32px;padding:5px 10px;font-size:13px}
+ .v-actions{flex-direction:column;gap:8px}
+ .v-actions .copy-all{width:100%;min-height:44px;border:1px solid var(--blue-line);border-radius:6px;text-decoration:none;text-align:center}
+ .st .vocab li{min-height:44px}
+ .mbar:not([hidden]){display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(247,244,239,.96);border-top:1px solid #e4ded3;backdrop-filter:blur(6px)}
+ .mbar button{min-height:46px;border-radius:6px;font-size:15px;font-weight:600}
+ .mbar-draw{flex:1;background:var(--orange-btn);color:#fff;border:0}
+ .mbar-pdf{background:transparent;border:1px solid var(--ink);color:var(--ink);padding:0 18px}
+ body.has-mbar .wrap{padding-bottom:96px}
+}
+
+/* PDF: alles weiß */
+body.pdf-mode .panel,body.pdf-mode .plan,body.pdf-mode .video{background:#fff!important;border-color:#fff!important}
+
+/* PDF */
+.pdf-row{flex-direction:column;align-items:flex-start}
+.pdf-hint{font-size:13px;color:var(--muted);max-width:52ch}
+.pdf-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:6px 0 0}
+.pdf-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--ink);color:var(--ink);border-radius:6px;padding:10px 16px;font-size:15px;font-weight:500}
+.pdf-btn:hover{background:rgba(34,46,102,.06)}
+.pdf-btn:disabled{opacity:.6;cursor:default}
+.pdf-btn svg{width:18px;height:18px}
+.pdf-msg{font-size:13px;color:var(--muted)}
+@media print{
+ .top,.deck,.pick,.pdf-row,.video .v-thumb{display:none!important}
+ body{background:#fff}
+ .panel,.plan{break-inside:auto;border:1px solid #ddd}
+ .block{break-inside:avoid}
+}
+
+/* Mobil */
+@media (max-width:560px){
+ .wrap{padding:20px 14px 40px;gap:18px}
+ h1{font-size:26px}
+ .how{gap:8px}
+ .how li{padding:12px 14px}
+ .how li{display:grid;grid-template-columns:56px minmax(0,1fr);column-gap:14px;align-items:center}
+ .how .ill{width:56px;height:41px;margin:0;grid-row:span 2}
+ .how b{line-height:1.3}
+ .deck{gap:18px;padding:16px 16px 16px 20px}
+ .stack{transform:scale(.85);margin:0 4px 0 6px}
+ .draw{padding:10px 14px}
+ .plan{padding:18px 16px}
+ .panel{padding:20px 16px;gap:22px}
+ .card h2{font-size:22px}
+ .steps li{gap:10px}
+ .chips{gap:6px}
+ .chip{padding:5px 9px}
+ .label-row{flex-wrap:wrap}
+ .pdf-btn{width:100%;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Mobil: proportionale Typo- und Größenskala (14 Text · 13 Neben · 10 Label · 16 Schritt · 20 Thema · 24 Titel) */
+@media (max-width:560px){
+ body{font-size:14px;line-height:1.45}
+ .wrap{padding:18px 14px 32px;gap:16px}
+ .top{gap:16px}
+ h1{font-size:24px}
+ .how li{padding:10px 12px;column-gap:12px}
+ .how .ill{width:46px;height:34px}
+ .how b{font-size:14px}
+ .how span{font-size:12px}
+ .pick{gap:12px}
+ .pick-in{gap:8px}
+ .pick-label{font-size:14px}
+ .chip{font-size:12px;min-height:30px;padding:4px 9px}
+ .deck{gap:14px;padding:12px 14px}
+ .stack{transform:scale(.7);margin:-8px -4px -8px 0}
+ .deck-txt{gap:8px}
+ .deck-txt p{font-size:12px}
+ .draw{font-size:14px;padding:9px 14px;min-height:40px;gap:6px}
+ .draw svg{width:16px;height:16px}
+ .panel{padding:16px 14px;gap:18px}
+ .card h2{font-size:20px}
+ .card .worum{font-size:14px;line-height:1.5}
+ .label{font-size:10px}
+ .video{flex-direction:row;align-items:center;gap:10px;padding:8px}
+ .v-thumb{width:96px}
+ .v-play{transform:scale(.7)}
+ .v-title{font-size:14px}
+ .v-src,.v-kicker{font-size:11px}
+ .st-time{font-size:12px;padding:3px 7px}
+ .st-body{gap:8px}
+ .st-body h4{font-size:16px}
+ .st-say{font-size:14px}
+ .st-lab{font-size:10px}
+ .st-prep{padding:10px 12px}
+ .st-prep p{font-size:13px}
+ .st .vocab li{min-height:0;padding:7px 0}
+ .vocab .de,.say .de{font-size:14px}
+ .vocab .ru,.say .ru{font-size:12px}
+ .vocab .bsp{font-size:13px}
+ .q li{font-size:14px}
+ .sosagt .richtig,.sosagt del{font-size:14px}
+ .sosagt .warum,.fehler-sub{font-size:12px}
+ .v-actions .copy-all{min-height:40px;font-size:13px}
+ .mbar:not([hidden]){padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px))}
+ .mbar button{min-height:42px;font-size:14px}
+ body.has-mbar .wrap{padding-bottom:80px}
+}
+
+
+/* Lesegröße: größere Grundschrift für Desktop und Mobil */
+body{font-size:17px;line-height:1.5}
+h1{font-size:34px}
+.how b{font-size:17px}
+.how span{font-size:15px}
+.pick-label{font-size:17px}
+.chip{font-size:15px;padding:6px 12px}
+.deck-txt p{font-size:15px}
+.draw{font-size:17px;padding:12px 20px}
+.card h2{font-size:28px}
+.card .worum{font-size:17px;line-height:1.55}
+.label{font-size:12px}
+.v-title{font-size:17px}
+.v-src{font-size:14px}
+.v-kicker{font-size:12px}
+.st-time{font-size:14px}
+.st-body h4{font-size:21px}
+.st-say{font-size:17px}
+.st-lab{font-size:12px}
+.st-prep p{font-size:16px}
+.vocab .de,.say .de{font-size:17px}
+.vocab .ru,.say .ru{font-size:15px}
+.vocab .bsp{font-size:15px}
+.q li{font-size:17px}
+.sosagt .richtig,.sosagt del{font-size:17px}
+.sosagt .warum,.fehler-sub{font-size:15px}
+.copy-all{font-size:15px}
+.pdf-btn{font-size:17px;padding:12px 18px}
+.pdf-hint{font-size:15px}
+@media (max-width:560px){
+ body{font-size:16px}
+ h1{font-size:28px}
+ .how b{font-size:16px}
+ .how span{font-size:14px}
+ .how .ill{width:52px;height:38px}
+ .pick-label{font-size:16px}
+ .chip{font-size:14px;min-height:36px;padding:6px 11px}
+ .deck-txt p{font-size:14px}
+ .draw{font-size:16px;min-height:46px;padding:10px 16px}
+ .draw svg{width:18px;height:18px}
+ .stack{transform:scale(.8)}
+ .card h2{font-size:23px}
+ .card .worum{font-size:16px}
+ .label{font-size:11px}
+ .v-title{font-size:15px}
+ .v-src,.v-kicker{font-size:12px}
+ .v-thumb{width:110px}
+ .st-time{font-size:13px}
+ .st-body h4{font-size:19px}
+ .st-say{font-size:16px}
+ .st-lab{font-size:11px}
+ .st-prep p{font-size:15px}
+ .vocab .de,.say .de{font-size:16px}
+ .vocab .ru,.say .ru{font-size:14px}
+ .vocab .bsp{font-size:15px}
+ .q li{font-size:16px}
+ .sosagt .richtig,.sosagt del{font-size:16px}
+ .sosagt .warum,.fehler-sub{font-size:14px}
+ .v-actions .copy-all{font-size:15px;min-height:44px}
+ .pdf-btn{font-size:16px;min-height:48px}
+ .pdf-hint{font-size:14px}
+}
+
+/* Feinschliff Desktop: kompaktere Schritte und Deck */
+.how li{padding:16px 18px}
+.how .ill{margin-bottom:6px}
+.deck{padding:16px 24px;align-items:center}
+.deck-meta{margin-left:auto;text-align:right;font-size:14px;color:var(--muted);line-height:1.5}
+.deck-meta b{font-size:20px;color:var(--ink);font-weight:600;margin-right:4px}
+.deck{gap:36px}
+.stack{margin-left:6px}
+@media (max-width:560px){.deck{gap:24px;padding:14px 16px}.stack{margin:0 4px 0 6px;transform:scale(.8);transform-origin:center}.deck-meta{display:none}.how li{padding:10px 12px}.how .ill{margin-bottom:0}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <header class="head">
+      <h1>Pitch-Runde</h1>
+      <ol class="how" aria-label="So läuft die Pitch-Runde">
+        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh1" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4a94"/><stop offset="1" stop-color="#222e66"/></linearGradient><linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1fb"/><stop offset="1" stop-color="#d6def2"/></linearGradient></defs><rect x="22" y="6" width="50" height="34" rx="6" fill="url(#g1b)"/><rect x="16" y="13" width="56" height="36" rx="6" fill="url(#g1)"/><g filter="url(#sh1)"><rect x="8" y="22" width="60" height="36" rx="6" fill="#ffffff"/></g><rect x="15" y="29" width="18" height="6" rx="3" fill="#fc6526"/><rect x="15" y="40" width="40" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="15" y="47" width="28" height="3.5" rx="1.75" fill="#d6def2"/><circle cx="60" cy="32" r="3" fill="#d6def2"/></svg><b>Thema ziehen</b><span>Bereich wählen, Karte ziehen.</span></li>
+        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#ff9a5c"/><stop offset="1" stop-color="#fc6526"/></linearGradient></defs><g transform="translate(40 32) scale(.8) translate(-43 -31)"><g filter="url(#sh2)"><rect x="3" y="3" width="80" height="56" rx="7" fill="#ffffff"/></g><rect x="10.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.45"/><rect x="19.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.45"/><rect x="28.8" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.6"/><rect x="38.2" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.6"/><rect x="47.6" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.75"/><rect x="57.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.75"/><rect x="66.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.9"/><rect x="10.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="0.9"/><rect x="19.4" y="19.4" width="7.4" height="7.4" rx="2" fill="#fc6526" opacity="1"/><rect x="28.8" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="38.2" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="47.6" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="57.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="66.9" y="19.9" width="6.4" height="6.4" rx="1.8" fill="#ffffff" stroke="#222e66" stroke-width="1.2"/><rect x="10" y="36" width="66" height="4" rx="2" fill="#d6def2"/><rect x="10" y="36" width="42" height="4" rx="2" fill="url(#g2)"/><rect x="10" y="46" width="22" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="62" y="46" width="14" height="3.5" rx="1.75" fill="#d6def2"/></g></svg><b>2 Wochen vorbereiten</b><span>Recherchieren, Phrasen lernen.</span></li>
+        <li><svg class="ill" viewBox="0 0 88 64" aria-hidden="true"><defs><filter id="sh3" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb07f"/><stop offset="1" stop-color="#fc6526"/></linearGradient></defs><g filter="url(#sh3)"><circle cx="26" cy="32" r="24" fill="#ffffff"/></g><circle cx="26" cy="32" r="17" fill="none" stroke="#d6def2" stroke-width="5"/><circle cx="26" cy="32" r="17" fill="none" stroke="url(#g3)" stroke-width="5" stroke-linecap="round" stroke-dasharray="66.2 106.8" transform="rotate(-90 26 32)"/><text x="26" y="35.5" text-anchor="middle" font-family="Geist,Helvetica,Arial,sans-serif" font-size="10" font-weight="600" fill="#222e66">5:00</text><rect x="52" y="28.0" width="2.8" height="8" rx="1.4" fill="#fc6526" opacity="1"/><rect x="57" y="24.0" width="2.8" height="16" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="62" y="20.0" width="2.8" height="24" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="67" y="26.0" width="2.8" height="12" rx="1.4" fill="#fc6526" opacity="1"/><rect x="72" y="22.0" width="2.8" height="20" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="77" y="27.0" width="2.8" height="10" rx="1.4" fill="#222e66" opacity="0.9"/><rect x="82" y="29.0" width="2.8" height="6" rx="1.4" fill="#fc6526" opacity="1"/></svg><b>Max. 5 Minuten pitchen</b><span>Vor der Gruppe, dann eine Frage.</span></li>
+      </ol>
+    </header>
+
+    <section class="pick" aria-labelledby="pickH">
+      <div class="pick-in">
+        <p class="pick-label" id="pickH">Bereich wählen oder alles dem Zufall überlassen.</p>
+        <div class="chips" id="chips" role="group" aria-label="Bereich"></div>
+      </div>
+      <div class="deck">
+        <div class="stack" aria-hidden="true"><i></i><i></i><i><b class="s-tag"></b><b class="s-l1"></b><b class="s-l2"></b><b class="s-l3"></b><b class="s-l4"></b></i></div>
+        <div class="deck-txt">
+          <p id="deckHint">Deine Karte liegt noch verdeckt.</p>
+          <button class="draw" id="drawBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg><span id="drawLbl">Thema ziehen</span></button>
+        </div>
+        <p class="deck-meta" id="deckMeta"></p>
+      </div>
+    </section>
+  </div>
+
+  <article class="card" id="card" aria-live="polite" hidden>
+    <div class="panel peach">
+      <div class="card-head">
+        <h2 id="title"></h2>
+        <p class="worum" id="worum"></p>
+      </div>
+
+      <a class="video" id="video" target="_blank" rel="noopener" hidden>
+        <span class="v-thumb"><img id="vThumb" alt="" loading="lazy"><span class="v-play" aria-hidden="true"></span></span>
+        <span class="v-txt"><span class="v-kicker">Video zum Thema</span><span class="v-title" id="vTitle"></span><span class="v-src" id="vSrc"></span></span>
+      </a>
+
+    </div>
+
+    <section class="panel plan" id="plan">
+      <h3 class="label">So baust du deine 5 Minuten</h3>
+      <ol class="pitch" id="steps"></ol>
+      <div class="v-actions"><button class="copy-all" type="button" id="copyVocab">Alle Wendungen kopieren</button><button class="copy-all" type="button" id="cardsVocab">Als Lernkarten speichern</button></div>
+      <p class="v-msg" id="vMsg" aria-live="polite"></p>
+    </section>
+
+    <div class="panel blue">
+      <section class="block">
+        <h3 class="label">So reden Deutsche darüber</h3>
+        <div class="say" id="say"></div>
+      </section>
+
+      <section class="block">
+        <h3 class="label">So sagt man's</h3>
+        <p class="fehler-sub">Typische Fehler, wenn man auf Russisch denkt.</p>
+        <ul class="sosagt" id="fehler"></ul>
+      </section>
+    </div>
+    <div class="pdf-row">
+      <button class="pdf-btn" type="button" id="pdfBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Als PDF herunterladen</button>
+      <span class="pdf-msg" id="pdfMsg" aria-live="polite"></span>
+      <p class="pdf-hint">Lade die Karte als PDF herunter, damit dein Material nicht verloren geht. Beim nächsten Ziehen ist sie weg.</p>
+    </div>
+  </article>
+</div>
+
+<script>
+const R={
+ aktuell:"Aktuell",
+ promi:"Promis & TV",
+ hamburg:"Stadtgespräch Hamburg",
+ kneipe:"Kneipengespräch",
+ typisch:"Typisch deutsch",
+ geschichte:"Geschichte, die jeder kennt",
+ kultur:"Kultur & Pop",
+ feste:"Feste & Feiertage"
+};
+
+const T=[
+/* ---------- NEU: GERADE IN DEN NACHRICHTEN (Stand 8. Oktober 2026) ---------- */
+{"r":"aktuell","t":"Rekordpreise beim Tanken und Heizen","w":"Seit dem Krieg gegen den Iran Ende Februar 2026 ist die Straße von Hormus blockiert, Öl kostet rund 100 Dollar pro Barrel. Mitte September hat ein Liter E10 im Schnitt 2,27 Euro gekostet, so viel wie nie, und die Inflation ist im September auf 3,3 Prozent gestiegen. Seit 1. Oktober gibt es bis Ende Dezember einen Tankrabatt von rund 17 Cent pro Liter.","q":["Was kostet ein Liter E10 gerade bei dir in der Nähe?","Warum ist Öl seit Februar 2026 so teuer?","Was wollen SPD und Wirtschaftsministerin Reiche gegen die Preise tun?","Wie haben sich die Spritpreise in deinem Herkunftsland entwickelt?"],"v":[["an der Tankstelle stehen","стоять на заправке"],["sich über etw. (Akk) ärgern","злиться из-за чего-то"],["im Schnitt kosten","стоить в среднем"],["auf ... Prozent steigen","вырасти до ... процентов"],["einen Preisdeckel fordern","требовать потолка цен"],["etw. an die Kunden weitergeben","передавать что-то покупателям"]],"s":[["Tanken ist echt kaum noch bezahlbar.","Заправляться стало реально почти не по карману."],["Ich hab gestern fast 100 Euro für eine Tankfüllung bezahlt.","Я вчера отдал(а) почти 100 евро за полный бак."],["Die Heizölpreise sind ja total explodiert.","Цены на печное топливо просто взлетели."],["Kommt der Tankrabatt überhaupt bei uns an?","А скидка на бензин вообще до нас доходит?"],["Ich fahr jetzt öfter mit dem Rad oder mit der Bahn.","Теперь я чаще езжу на велосипеде или на поезде."]],"a":[["Einstieg","Erzähl kurz, wann du zuletzt getankt hast und was es gekostet hat."],["Fakten","Nenn die Rekordpreise, die Inflation und den Grund: die Blockade der Straße von Hormus."],["Reaktionen","Erklär den Tankrabatt und den Streit über einen Preisdeckel."],["Vergleich","Vergleich die Preise mit deinem Herkunftsland und sag, was du selbst denkst."],["Frage","Eine Frage an die Runde."]],"d":["Habt ihr wegen der Preise etwas in eurem Alltag geändert?","Findet ihr einen Preisdeckel wie in Belgien sinnvoll oder eher nicht?","Wie heizt ihr eure Wohnung, und merkt ihr die Preise?"],"f":["Die Inflation ist um 3,3 Prozent gestiegen.","Die Inflation ist auf 3,3 Prozent gestiegen.","auf = до какого уровня (итог), um = на сколько (разница). Инфляция выросла ДО 3,3 %."]},
+{"r":"aktuell","t":"Wackelt die Regierung Merz?","w":"Nach schweren CDU-Niederlagen bei den Landtagswahlen im September steht Kanzler Friedrich Merz unter großem Druck, in Mecklenburg-Vorpommern hat die CDU nur 4,9 Prozent bekommen. Union und SPD streiten über Rente, Pflege, Steuern und den Haushalt 2027. Am 7. Oktober hat der Koalitionsausschuss rund vier Stunden getagt, ohne Einigungen zu verkünden, und Merz will das Reformpaket jetzt erst bis Frühjahr 2027 umsetzen.","q":["Welches Thema aus der Bundespolitik betrifft dich persönlich?","Wie hat die CDU bei den Landtagswahlen im September abgeschnitten?","Worüber streiten Union und SPD gerade genau?","Was passiert in deinem Herkunftsland, wenn eine Regierung Wahlen verliert?"],"v":[["jdn. persönlich betreffen","касаться кого-то лично"],["sich für Politik interessieren","интересоваться политикой"],["an der Fünf-Prozent-Hürde scheitern","не преодолеть пятипроцентный барьер"],["unter Druck stehen","быть под давлением"],["sich über etw. (Akk) streiten","спорить о чём-то"],["sich auf etw. (Akk) einigen","договориться о чём-то"]],"s":[["Die Stimmung in der Koalition ist gerade ziemlich schlecht.","Настроение в коалиции сейчас довольно плохое."],["Die streiten sich ja ständig über die Rente.","Они же постоянно спорят из-за пенсии."],["Ob Merz das durchhält, weiß gerade keiner.","Выдержит ли Мерц, сейчас никто не знает."],["In Mecklenburg-Vorpommern hat die CDU richtig schlecht abgeschnitten.","В Мекленбурге - Передней Померании ХДС выступил очень плохо."],["Am Ende geht's halt ums Geld, also um den Haushalt.","В конце концов всё упирается в деньги, то есть в бюджет."]],"a":[["Einstieg","Sag, welches Thema dich persönlich betrifft: Rente, Pflege oder Steuern."],["Fakten","Erzähl von den Landtagswahlen im September und den schlechten Umfragewerten der Union."],["Streitpunkte","Erklär, worüber Union und SPD streiten und was beim Koalitionsausschuss passiert ist."],["Vergleich","Vergleich das mit deinem Herkunftsland und sag, ob die Koalition umsteuern sollte."],["Frage","Eine Frage an die Runde."]],"d":["Welche Themen sollte die Regierung eurer Meinung nach zuerst angehen?","Sollte eine Regierung nach Wahlniederlagen ihren Kurs ändern oder dabei bleiben?","Wie informiert ihr euch über deutsche Politik?"],"f":["Merz steht unter großen Druck.","Merz steht unter großem Druck.","unter + Dativ (где?): unter großem Druck stehen - находиться под сильным давлением."]},
+{"r":"aktuell","t":"AfD-Rekord in Sachsen-Anhalt","w":"Bei der Landtagswahl in Sachsen-Anhalt am 6. September 2026 hat die AfD 43,8 Prozent bekommen, die CDU 17,2 Prozent. Der AfD fehlen drei Sitze zur absoluten Mehrheit, und am 6. Oktober ist mit Tobias Rausch zum ersten Mal ein AfD-Politiker Landtagspräsident geworden. Spitzenkandidat Ulrich Siegmund will sich im Dezember zum Ministerpräsidenten wählen lassen.","q":["Was weißt du schon über Sachsen-Anhalt?","Wie viele Sitze haben die Parteien im Landtag von Sachsen-Anhalt?","Wie reagieren CDU und BSW auf Siegmunds Plan?","Was bedeutet der Begriff 'Brandmauer' in der deutschen Politik?"],"v":[["schon mal in ... gewesen sein","уже бывать где-то"],["etw. in den Nachrichten hören","услышать что-то в новостях"],["stärkste Kraft werden","стать самой сильной партией"],["jdm. fehlen (zu etw.)","кому-то не хватает (до чего-то)"],["sich zur Wahl stellen","баллотироваться, выставить свою кандидатуру"],["sich (der Stimme) enthalten","воздержаться (при голосовании)"]],"s":[["Über das Ergebnis in Sachsen-Anhalt reden gerade alle.","О результатах в Саксонии-Анхальт сейчас говорят все."],["Die AfD ist dort mit Abstand stärkste Kraft geworden.","АдГ стала там самой сильной партией с большим отрывом."],["Spannend wird's im Dezember, wenn der Ministerpräsident gewählt wird.","Самое интересное будет в декабре, когда будут выбирать премьер-министра земли."],["Das BSW will keine Koalition mit der AfD, sich aber enthalten.","БСВ не хочет коалиции с АдГ, но собирается воздержаться."],["Dazu hört man ganz unterschiedliche Meinungen.","На этот счёт можно услышать совершенно разные мнения."]],"a":[["Einstieg","Sag, ob du schon mal in Sachsen-Anhalt warst oder was du darüber weißt."],["Fakten","Nenn die Ergebnisse, die Sitzverteilung und wer jetzt Landtagspräsident ist."],["Ausblick","Erklär, was im Dezember passieren kann und warum das BSW wichtig ist."],["Debatte","Erklär die Debatte um die Brandmauer und frag die Gruppe nach ihrer Meinung."],["Frage","Eine Frage an die Runde."]],"d":["Wie sollten die anderen Parteien eurer Meinung nach mit einer so starken AfD umgehen?","Warum wählen Ost- und Westdeutschland oft so unterschiedlich, was meint ihr?","Wie wird in euren Familien oder bei Freunden über diese Wahl gesprochen?"],"f":["Die AfD hat stärkste Kraft geworden.","Die AfD ist stärkste Kraft geworden.","werden образует Perfekt с sein: ist geworden."]},
+{"r":"aktuell","t":"Ex-BND-Chef unter Spionageverdacht","w":"Der frühere BND-Präsident August Hanning (80) ist am 6. Oktober 2026 festgenommen worden und sitzt seit dem 7. Oktober in Untersuchungshaft. Er steht unter Verdacht, seit etwa 2010 von seinem früheren Büroleiter fast 2.000 interne BND-Dokumente bekommen und für seine Arbeit als Berater genutzt zu haben. Sein Anwalt sagt, Hanning habe Deutschland nicht geschadet, und bis zu einem Urteil gilt die Unschuldsvermutung.","q":["Was macht der BND eigentlich?","Was wirft die Bundesanwaltschaft Hanning genau vor?","Was sagt Hannings Anwalt, und was fordern Politiker jetzt?","Gibt es in deinem Herkunftsland Regeln für ehemalige Geheimdienstchefs?"],"v":[["wie im Film","как в кино"],["beim BND arbeiten","работать в БНД"],["unter Verdacht stehen","находиться под подозрением"],["in Untersuchungshaft sitzen","сидеть под стражей до суда"],["die Vorwürfe zurückweisen","отвергать обвинения"],["Konsequenzen fordern","требовать последствий"]],"s":[["Das klingt ja wie ein Krimi.","Это звучит прямо как детектив."],["Er steht unter Verdacht, geheime Dokumente bekommen zu haben.","Его подозревают в том, что он получал секретные документы."],["Bewiesen ist aber noch nichts, es gilt die Unschuldsvermutung.","Но пока ничего не доказано, действует презумпция невиновности."],["Sein Anwalt sagt, er wird zu Unrecht verfolgt.","Его адвокат говорит, что его преследуют несправедливо."],["Jetzt wird diskutiert, ob Ex-Geheimdienstchefs als Berater arbeiten dürfen.","Теперь обсуждают, можно ли бывшим главам спецслужб работать консультантами."]],"a":[["Einstieg","Fang mit einer Frage an: Wer guckt gern Spionagefilme?"],["Fakten","Erzähl, was Hanning vorgeworfen wird, und sag klar: Es ist ein Verdacht."],["Reaktionen","Sag, was sein Anwalt sagt und was Politiker jetzt fordern."],["Meinung","Sag, ob Ex-Geheimdienstchefs Berater werden dürfen, und vergleich mit deinem Land."],["Frage","Eine Frage an die Runde."]],"d":["Sollen Ex-Geheimdienstchefs nach dem Ruhestand als bezahlte Berater arbeiten dürfen?","Wie wird in eurem Herkunftsland über Geheimdienste gesprochen?","Warum interessieren sich so viele Leute für Spionagegeschichten, was meint ihr?"],"f":["Er ist verdächtig für Spionage.","Er steht unter Spionageverdacht.","По-русски 'подозревается в', по-немецки: unter Verdacht stehen или 'wird verdächtigt'."]},
+{"r":"promi","t":"Jauch und die 3-Millionen-Woche","w":"RTL zeigt vom 5. bis 8. Oktober 2026 eine Sonderwoche von „Wer wird Millionär?“ mit Günther Jauch. Die Kandidaten spielten nach Alter getrennt: junge Erwachsene, Leute ab 30 und Rentner. Wer mindestens 16.000 Euro gewonnen hat, spielt am 8. Oktober im Finale um bis zu 3 Millionen Euro.","q":["Was ist bei dieser Sonderwoche anders als sonst?","Wer durfte ins Finale, und wann läuft es?","Welcher Abend hatte die besten Quoten?","Was bietet Jauch den Kandidaten im Finale an?"],"v":[["eine Sendung gucken","смотреть передачу"],["um viel Geld spielen","играть на большие деньги"],["nach Alter getrennt sein","быть разделёнными по возрасту"],["ins Finale kommen","выйти в финал"],["vor dem Fernseher sitzen","сидеть перед телевизором"],["gute Quoten haben","иметь хорошие рейтинги"]],"s":[["Hast du gestern Jauch geguckt?","Ты вчера смотрел(а) Яуха?"],["Diesmal geht's um 3 Millionen, nicht nur um eine.","На этот раз речь о трёх миллионах, а не об одном."],["Die Rentner waren echt der Hammer.","Пенсионеры были просто супер."],["Ich hätte das Geld sofort genommen.","Я бы сразу забрал(а) деньги."],["Das Finale am Donnerstag hab ich auf jeden Fall geguckt.","Финал в четверг я посмотрела обязательно."]],"a":[["Einstieg","Erzähl, dass bei Jauch diese Woche um 3 Millionen gespielt wurde."],["Fakten","Erklär kurz den Ablauf: drei Altersgruppen, dann das Finale am Donnerstag."],["Reaktionen","Erzähl, wie viele zugeguckt haben und dass der Rentner-Abend stark war."],["Meinung","Sag ehrlich: Würdest du das sichere Geld nehmen oder alles riskieren?"],["Frage","Eine Frage an die Runde."]],"d":["Würdet ihr im Finale das sichere Geld nehmen oder weiterspielen?","Gibt es in euren Herkunftsländern auch so eine Quizshow, und guckt ihr die?","Warum waren gerade die Rentner bei den Jüngeren so beliebt, was meint ihr?"],"f":["Wenn ich wäre Kandidat, ich würde das Geld nehmen.","Wenn ich Kandidat wäre, würde ich das Geld nehmen.","В придаточном с wenn глагол уходит в конец, а главное предложение после него начинается с глагола (würde)."]},
+{"r":"promi","t":"Zverev wird die Nummer eins","w":"Alexander Zverev (29) hat 2026 die French Open und die US Open gewonnen, seine ersten zwei Grand-Slam-Titel. Weil Jannik Sinner am 6. Oktober seine Saison beendet hat, wird Zverev noch dieses Jahr die Nummer eins der Welt, frühestens nach dem Turnier in Wien (26. Oktober bis 1. November). Er wäre der erste Deutsche auf Platz eins seit Boris Becker.","q":["Welche Grand-Slam-Turniere hat Zverev 2026 gewonnen?","Gegen wen hat er das US-Open-Finale gewonnen, und wie ging es aus?","Was hat Sinner am 6. Oktober verkündet, und wie war der Punktestand?","Wann genau kann Zverev Platz eins übernehmen?"],"v":[["sich für Tennis interessieren","интересоваться теннисом"],["einen Titel holen","завоевать титул"],["ein Finale gewinnen","выиграть финал"],["einen Satz abgeben","отдать сет"],["die Saison beenden","завершить сезон"],["hinter jemandem zurückliegen","отставать от кого-то"]],"s":[["Hast du das Finale gegen Shelton gesehen?","Ты видел(а) финал против Шелтона?"],["Zverev hat endlich seinen ersten Grand Slam geholt, und dann gleich noch einen.","Зверев наконец взял первый турнир Большого шлема, а потом сразу ещё один."],["Sinner ist für diese Saison raus.","Синнер выбыл до конца сезона."],["Ein bisschen Glück ist da schon dabei, oder?","Тут всё-таки есть доля везения, да?"],["Seit Becker hat das kein Deutscher mehr geschafft.","Со времён Беккера этого не удавалось ни одному немцу."]],"a":[["Einstieg","Frag, wer Tennis guckt, und nenn Zverevs zwei große Titel."],["Fakten","Erzähl vom US-Open-Finale gegen Shelton und vom Ergebnis."],["Hintergrund","Erklär, dass Sinner die Saison beendet hat, und vergleich die Punkte."],["Meinung","Sag, ob Platz eins verdient ist, wenn der Rivale fehlt."],["Frage","Eine Frage an die Runde."]],"d":["Ist Platz eins für euch weniger wert, wenn der größte Rivale fehlt?","Wer ist in euren Herkunftsländern gerade ein großer Sportstar?","Guckt ihr Tennis, oder ist euch Fußball lieber?"],"f":["Ich bin interessiert für Tennis.","Ich interessiere mich für Tennis.","«Интересоваться» по-немецки - возвратный глагол: sich interessieren für + Akk."]},
+{"r":"promi","t":"Promi Big Brother: Staffel 14","w":"Seit dem 5. Oktober 2026 zeigt Sat.1 die 14. Staffel von „Promi Big Brother“ mit Marlene Lufen und Jochen Schropp. 14 Prominente wohnen zusammen, zum Beispiel Ex-Boxer Axel Schulz und Sängerin Nadja Benaissa. Am ersten Abend guckten 1,26 Millionen Menschen zu, danach wurden es weniger.","q":["Wie funktioniert das Format, und wer moderiert?","Welche Prominenten sind diesmal dabei?","Wie haben sich die Einschaltquoten in der ersten Woche entwickelt?","Welche Regeln gibt es, und was passiert bei einem Regelbruch?"],"v":[["unter Beobachtung stehen","быть под наблюдением"],["eine Sendung moderieren","вести передачу"],["ins Haus einziehen","въехать в дом"],["mit dabei sein","участвовать, быть в составе"],["Zuschauer verlieren","терять зрителей"],["knapp vorne liegen","немного опережать"]],"s":[["Guckst du eigentlich Promi Big Brother?","Ты вообще смотришь «Promi Big Brother»?"],["Die Hälfte der Leute kenn ich gar nicht.","Половину людей я вообще не знаю."],["Das läuft bei mir halt so nebenbei.","У меня это так, фоном идёт."],["Wegen einer Teigtasche gab's gleich eine Strafe.","Из-за одного пирожка сразу наказание."],["Die Quoten sind schon ein bisschen runtergegangen.","Рейтинги уже немного упали."]],"a":[["Einstieg","Erklär kurz das Format: Prominente wohnen zusammen, Kameras sind immer dabei."],["Fakten","Nenn zwei, drei bekannte Bewohner und sag, wann die Staffel gestartet ist."],["Reaktionen","Erzähl, wie die Quoten gesunken sind und wer am Dienstag vorne lag."],["Meinung","Sag deine Meinung: gute Unterhaltung oder einfach nur Trash?"],["Frage","Eine Frage an die Runde."]],"d":["Ist so ein Format für euch gute Unterhaltung oder eher Trash?","Gibt es in euren Herkunftsländern ähnliche Reality-Shows?","Würdet ihr selbst mit Kameras in einem Haus wohnen, und warum (nicht)?"],"f":["Die Show geht auf Sat.1.","Die Show läuft auf Sat.1.","«Идёт по телевизору» = laufen, а не gehen."]},
+{"r":"promi","t":"Babylon Berlin: Das große Finale","w":"Die fünfte und letzte Staffel von „Babylon Berlin“ ist seit dem 10. September 2026 in der ARD Mediathek, im Ersten lief sie am 19. und 25. September. Die acht Folgen spielen im Februar 1933, zwischen Hitlers Ernennung zum Reichskanzler und dem Reichstagsbrand. Beim Streaming war die Serie in Deutschland auf Platz eins.","q":["Wann und wo kann man die letzte Staffel sehen?","In welcher Zeit spielt die finale Staffel?","Wie erfolgreich ist die Serie in Deutschland und im Ausland?","Warum finden viele das Thema der Serie heute aktuell?"],"v":[["in der Mediathek gucken","смотреть в онлайн-медиатеке"],["eine Serie zu Ende gucken","досмотреть сериал"],["im Jahr 1933 spielen","происходить в 1933 году"],["um etwas gehen","речь идёт о чём-то"],["in viele Länder verkauft werden","продаваться во многие страны"],["auf Platz eins landen","оказаться на первом месте"]],"s":[["Hast du schon die letzte Staffel von Babylon Berlin gesehen?","Ты уже видел(а) последний сезон «Вавилона-Берлина»?"],["Ich hab alle acht Folgen an einem Wochenende weggeguckt.","Я посмотрел(а) все восемь серий за одни выходные."],["Am Ende wird's ziemlich düster.","В конце всё становится довольно мрачно."],["Die Ausstattung ist echt der Wahnsinn.","Декорации и костюмы просто невероятные."],["Schade, dass es jetzt vorbei ist.","Жаль, что всё закончилось."]],"a":[["Einstieg","Erzähl, ob du die Serie kennst und wo man sie gucken kann."],["Fakten","Erklär, dass die letzte Staffel im Februar 1933 spielt."],["Hintergrund","Nenn ein paar Zahlen: Start 2017, über 140 Länder, Platz eins."],["Meinung","Sag, ob das düstere Ende passt und ob das Thema heute aktuell ist."],["Frage","Eine Frage an die Runde."]],"d":["Hat euch das Ende gefallen, oder gab es zu viele Handlungsstränge?","Welche historische Serie aus euren Herkunftsländern würdet ihr empfehlen?","Warum ist eine Serie über 1933 gerade heute so erfolgreich, was meint ihr?"],"f":["Die Staffel hat acht Serien.","Die Staffel hat acht Folgen.","Русская «серия» = die Folge; die Serie = весь сериал."]},
+/* ---------- AKTUELL ---------- */
+{r:"aktuell",t:"Das WM-Aus gegen Paraguay",
+ w:"Bei der WM 2026 ist Deutschland schon im Sechzehntelfinale ausgeschieden, nach 1:1 nach Verlängerung und 3:4 im Elfmeterschießen gegen Paraguay. In Büros und Kneipen war das wochenlang Thema, und die Frage nach dem Bundestrainer auch.",
+ q:["Wie lief das Spiel gegen Paraguay genau ab?","Wer ist jetzt Bundestrainer und was ist mit Nagelsmann passiert?","Wer ist Weltmeister 2026 geworden?","Was haben die Zeitungen nach dem Aus geschrieben?"],
+ v:[["im Elfmeterschießen verlieren","проиграть по пенальти"],["aus dem Turnier ausscheiden","вылететь из турнира"],["eine bittere Niederlage","горькое поражение"],["den Bundestrainer entlassen","уволить тренера сборной"],["ein Tor schießen","забить гол"],["die Mannschaft anfeuern","поддерживать команду"]],
+ s:[["Das war echt peinlich.","Это было реально стыдно."],["Ich hab's kommen sehen.","Я так и знала."],["Die haben einfach keinen Plan.","У них просто нет плана."],["Mal sehen, ob das noch was wird.","Посмотрим, выйдет ли из этого что-то."],["Fußball ist für viele hier fast Religion.","Футбол для многих здесь почти религия."]],
+ a:[["Einstieg","Wo warst du, als das Spiel lief? Oder: Wer von euch hat es gesehen?"],["Fakten","Das Spiel und das Ergebnis in drei Sätzen."],["Reaktionen","Was Zeitungen und Leute danach gesagt haben."],["Meinung","Ist Fußball dir wichtig? Wie war das in deinem Herkunftsland?"],["Frage","Eine Frage an die Runde."]],
+ d:["Warum ist Fußball in Deutschland so wichtig?","Findet ihr Klopp als neuen Bundestrainer eine gute Wahl?","Schaut ihr Fußball mit deutschen Freunden oder Kollegen?"],
+ f:["Deutschland hat Paraguay verloren.","Deutschland hat gegen Paraguay verloren.","«проиграть кому-то» по-немецки только с gegen"],
+ h:["Abpfiff","Финальный свисток. Und: «Nach dem Abpfiff ist vor dem Anpfiff.»"]},
+
+{r:"aktuell",t:"Mieten in Hamburg",
+ w:"Hamburg gehört zu den Städten, in denen die Mieten gerade am schnellsten steigen. Fast jeder hat eine Geschichte von Besichtigungen mit 50 Leuten oder einer WG, die doppelt so viel kostet wie vor fünf Jahren.",
+ q:["Was kostet ein Quadratmeter Miete im Hamburger Durchschnitt?","Was ist die Mietpreisbremse und hilft sie?","In welchen Stadtteilen ist es am teuersten, wo noch bezahlbar?","Was ist ein WBS (Wohnberechtigungsschein)?"],
+ v:[["eine Wohnung besichtigen","смотреть квартиру"],["die Miete erhöhen","повышать аренду"],["die Kaution zahlen","платить залог"],["einen Mietvertrag unterschreiben","подписать договор аренды"],["auf Wohnungssuche sein","быть в поиске квартиры"],["sich die Miete kaum leisten können","едва тянуть аренду"]],
+ s:[["Die Wohnung kostet 1.200 warm.","Квартира стоит 1200 с коммуналкой."],["Da standen 40 Leute vor der Tür.","Там у двери стояло 40 человек."],["Man nimmt, was man kriegen kann.","Берёшь, что дают."],["Das ist doch Wahnsinn.","Это же безумие."],["Ich hab einfach Glück gehabt.","Мне просто повезло."]],
+ a:[["Einstieg","Deine eigene Wohnungssuche in einem Satz."],["Fakten","Zahlen: Was kostet Wohnen in Hamburg jetzt?"],["Hintergrund","Warum es so teuer ist und was die Stadt dagegen tut."],["Meinung","Was würdest du ändern?"],["Frage","Wie habt ihr eure Wohnung gefunden?"]],
+ d:["Wie habt ihr eure Wohnung gefunden?","Würdet ihr für eine günstige Wohnung an den Stadtrand ziehen?","Wie ist der Wohnungsmarkt in eurer Heimatstadt?"],
+ f:["Die Mieten sind teuer.","Die Mieten sind hoch.","Miete и Preise бывают hoch, teuer бывает сама квартира"]},
+
+{r:"aktuell",t:"Deutschlandticket: Lohnt es sich noch?",
+ w:"Seit Januar 2026 kostet das Deutschlandticket 63 Euro im Monat statt 58, ab Januar 2027 sollen es 66,80 Euro sein. Bund und Länder haben die Finanzierung bis 2030 gesichert, aber über den Preis wird weiter gestritten. Fast jeder in Hamburg hat eine Meinung dazu.",
+ q:["Wie viel hat das Ticket 2023 am Anfang gekostet?","Wie viele Menschen nutzen es?","Gibt es in Hamburg ein günstigeres Ticket für bestimmte Gruppen?","Was ist für 2027 geplant?"],
+ v:[["ein Abo abschließen","оформить подписку"],["das Abo kündigen","отменить подписку"],["mit den Öffis fahren","ездить на общественном транспорте"],["sich finanziell lohnen","финансово окупаться"],["den Preis erhöhen","повысить цену"],["im ganzen Land gelten","действовать по всей стране"]],
+ s:[["Für mich rechnet sich das noch.","Для меня это ещё окупается."],["Ich fahr eh jeden Tag.","Я и так езжу каждый день."],["Wenn's noch teurer wird, bin ich raus.","Если станет ещё дороже, я выхожу из игры."],["Hauptsache, die Bahn kommt.","Главное, чтобы поезд пришёл."],["Das war mal ein Super-Deal.","Когда-то это было супер-выгодно."]],
+ a:[["Einstieg","Wie bist du heute zum Treffen gekommen?"],["Fakten","Preisgeschichte: von 49 bis 63 Euro."],["Hintergrund","Wer bezahlt das und warum ist es umstritten?"],["Meinung","Lohnt es sich für dich?"],["Frage","Wer von euch hat das Ticket?"]],
+ d:["Wie viel würdet ihr maximal bezahlen?","Fahrt ihr mehr Bahn als in eurem Herkunftsland?","Was nervt euch am HVV und was ist gut?"],
+ f:["Ich habe das Abo abgesagt.","Ich habe das Abo gekündigt.","подписку и договор kündigen, а absagen встречу"]},
+
+{r:"aktuell",t:"Ausbildung oder Studium?",
+ w:"Immer mehr junge Leute in Deutschland entscheiden sich wieder für eine Ausbildung statt für die Uni. Handwerker werden gesucht, und manche Absolventen finden schwerer einen Job. Für viele Zugewanderte ist das deutsche Ausbildungssystem ein Rätsel.",
+ q:["Was ist eine duale Ausbildung und wie lange dauert sie?","Welche Berufe werden in Hamburg am meisten gesucht?","Was verdient ein Azubi ungefähr?","Kann man auch mit 30 oder 40 noch eine Ausbildung machen?"],
+ v:[["eine Ausbildung machen","проходить профобучение"],["ein Studium abschließen","окончить вуз"],["den Abschluss anerkennen lassen","признать диплом"],["sich um einen Ausbildungsplatz bewerben","подаваться на место ученика"],["eine Umschulung machen","переучиваться"],["händeringend Fachkräfte suchen","отчаянно искать специалистов"]],
+ s:[["Handwerk hat goldenen Boden.","Ремесло всегда прокормит."],["Mit einem Studium ist man nicht automatisch auf der sicheren Seite.","Диплом не гарантирует надёжности."],["Die suchen händeringend Leute.","Они отчаянно ищут людей."],["Mein Abschluss wird hier nicht anerkannt.","Мой диплом здесь не признают."],["Ich hab umgeschult.","Я переучилась."]],
+ a:[["Einstieg","Was wolltest du als Kind werden?"],["Fakten","Wie die Ausbildung in Deutschland funktioniert."],["Trend","Warum Ausbildung gerade wieder beliebter wird."],["Vergleich","Wie ist das bei dir zu Hause?"],["Frage","Wer von euch hat hier umgeschult?"]],
+ d:["Wurde euer Abschluss in Deutschland anerkannt?","Würdet ihr heute eine Ausbildung machen?","Welcher Beruf ist in Deutschland unterschätzt?"],
+ f:["Ich habe die Universität beendet.","Ich habe mein Studium abgeschlossen.","«окончить университет» по-немецки так"]},
+
+/* ---------- HAMBURG ---------- */
+{r:"hamburg",t:"Was wird aus dem Elbtower?",
+ w:"In der HafenCity sollte mit dem Elbtower Hamburgs höchstes Gebäude entstehen, geplant rund 245 Meter. Nach der Pleite der Signa-Gruppe von René Benko stoppte der Bau Ende 2023 bei etwa 100 Metern. Seitdem fragt sich die ganze Stadt, was aus der Bauruine wird.",
+ q:["Wie ist der aktuelle Stand beim Elbtower?","Wer will den Turm jetzt weiterbauen und was soll hinein?","Wer war René Benko und was ist mit Signa passiert?","Was sagen Hamburger dazu? Such einen Kommentar oder eine Umfrage."],
+ v:[["den Bau stoppen","остановить стройку"],["in die Insolvenz gehen","обанкротиться"],["einen Investor finden","найти инвестора"],["den Turm weiterbauen","достраивать башню"],["Geld in den Sand setzen","выбросить деньги на ветер"],["als Bauruine stehen bleiben","остаться недостроем"]],
+ s:[["Da steht jetzt so ein halber Turm.","Там теперь стоит полбашни."],["Typisch Großprojekt.","Типичный мегапроект."],["Das hätte man sich denken können.","Можно было догадаться."],["Die Stadt hat sich da verzockt.","Город на этом проигрался."],["Mal sehen, was daraus wird.","Посмотрим, что из этого выйдет."]],
+ a:[["Einstieg","Ein Foto vom Turm zeigen oder beschreiben."],["Geschichte","Plan, Pleite, Baustopp."],["Heute","Der aktuelle Stand."],["Meinung","Was würdest du daraus machen?"],["Frage","Braucht Hamburg überhaupt Hochhäuser?"]],
+ d:["Braucht Hamburg Hochhäuser?","Kennt ihr ähnliche Bauruinen aus eurer Heimat?","Was sollte in den Turm: Büros, Wohnungen, ein Museum?"],
+ f:["Die Firma ist bankrott gegangen.","Die Firma ist pleitegegangen.","в разговоре говорят pleitegehen, официально Insolvenz anmelden"]},
+
+{r:"hamburg",t:"Die Elbphilharmonie",
+ w:"Die Elphi wurde im Januar 2017 eröffnet, Jahre zu spät und viel teurer als geplant: Am Ende kostete sie die Stadt rund 866 Millionen Euro, geplant waren ursprünglich 77 Millionen. Heute ist sie das Wahrzeichen, auf das alle stolz sind.",
+ q:["Warum wurde der Bau so viel teurer?","Wie kommt man an Konzertkarten und was kosten sie?","Was ist die Plaza und kostet der Eintritt etwas?","Welche Konzerte laufen dort diesen Monat?"],
+ v:[["Karten ergattern","урвать билеты"],["auf die Plaza gehen","подняться на смотровую площадку"],["den Kostenrahmen sprengen","выйти за рамки бюджета"],["sofort ausverkauft sein","мгновенно распродаться"],["eine tolle Akustik haben","иметь отличную акустику"],["stolz sein auf","гордиться чем-то"]],
+ s:[["Karten kriegst du da nur mit Glück.","Билеты там достаются только с удачей."],["Der Blick von der Plaza ist der Hammer.","Вид с площадки обалденный."],["Erst haben alle gemeckert, jetzt sind alle stolz.","Сначала все ворчали, теперь все гордятся."],["Das war jeden Cent wert.","Это стоило каждого цента."],["Warst du schon drin?","Ты уже была внутри?"]],
+ a:[["Einstieg","Dein erster Besuch oder dein erster Blick auf das Gebäude."],["Geschichte","Plan, Kosten, Eröffnung."],["Heute","Was man dort machen kann, auch ohne Konzertkarte."],["Meinung","Hat sich das Geld gelohnt?"],["Frage","Wer war schon in einem Konzert?"]],
+ d:["Hat sich das Geld gelohnt?","Welches Gebäude ist das Wahrzeichen eurer Heimatstadt?","Geht ihr in klassische Konzerte?"],
+ f:["Der Bau kostete zehnmal teurer.","Der Bau war zehnmal so teuer wie geplant.","«в десять раз дороже» так"]},
+
+{r:"hamburg",t:"Was ist typisch Hamburg?",
+ w:"Moin zu jeder Uhrzeit, Franzbrötchen, Schietwetter und Menschen, die erst kühl wirken und dann sehr loyal sind. Hamburger lieben es, über ihre eigene Art zu reden, und freuen sich, wenn Zugezogene sie verstehen.",
+ q:["Woher kommt das Wort Moin?","Was bedeutet hanseatisch?","Was ist ein Franzbrötchen und wo gibt es das beste?","Welche Klischees über Hamburger gibt es in anderen Teilen Deutschlands?"],
+ v:[["Moin sagen","говорить «мойн»"],["sich an das Wetter gewöhnen","привыкнуть к погоде"],["ein Franzbrötchen holen","взять франц-булочку"],["zurückhaltend wirken","казаться сдержанным"],["erst mal warm werden","сначала освоиться, оттаять"],["bei Schietwetter rausgehen","выходить в мерзкую погоду"]],
+ s:[["Moin! Und mehr muss man nicht sagen.","Мойн! И больше ничего говорить не нужно."],["Hamburger muss man erst knacken.","Гамбуржцев сначала надо раскусить."],["Hier ist man nicht unfreundlich, nur direkt.","Здесь не грубые, просто прямые."],["Ohne Regenjacke geh ich nicht raus.","Без дождевика я не выхожу."],["Ich bin inzwischen halbe Hamburgerin.","Я уже наполовину гамбуржанка."]],
+ a:[["Einstieg","Dein erstes Moin oder dein erster Hamburger Moment."],["Typisch","Drei Dinge, die nur Hamburg hat."],["Menschen","Wie Hamburger sind, aus deiner Sicht."],["Meinung","Was du übernommen hast und was nie."],["Frage","Was ist für euch typisch Hamburg?"]],
+ d:["Was habt ihr von den Hamburgern übernommen?","Welches Klischee stimmt, welches nicht?","Was vermisst ihr hier aus eurer Heimat?"],
+ f:["Ich lebe in Hamburg schon vier Jahre.","Ich lebe schon seit vier Jahren in Hamburg.","срок с seit, а место ближе к концу"],
+ h:["Klönschnack","Неспешная болтовня. «Wir haben ein bisschen geklönt.»"]},
+
+{r:"hamburg",t:"Der Hamburger Hafen",
+ w:"Der Hafen ist das Herz der Stadt: der größte Hafen Deutschlands, Arbeitgeber für Zehntausende, Kulisse für Hafengeburtstag und Hafenrundfahrt. Gleichzeitig wird viel diskutiert, zum Beispiel über die Elbvertiefung und darüber, dass die Reederei MSC beim Hafenbetreiber HHLA eingestiegen ist.",
+ q:["Wie viele Container werden jährlich umgeschlagen?","Was war der Streit um MSC und die HHLA?","Was ist die Elbvertiefung und warum war sie umstritten?","Wann ist der nächste Hafengeburtstag?"],
+ v:[["eine Hafenrundfahrt machen","съездить на экскурсию по порту"],["mit der Fähre fahren","плыть на пароме"],["Container umschlagen","перегружать контейнеры"],["Arbeitsplätze schaffen","создавать рабочие места"],["die Elbe vertiefen","углублять Эльбу"],["am Wasser spazieren gehen","гулять у воды"]],
+ s:[["Ohne den Hafen wäre Hamburg nicht Hamburg.","Без порта Гамбург не был бы Гамбургом."],["Die großen Pötte kommen kaum noch rein.","Большие корабли еле заходят."],["Mit der Fähre 62 kriegst du die Hafenrundfahrt fast umsonst.","На пароме 62 почти бесплатная экскурсия по порту."],["Das ist ein Stück Hamburger Identität.","Это часть гамбургской идентичности."],["Da geht's um viel Geld und viele Jobs.","Тут речь о больших деньгах и рабочих местах."]],
+ a:[["Einstieg","Dein Lieblingsplatz am Wasser."],["Fakten","Was der Hafen für die Stadt bedeutet, in Zahlen."],["Diskussion","Ein aktueller Streitpunkt."],["Meinung","Wie siehst du das?"],["Frage","Welche Hafenecke empfehlt ihr?"]],
+ d:["Ist der Hafen für euch Arbeit oder Freizeit?","Habt ihr schon eine Hafenrundfahrt gemacht?","Was ist wichtiger: Wirtschaft oder Umwelt?"],
+ f:["Der Hafen gibt Arbeit für viele Menschen.","Der Hafen schafft viele Arbeitsplätze.","«даёт работу» по-немецки schafft Arbeitsplätze"],
+ h:["Pott","Большой корабль. «Guck mal, was für ein Pott!»"]},
+
+/* ---------- KNEIPE ---------- */
+{r:"kneipe",t:"Die Bahn mal wieder",
+ w:"Über die Deutsche Bahn schimpft fast jeder, das ist Volkssport. Verspätungen, Zugausfälle, Schienenersatzverkehr. Wer die Witze und Klagen versteht, kann mit jedem Deutschen sofort ins Gespräch kommen.",
+ q:["Wie pünktlich war der Fernverkehr der Bahn im letzten Jahr?","Ab wie vielen Minuten gilt ein Zug als verspätet?","Welche Entschädigung gibt es bei Verspätung?","Welche großen Baustellen gibt es gerade rund um Hamburg?"],
+ v:[["Verspätung haben","опаздывать (о поезде)"],["den Anschluss verpassen","пропустить пересадку"],["der Zug fällt aus","поезд отменили"],["eine Entschädigung beantragen","запросить компенсацию"],["Puffer einplanen","закладывать запас времени"],["in den Ersatzbus umsteigen","пересесть на замещающий автобус"]],
+ s:[["Typisch Bahn.","Типичная Deutsche Bahn."],["Ich plane immer eine Stunde Puffer ein.","Я всегда закладываю час запаса."],["Heute ausnahmsweise pünktlich!","Сегодня в виде исключения вовремя!"],["Der Anschluss ist natürlich weg.","Пересадка, конечно, ушла."],["Grund dafür ist eine Störung im Betriebsablauf.","Причина: сбой в рабочем процессе (классика объявлений)."]],
+ a:[["Einstieg","Deine schlimmste Bahngeschichte."],["Fakten","Zahlen zur Pünktlichkeit."],["Warum","Was die Gründe sind."],["Vergleich","Wie fährt man in deinem Herkunftsland?"],["Frage","Wer hat die beste Bahn-Horrorgeschichte?"]],
+ d:["Was war eure schlimmste Bahnfahrt?","Fahrt ihr trotzdem lieber Bahn als Auto?","Habt ihr schon mal eine Entschädigung beantragt?"],
+ f:["Der Zug hat sich auf 20 Minuten verspätet.","Der Zug hat 20 Minuten Verspätung.","«опоздал на 20 минут» так"]},
+
+{r:"kneipe",t:"Urlaub: Malle, Ostsee oder weit weg?",
+ w:"Deutsche reden viel und gern über Urlaub: wo man war, wo man hinwill, wie viele Urlaubstage man hat. Mallorca, die Ostsee und Fernreisen sind die Klassiker, und jedes Ziel sagt etwas über die Person aus.",
+ q:["Was sind die beliebtesten Urlaubsziele der Deutschen?","Wie viele Urlaubstage haben Deutsche im Schnitt?","Was ist Malle und warum hat es einen Ruf?","Welche Ostseeorte erreicht man von Hamburg in einer Stunde?"],
+ v:[["Urlaub beantragen","подать заявление на отпуск"],["in den Urlaub fahren","уехать в отпуск"],["einen Brückentag nehmen","взять день-мостик"],["eine Pauschalreise buchen","забронировать турпакет"],["urlaubsreif sein","нуждаться в отпуске"],["an die Ostsee fahren","поехать на Балтику"]],
+ s:[["Ich bin total urlaubsreif.","Мне срочно нужен отпуск."],["Wo geht's dieses Jahr hin?","Куда в этом году?"],["Hauptsache Sonne.","Главное, чтобы было солнце."],["An der Ostsee ist es auch schön, nur kalt.","На Балтике тоже красиво, только холодно."],["Brückentage muss man ausnutzen.","Дни-мостики нужно использовать."]],
+ a:[["Einstieg","Dein schönster oder schrägster Urlaub."],["Fakten","Wohin Deutsche am liebsten fahren."],["Kultur","Urlaub als deutsches Ritual: planen, buchen, erzählen."],["Vergleich","Wie macht man bei dir zu Hause Urlaub?"],["Frage","Wohin geht's bei euch als Nächstes?"]],
+ d:["Wohin fahrt ihr als Nächstes?","Strand, Berge oder Stadt?","Plant ihr Urlaub so früh wie Deutsche?"],
+ f:["Ich fahre in Urlaub auf Mallorca.","Ich fahre nach Mallorca in den Urlaub.","на остров едут nach, а in den Urlaub"],
+ h:["Malle","Майорка на сленге. «Malle ist nur einmal im Jahr.»"]},
+
+{r:"kneipe",t:"HSV oder St. Pauli?",
+ w:"In Hamburg fragt man irgendwann: HSV oder St. Pauli? Der HSV ist der Traditionsverein aus dem Volkspark, St. Pauli der Kultklub vom Millerntor mit Totenkopf und politischer Haltung. Die Antwort sagt viel darüber, wie jemand die Stadt sieht.",
+ q:["In welcher Liga spielen beide Vereine gerade?","Was ist das Stadtderby und wie ging das letzte aus?","Warum hat St. Pauli einen Totenkopf als Symbol?","Was bedeutet beim HSV die Uhr im Stadion?"],
+ v:[["zu einem Verein halten","болеть за клуб"],["ins Stadion gehen","пойти на стадион"],["in die zweite Liga absteigen","вылететь во вторую лигу"],["in die erste Liga aufsteigen","выйти в первую лигу"],["eine Dauerkarte haben","иметь абонемент"],["das Derby gewinnen","выиграть дерби"]],
+ s:[["Ich bin eher St. Pauli.","Я скорее за Санкт-Паули."],["Einmal HSV, immer HSV.","Однажды HSV, навсегда HSV."],["Die Stimmung am Millerntor ist einmalig.","Атмосфера на Миллернторе уникальна."],["Am Wochenende ist Derby, da ist die Stadt im Ausnahmezustand.","На выходных дерби, город на ушах."],["Ich versteh von Fußball nichts, aber die Stimmung mag ich.","Я ничего не понимаю в футболе, но атмосферу люблю."]],
+ a:[["Einstieg","Die Frage an die Runde: HSV oder St. Pauli?"],["Zwei Vereine","Was jeden Verein ausmacht."],["Aktuell","Wie es beiden gerade sportlich geht."],["Meinung","Für wen bist du und warum?"],["Frage","Wer war schon im Stadion?"]],
+ d:["Für welchen Verein seid ihr?","Wart ihr schon im Stadion?","Ist Fußball bei euch zu Hause auch so wichtig?"],
+ f:["Ich bin Fan von HSV.","Ich bin HSV-Fan. / Ich bin Fan vom HSV.","у клубов есть артикль: der HSV"]},
+
+{r:"kneipe",t:"Der Dönerpreis",
+ w:"Der Döner ist in Deutschland mehr als Essen, er ist ein Preisbarometer. Früher bekam man ihn für 3 oder 4 Euro, in Großstädten zahlt man inzwischen oft 7 Euro und mehr. Wenn Deutsche über Inflation reden, reden sie über den Döner.",
+ q:["Was kostet ein Döner in deinem Viertel?","Wer hat den Döner erfunden? Es gibt zwei Geschichten.","Was war die Idee mit der Dönerpreisbremse?","Wie stark sind Lebensmittelpreise in den letzten Jahren gestiegen?"],
+ v:[["einen Döner bestellen","заказать дёнер"],["sich etwas nicht mehr leisten können","больше не мочь себе позволить"],["die Preise steigen","цены растут"],["ein echtes Schnäppchen","настоящая выгода"],["mit alles und scharf","со всем и острый (заказ)"],["beim Imbiss um die Ecke","в закусочной за углом"]],
+ s:[["Einmal mit alles und scharf, bitte.","Один со всем и острый, пожалуйста."],["Früher war der Döner billiger.","Раньше дёнер был дешевле."],["Das kann sich doch keiner mehr leisten.","Это же никто уже не может себе позволить."],["Für sieben Euro? Echt jetzt?","За семь евро? Серьёзно?"],["Der Laden um die Ecke ist der beste.","Лавка за углом лучшая."]],
+ a:[["Einstieg","Was hat dein letzter Döner gekostet?"],["Geschichte","Woher der Döner kommt."],["Preise","Der Döner als Inflationsmesser."],["Meinung","Was ist dir zu teuer geworden?"],["Frage","Wo gibt's den besten Döner in Hamburg?"]],
+ d:["Wo gibt es den besten Döner?","Was ist für euch in Deutschland zu teuer geworden?","Welches Streetfood fehlt euch aus der Heimat?"],
+ f:["Die Preise sind teuer.","Die Preise sind hoch.","цены высокие, а не дорогие"]},
+
+/* ---------- TYPISCH DEUTSCH ---------- */
+{r:"typisch",t:"Pfand und Mülltrennung",
+ w:"Deutschland trennt Müll in viele Tonnen, und für Flaschen und Dosen gibt es Pfand. Für Zugezogene ist das am Anfang verwirrend, für Deutsche oft ein Thema mit Stolz und Selbstironie.",
+ q:["Wie viel Pfand gibt es auf Einweg- und Mehrwegflaschen?","Welche Tonne ist in Hamburg für was?","Seit wann gibt es das Pfandsystem?","Was passiert mit dem Plastik aus der gelben Tonne?"],
+ v:[["den Müll trennen","сортировать мусор"],["Flaschen zurückbringen","сдавать бутылки"],["den Pfandbon einlösen","обналичить чек за тару"],["den Müll rausbringen","выносить мусор"],["in die gelbe Tonne werfen","бросать в жёлтый бак"],["das Pfand zurückbekommen","получить залог обратно"]],
+ s:[["Ich bring noch schnell das Leergut weg.","Я быстро отнесу пустую тару."],["Pfand gehört daneben.","Тару ставят рядом (а не в урну)."],["Das kommt in die Gelbe.","Это в жёлтый бак."],["Ich hab einen Sack voll Pfandflaschen auf dem Balkon.","У меня на балконе мешок тары."],["Mülltrennung ist hier Ehrensache.","Сортировка мусора здесь дело чести."]],
+ a:[["Einstieg","Dein erster Kampf mit dem Pfandautomaten."],["Fakten","Wie das System funktioniert."],["Kultur","Pfand gehört daneben: was das über Deutschland sagt."],["Vergleich","Wie ist es bei dir zu Hause?"],["Frage","Wer trennt wirklich alles richtig?"]],
+ d:["Trennt ihr wirklich alles?","Was hat euch am Anfang verwirrt?","Sollten andere Länder das System übernehmen?"],
+ f:["Ich werfe den Müll.","Ich bringe den Müll raus.","«выносить мусор» так"]},
+
+{r:"typisch",t:"Sonntagsruhe",
+ w:"Am Sonntag haben die Läden zu, und Lärm ist tabu: kein Bohren, kein Rasenmähen, manchmal nicht mal Flaschen einwerfen. Viele Zugezogene finden das erst nervig und später genau richtig.",
+ q:["Was ist laut Gesetz am Sonntag erlaubt und was nicht?","Was steht in einer typischen Hausordnung zu Ruhezeiten?","Was sind verkaufsoffene Sonntage in Hamburg?","Woher kommt die Sonntagsruhe historisch?"],
+ v:[["die Ruhezeiten einhalten","соблюдать часы тишины"],["Lärm machen","шуметь"],["sich über den Nachbarn beschweren","жаловаться на соседа"],["sonntags geschlossen haben","не работать по воскресеньям"],["schnell zur Tanke gehen","сбегать на заправку"],["einen Sonntagsspaziergang machen","прогуляться в воскресенье"]],
+ s:[["Sonntags wird nicht gebohrt.","По воскресеньям не сверлят."],["Ich hab vergessen einzukaufen, jetzt bleibt nur die Tanke.","Забыла купить продукты, остаётся только заправка."],["Die Nachbarn haben sich schon beschwert.","Соседи уже жаловались."],["Am Sonntag gehört die Stadt den Spaziergängern.","В воскресенье город принадлежит гуляющим."],["Am Anfang fand ich das komisch.","Сначала мне это казалось странным."]],
+ a:[["Einstieg","Dein erster Sonntag in Deutschland."],["Regeln","Was erlaubt ist und was nicht."],["Warum","Woher die Regel kommt."],["Meinung","Nervig oder genial?"],["Frage","Was macht ihr am Sonntag?"]],
+ d:["Was macht ihr am Sonntag?","Hattet ihr schon Ärger mit Nachbarn?","Sollen Läden sonntags öffnen dürfen?"],
+ f:["Am Sonntag alle Geschäfte sind zu.","Am Sonntag sind alle Geschäfte zu.","глагол всегда на втором месте"]},
+
+{r:"typisch",t:"Duzen oder Siezen?",
+ w:"Du oder Sie, das ist in Deutschland eine kleine Wissenschaft. Im Büro, beim Sport, im Netz, beim Nachbarn gelten andere Regeln, und Hamburg ist dabei förmlicher als Berlin.",
+ q:["Wer bietet wem das Du an? Gibt es feste Regeln?","Duzen sich Kollegen in Start-ups und in alten Firmen anders?","Was ist das Hamburger Sie?","Wann ist Duzen eine Beleidigung?"],
+ v:[["jemandem das Du anbieten","предложить перейти на ты"],["sich duzen","быть на ты друг с другом"],["beim Sie bleiben","остаться на вы"],["jemanden mit Vornamen ansprechen","обращаться по имени"],["ins Fettnäpfchen treten","попасть впросак"],["mit jemandem per Du sein","быть с кем-то на ты"]],
+ s:[["Wollen wir uns duzen?","Давай перейдём на ты?"],["Ich bin die Olga.","Я Ольга (так предлагают ты)."],["Bei uns duzen sich alle.","У нас все на ты."],["Da bin ich mir nie sicher.","Тут я никогда не уверена."],["Im Zweifel lieber Sie.","Если сомневаешься, лучше на вы."]],
+ a:[["Einstieg","Ein peinlicher Du-Sie-Moment."],["Regeln","Wann man duzt und wann siezt."],["Hamburg","Das Hamburger Sie und warum es das gibt."],["Vergleich","Wie ist es in deiner Sprache?"],["Frage","Wem habt ihr schon das Du angeboten?"]],
+ d:["Wer duzt euch, wer siezt euch?","Ist euch das Sie manchmal zu distanziert?","Wie ist es mit Ты und Вы im Vergleich?"],
+ f:["Kann ich zu Ihnen du sagen?","Wollen wir uns duzen?","естественная фраза-предложение"],
+ h:["Hamburger Sie","Вы + имя: «Anna, können Sie mal kurz kommen?»"]},
+
+{r:"typisch",t:"Termin beim Amt",
+ w:"Anmeldung, Ausweis, Führerschein: ohne Termin geht beim Amt fast nichts. Deutsche selbst stöhnen über Bürokratie, Formulare und Faxgeräte, und gleichzeitig wird viel digitalisiert. Jede Zugezogene hat hier eine Geschichte.",
+ q:["Innerhalb wie vieler Tage muss man sich nach einem Umzug anmelden?","Was kann man in Hamburg schon online erledigen?","Warum gibt es in deutschen Ämtern noch Faxgeräte?","Was ist das Bürgeramt / Kundenzentrum?"],
+ v:[["einen Termin vereinbaren","договориться о записи"],["einen Antrag stellen","подать заявление"],["ein Formular ausfüllen","заполнить бланк"],["sich ummelden","перерегистрироваться по новому адресу"],["die Unterlagen einreichen","подать документы"],["etwas online erledigen","сделать что-то онлайн"]],
+ s:[["Ohne Termin läuft da gar nichts.","Без записи там ничего не выйдет."],["Ich hab drei Monate auf einen Termin gewartet.","Я три месяца ждала записи."],["Da fehlte natürlich noch ein Formular.","Конечно, не хватило ещё одного бланка."],["Deutschland und Digitalisierung, das ist so eine Sache.","Германия и цифровизация, это отдельная история."],["Die Sachbearbeiterin war echt nett.","Сотрудница была очень милой."]],
+ a:[["Einstieg","Deine Amt-Geschichte in drei Sätzen."],["Fakten","Was man wo erledigen muss."],["Diskussion","Bürokratie und Digitalisierung."],["Vergleich","Wie läuft das bei dir zu Hause?"],["Frage","Wer hat einen Tipp für schnelle Termine?"]],
+ d:["Wer hat einen Tipp für schnelle Termine?","Was war euer schlimmstes Amtserlebnis?","Was läuft bei euch zu Hause besser oder schlechter?"],
+ f:["Ich muss einen Termin nehmen.","Ich muss einen Termin machen / vereinbaren.","«взять запись» так"]},
+
+/* ---------- GESCHICHTE ---------- */
+{r:"geschichte",t:"Mauerfall und Deutsche Einheit",
+ w:"Am 9. November 1989 fiel die Mauer, am 3. Oktober 1990 wurde Deutschland wiedervereinigt. Fast jeder ältere Deutsche weiß, wo er an diesem Abend war. Der 3. Oktober ist Feiertag, und Ost und West sind bis heute ein Gesprächsthema.",
+ q:["Warum ist der Feiertag am 3. Oktober und nicht am 9. November?","Was passierte am 9. November in der deutschen Geschichte noch?","Was war Günter Schabowskis berühmter Satz?","Wo in Hamburg kann man etwas zur Teilung sehen oder lernen?"],
+ v:[["die Mauer fällt","стена падает"],["die Grenze öffnen","открыть границу"],["in den Westen fliehen","бежать на Запад"],["im Osten aufwachsen","вырасти на Востоке"],["die Einheit feiern","праздновать единство"],["sich an den Abend erinnern","вспоминать тот вечер"]],
+ s:[["Wo warst du, als die Mauer fiel?","Где ты была, когда пала стена?"],["Das war ein unglaublicher Moment.","Это был невероятный момент."],["Viele hatten Tränen in den Augen.","У многих были слёзы на глазах."],["Das ist bis heute nicht ganz zusammengewachsen.","Это до сих пор не совсем срослось."],["Mein Kollege ist im Osten aufgewachsen.","Мой коллега вырос на Востоке."]],
+ a:[["Einstieg","Ein Bild oder Satz vom 9. November 1989."],["Geschichte","Von der Teilung zur Einheit, kurz."],["Heute","Was davon man heute noch spürt."],["Persönlich","Wie hat man in deinem Land diese Zeit erlebt?"],["Frage","Kennt ihr jemanden, der sich erinnert?"]],
+ d:["Wisst ihr, wo eure Eltern 1989 waren?","Habt ihr mit Deutschen darüber gesprochen?","Was wusstet ihr vorher über die DDR?","Merkt man heute noch Unterschiede?"],
+ f:["Die Mauer ist in 1989 gefallen.","Die Mauer ist 1989 gefallen.","перед годом in не ставят (или im Jahr 1989)"]},
+
+{r:"geschichte",t:"Das Sommermärchen und das 7:1",
+ w:"2006 war die WM in Deutschland, das ganze Land feierte mit Fahnen, das nennt man bis heute Sommermärchen. 2014 schlug Deutschland Brasilien im Halbfinale 7:1 und wurde Weltmeister. Diese zwei Momente zitieren Deutsche ständig.",
+ q:["Warum heißt 2006 Sommermärchen und welchen Platz holte Deutschland?","Wer schoss 2014 im Finale das Siegtor?","Was war der Skandal um das Sommermärchen später?","Was ist Public Viewing?"],
+ v:[["Weltmeister werden","стать чемпионом мира"],["ins Finale einziehen","выйти в финал"],["beim Public Viewing schauen","смотреть на общем экране"],["die Fahne schwenken","размахивать флагом"],["Gänsehaut bekommen","покрыться мурашками"],["sich in den Armen liegen","обниматься от радости"]],
+ s:[["Das war wie ein Rausch.","Это было как опьянение."],["Ich erinnere mich noch genau daran.","Я до сих пор точно это помню."],["Ganz Deutschland lag sich in den Armen.","Вся Германия обнималась."],["Bei dem Gedanken krieg ich heute noch Gänsehaut.","При этой мысли до сих пор мурашки."],["Das 7:1 vergisst kein Mensch.","7:1 никто не забудет."]],
+ a:[["Einstieg","Ein Satz: Wo warst du 2014 beim Finale?"],["2006","Was das Sommermärchen war."],["2014","Das 7:1 und der Titel."],["Meinung","Warum Deutsche so an diesen Momenten hängen."],["Frage","Welcher Sportmoment ist bei euch zu Hause legendär?"]],
+ d:["Welcher Sportmoment ist in eurem Land legendär?","Habt ihr schon Public Viewing erlebt?","Warum zeigen Deutsche ihre Fahne sonst eher selten?"],
+ f:["Ich erinnere mich das.","Ich erinnere mich daran.","sich erinnern всегда an etwas"]},
+
+{r:"geschichte",t:"Ossis und Wessis heute",
+ w:"Über 35 Jahre nach der Einheit gibt es noch Unterschiede zwischen Ost und West: bei Löhnen, Renten, Lebensgefühl. Dazu kommen Ostalgie, Ampelmännchen und Spreewaldgurken. In Hamburg leben viele, die im Osten geboren sind.",
+ q:["Wie groß ist der Lohnunterschied zwischen Ost und West heute?","Was ist Ostalgie und wo sieht man sie?","Welche Produkte aus der DDR gibt es noch?","Was ist das Ampelmännchen?"],
+ v:[["Unterschiede spüren","чувствовать разницу"],["Vorurteile haben","иметь предрассудки"],["die Mauer in den Köpfen","стена в головах"],["im Osten geboren sein","родиться на Востоке"],["weniger verdienen","зарабатывать меньше"],["alten Zeiten nachtrauern","тосковать по старым временам"]],
+ s:[["Das ist so ein Ost-West-Ding.","Это такая штука между Востоком и Западом."],["Man merkt das immer noch.","Это до сих пор заметно."],["Die Mauer in den Köpfen.","Стена в головах."],["Ich finde, das wird langsam weniger.","Мне кажется, это постепенно уходит."],["Das hängt davon ab, wen du fragst.","Зависит от того, кого спросишь."]],
+ a:[["Einstieg","Kennst du jemanden aus dem Osten? Eine Geschichte."],["Fakten","Wo es noch Unterschiede gibt."],["Kultur","Ostalgie, Produkte, Symbole."],["Vergleich","Gibt es so etwas in deinem Land?"],["Frage","Seid ihr schon im Osten gereist?"]],
+ d:["Wart ihr schon in Ostdeutschland?","Gibt es in eurem Land ähnliche Unterschiede?","Ist Ostalgie verständlich?"],
+ f:["Das hängt davon, wen du fragst.","Das hängt davon ab, wen du fragst.","abhängen: не забывай ab в конце"]},
+
+{r:"geschichte",t:"Die Sturmflut 1962",
+ w:"In der Nacht vom 16. auf den 17. Februar 1962 brachen in Hamburg die Deiche. 315 Menschen starben, vor allem in Wilhelmsburg. Helmut Schmidt, damals Polizeisenator, organisierte die Rettung mit Hilfe der Bundeswehr. Viele Hamburger Familien erzählen bis heute davon.",
+ q:["Warum war Wilhelmsburg so stark betroffen?","Was genau hat Helmut Schmidt gemacht?","Wie schützt sich Hamburg heute vor Sturmfluten?","Wo erinnert man in Hamburg an die Flut?"],
+ v:[["die Deiche brechen","дамбы прорывает"],["Menschen retten","спасать людей"],["unter Wasser stehen","стоять под водой"],["sich vor Hochwasser schützen","защищаться от наводнения"],["eine Sturmflutwarnung geben","объявить штормовое предупреждение"],["ums Leben kommen","погибнуть"]],
+ s:[["Meine Oma erzählt heute noch davon.","Моя бабушка до сих пор об этом рассказывает."],["Das hat die Stadt geprägt.","Это сформировало город."],["Er hat einfach angepackt.","Он просто взялся за дело."],["Daraus hat man gelernt.","Из этого извлекли уроки."],["Bei Sturmflutwarnung wird's am Fischmarkt nass.","При штормовом предупреждении Фишмаркт заливает."]],
+ a:[["Einstieg","Die Nacht in drei starken Sätzen."],["Fakten","Was passierte und wer war betroffen."],["Helmut Schmidt","Seine Rolle und warum er dadurch bekannt wurde."],["Heute","Hochwasserschutz und Erinnerung."],["Frage","Gibt es so ein Ereignis in eurer Heimatstadt?"]],
+ d:["Gibt es so ein Ereignis in eurer Heimat?","Habt ihr schon eine Sturmflut am Fischmarkt gesehen?","Was wisst ihr über Helmut Schmidt?"],
+ f:["Helmut Schmidt hatte eine große Rolle.","Helmut Schmidt spielte eine große Rolle.","Rolle всегда spielen"]},
+
+/* ---------- KULTUR ---------- */
+{r:"kultur",t:"Tatort am Sonntagabend",
+ w:"Seit 1970 läuft sonntags um 20:15 Uhr im Ersten der Tatort. Millionen schauen zu, in Kneipen gibt es Tatort-Abende, und am Montag redet man im Büro darüber. Jede Stadt hat ihre eigenen Kommissare, auch Hamburg.",
+ q:["Wer ermittelt gerade im Hamburger Tatort?","Welcher Tatort ist am beliebtesten und warum?","Wo kann man in Hamburg Tatort in einer Kneipe schauen?","Warum ist die Melodie so berühmt?"],
+ v:[["Tatort schauen","смотреть Tatort"],["in der Mediathek nachschauen","досмотреть в онлайн-архиве"],["den Mörder erraten","угадать убийцу"],["einen Fall lösen","раскрыть дело"],["etwas spannend finden","находить захватывающим"],["jemandem das Ende spoilern","проспойлерить кому-то концовку"]],
+ s:[["Sonntag ist Tatort-Zeit.","Воскресенье время Tatort."],["Der war heute echt schwach.","Сегодняшний был реально слабый."],["Bitte nicht spoilern!","Пожалуйста, без спойлеров!"],["Ich schau den in der Mediathek nach.","Посмотрю в онлайн-архиве."],["Ich hab den Mörder sofort erkannt.","Я сразу поняла, кто убийца."]],
+ a:[["Einstieg","Die berühmte Melodie summen oder beschreiben."],["Fakten","Was der Tatort ist und seit wann."],["Ritual","Wie Deutsche ihn schauen."],["Meinung","Hast du ihn geschaut? Dein Urteil."],["Frage","Welche Serie läuft bei euch zu Hause am Sonntag?"]],
+ d:["Habt ihr schon Tatort geschaut?","Welche Serie war in eurer Heimat Kult?","Schaut ihr deutsches Fernsehen zum Lernen?"],
+ f:["Ich schaue Fernseher.","Ich schaue fern. / Ich sehe fern.","Fernseher это аппарат, смотрят fern"]},
+
+{r:"kultur",t:"Loriot und deutscher Humor",
+ w:"Haben Deutsche Humor? Ja, nur anders. Loriot, also Vicco von Bülow (1923 bis 2011), ist der Klassiker: feine Sketche über Alltag und Missverständnisse. Sätze wie «Früher war mehr Lametta» kennt fast jeder Deutsche.",
+ q:["Welche Loriot-Sketche sind am bekanntesten?","Woher kommt «Früher war mehr Lametta»?","Wer sind heute bekannte Comedians in Deutschland?","Was ist der Unterschied zwischen Ironie und Sarkasmus auf Deutsch?"],
+ v:[["einen Witz erzählen","рассказать анекдот"],["den Witz kapieren","понять шутку"],["sich kaputtlachen","умирать со смеху"],["trockenen Humor haben","иметь сухой юмор"],["etwas ironisch meinen","говорить что-то с иронией"],["über sich selbst lachen","смеяться над собой"]],
+ s:[["Den Witz hab ich nicht kapiert.","Я не поняла шутку."],["Das ist so trocken, dass es schon wieder lustig ist.","Так сухо, что уже смешно."],["Ich hab mich kaputtgelacht.","Я умирала со смеху."],["Das ist typisch deutscher Humor.","Это типичный немецкий юмор."],["Früher war mehr Lametta.","«Раньше было больше мишуры» (цитата Лорио)."]],
+ a:[["Einstieg","Ein Witz, den du in Deutschland nicht verstanden hast."],["Loriot","Wer er war und ein Sketch kurz erzählt."],["Humor","Was deutschen Humor ausmacht."],["Vergleich","Worüber lacht man bei dir zu Hause?"],["Frage","Welcher deutsche Witz hat euch zum Lachen gebracht?"]],
+ d:["Haben Deutsche wirklich keinen Humor?","Welcher Comedian ist in eurer Heimat Kult?","Wann habt ihr auf Deutsch zuletzt gelacht?"],
+ f:["Mir ist lustig.","Ich finde das lustig. / Ich muss lachen.","«мне смешно» дословно не работает"]},
+
+{r:"kultur",t:"Deutschland beim Eurovision",
+ w:"Der Eurovision Song Contest ist in Deutschland ein jährliches Drama. Gewonnen hat Deutschland nur zweimal: 1982 mit Nicole und 2010 mit Lena. Öfter landet es weit hinten, und jedes Jahr wird diskutiert, warum.",
+ q:["Welchen Platz hat Deutschland beim letzten ESC belegt?","Wer hat für Deutschland gesungen und wie wurde der Act ausgewählt?","Was sind die Big Five?","Wie funktioniert die Punktevergabe?"],
+ v:[["für ein Land abstimmen","голосовать за страну"],["null Punkte bekommen","получить ноль баллов"],["den letzten Platz belegen","занять последнее место"],["einen Auftritt bewerten","оценивать выступление"],["den Vorentscheid gewinnen","выиграть национальный отбор"],["eine ESC-Party feiern","устроить вечеринку Евровидения"]],
+ s:[["Null Punkte, wie immer.","Ноль баллов, как всегда."],["Ich schau das nur wegen der Kommentare.","Я смотрю только ради комментариев."],["Das war doch ganz okay!","Это было вполне неплохо!"],["Europa mag uns einfach nicht.","Европа нас просто не любит."],["Am Samstag ist ESC-Party bei mir.","В субботу у меня вечеринка Евровидения."]],
+ a:[["Einstieg","Ein legendärer ESC-Moment."],["Fakten","Deutschlands Bilanz beim ESC."],["Dieses Jahr","Wie es zuletzt lief."],["Meinung","Warum klappt es nicht?"],["Frage","Welchen ESC-Song mögt ihr?"]],
+ d:["Wie wichtig ist der ESC in eurem Land?","Welcher Song war euer Favorit?","Ist der ESC politisch?"],
+ f:["Deutschland hat den letzten Platz besetzt.","Deutschland hat den letzten Platz belegt.","«занять место» в рейтинге belegen"]},
+
+{r:"kultur",t:"Hamburg und die Beatles",
+ w:"Bevor sie weltberühmt wurden, spielten die Beatles von 1960 bis 1962 auf der Reeperbahn, im Indra, im Kaiserkeller und im Star-Club. John Lennon soll gesagt haben, er sei in Hamburg erwachsen geworden. Hamburg ist bis heute eine Musikstadt.",
+ q:["Wie lange und wo genau haben die Beatles in Hamburg gespielt?","Was ist der Beatles-Platz?","Welche Hamburger Bands und Musiker sind heute bekannt?","Was ist das Reeperbahn Festival?"],
+ v:[["in einem Club auftreten","выступать в клубе"],["den Durchbruch schaffen","добиться прорыва"],["auf den Kiez gehen","пойти на Киц"],["Livemusik hören","слушать живую музыку"],["ein Konzert besuchen","сходить на концерт"],["berühmt werden","стать знаменитым"]],
+ s:[["Die Beatles haben hier angefangen.","Битлз начинали здесь."],["Auf dem Kiez ist immer was los.","На Кице всегда что-то происходит."],["Hamburg war ihre Schule.","Гамбург был их школой."],["Ich geh lieber in kleine Clubs.","Я больше люблю маленькие клубы."],["Kennst du die Hamburger Schule?","Знаешь «гамбургскую школу» (музыкальное направление)?"]],
+ a:[["Einstieg","Ein Beatles-Song und die Frage, woher er kommt."],["Geschichte","Die Hamburger Jahre."],["Heute","Hamburgs Musikszene."],["Meinung","Was hörst du gern auf Deutsch?"],["Frage","Welche Musik verbindet ihr mit eurer Jugend?"]],
+ d:["Welche deutsche Musik hört ihr?","Wart ihr schon in einem Club auf dem Kiez?","Welche Band hat eure Jugend geprägt?"],
+ f:["Die Beatles haben großen Einfluss gemacht.","Die Beatles hatten großen Einfluss auf ...","«оказать влияние» Einfluss haben auf"],
+ h:["Kiez","Район Санкт-Паули вокруг Рипербана."]},
+
+/* ---------- FESTE ---------- */
+{r:"feste",t:"Reformationstag oder Halloween?",
+ w:"Am 31. Oktober ist in Hamburg seit 2018 ein Feiertag: der Reformationstag. Er erinnert an Martin Luther und 1517. Am selben Abend ziehen Kinder verkleidet um die Häuser und rufen «Süßes oder Saures». Zwei Traditionen an einem Tag.",
+ q:["Was passierte 1517 und wer war Martin Luther?","Warum ist der Tag in Hamburg erst seit 2018 Feiertag?","Wie feiern Kinder in Hamburg Halloween?","Welche Bundesländer haben den Feiertag noch?"],
+ v:[["einen freien Tag haben","иметь выходной"],["sich als Hexe verkleiden","нарядиться ведьмой"],["einen Kürbis schnitzen","вырезать тыкву"],["Süßigkeiten verteilen","раздавать сладости"],["von Haus zu Haus ziehen","ходить от дома к дому"],["an Martin Luther erinnern","напоминать о Мартине Лютере"]],
+ s:[["Schönen Feiertag!","Хорошего праздника!"],["Ich hab Süßigkeiten für die Kinder gekauft.","Я купила сладости для детей."],["Halloween ist eigentlich nicht deutsch.","Хэллоуин вообще-то не немецкий праздник."],["Hauptsache, ein freier Tag.","Главное, выходной."],["Wir schnitzen jedes Jahr einen Kürbis.","Мы каждый год вырезаем тыкву."]],
+ a:[["Einstieg","Was hast du letztes Jahr am 31. Oktober gemacht?"],["Reformation","Luther in drei Sätzen."],["Halloween","Wie es nach Deutschland kam."],["Vergleich","Was feiert man bei dir Ende Oktober?"],["Frage","Was macht ihr an diesem Tag?"]],
+ d:["Feiert ihr Halloween?","Was wisst ihr über Luther?","Welche Feiertage fehlen euch hier?"],
+ f:["Ich gratuliere dir zum Feiertag!","Schönen Feiertag!","с праздниками в Германии не поздравляют, а желают"]},
+
+{r:"feste",t:"Laternelaufen",
+ w:"Im Herbst, oft rund um Sankt Martin am 11. November, laufen Kinder mit selbst gebastelten Laternen durch die Straßen und singen. In Hamburg ist das ein großes Kita- und Nachbarschaftsritual, auch wer keine Kinder hat, kennt die Lieder.",
+ q:["Wer war Sankt Martin und was hat er mit dem Mantel gemacht?","Welche Laternenlieder kennt jedes Kind?","Wo gibt es in Hamburg große Laternenumzüge?","Warum basteln Kinder ihre Laternen selbst?"],
+ v:[["eine Laterne basteln","смастерить фонарик"],["beim Umzug mitlaufen","идти в шествии"],["Laternenlieder singen","петь песни с фонариками"],["den Mantel teilen","поделиться плащом"],["in die Kita gehen","ходить в детский сад"],["es wird früh dunkel","рано темнеет"]],
+ s:[["Wir gehen heute Laternelaufen.","Сегодня идём с фонариками."],["Die Laterne hat mein Sohn selbst gebastelt.","Фонарик сын сделал сам."],["Das ist so eine schöne Tradition.","Это такая красивая традиция."],["Ich hab die Lieder nicht mitsingen können.","Я не смогла подпевать песни."],["Da kommt richtig Stimmung auf.","Возникает настоящая атмосфера."]],
+ a:[["Einstieg","Hast du schon einen Laternenumzug gesehen?"],["Geschichte","Die Legende von Sankt Martin."],["Heute","Wie das Ritual in Hamburg aussieht."],["Vergleich","Welche Herbsttradition gibt es bei dir?"],["Frage","Wer geht dieses Jahr mit?"]],
+ d:["Gibt es in eurer Heimat ein ähnliches Fest?","Wart ihr schon bei einem Umzug?","Was bedeutet Teilen für euch?"],
+ f:["Er hat mir angerufen.","Er hat mich angerufen.","anrufen требует Akkusativ: mich"]},
+
+{r:"feste",t:"Der 11.11.: Karneval im Norden?",
+ w:"Am 11.11. um 11:11 Uhr beginnt in Köln, Düsseldorf und Mainz die Karnevalssaison. Im Norden schauen viele eher kopfschüttelnd zu. Das Thema zeigt, wie unterschiedlich Deutschland ist: Norden und Süden, Westen und Osten.",
+ q:["Warum beginnt der Karneval am 11.11. um 11:11 Uhr?","Was rufen die Leute in Köln und was in Mainz?","Was ist der Unterschied zwischen Karneval, Fasching und Fastnacht?","Wird in Hamburg überhaupt Karneval gefeiert?"],
+ v:[["Karneval feiern","праздновать карнавал"],["ein Kostüm tragen","быть в костюме"],["zum Umzug gehen","пойти на шествие"],["Kamelle fangen","ловить конфеты на шествии"],["nicht so mein Ding sein","не моё"],["kopfschüttelnd zuschauen","смотреть, качая головой"]],
+ s:[["Karneval ist nicht so mein Ding.","Карнавал не совсем моё."],["Die im Rheinland sind da ganz anders.","В Рейнланде с этим совсем иначе."],["Einmal im Leben muss man in Köln gewesen sein.","Раз в жизни нужно побывать в Кёльне."],["Bei uns im Norden ist das eher ruhig.","У нас на севере с этим спокойно."],["Da drehen alle durch.","Там все сходят с ума."]],
+ a:[["Einstieg","Zeig ein Karnevalsfoto aus Köln. Was denkt ihr?"],["Fakten","Was am 11.11. passiert."],["Nord gegen Süd","Warum Hamburg da anders tickt."],["Meinung","Würdest du mitfeiern?"],["Frage","Wer war schon beim Karneval?"]],
+ d:["Wart ihr schon beim Karneval?","Gibt es in eurer Heimat ein verrücktes Fest?","Welche deutsche Region ist euch am fremdesten?"],
+ f:["Diesen Humor ich verstehe nicht.","Diesen Humor verstehe ich nicht.","после первого члена предложения сразу глагол"]},
+
+{r:"feste",t:"Advent und Weihnachtsmarkt",
+ w:"Ab Ende November ist Adventszeit: Adventskranz, Adventskalender, Weihnachtsmärkte mit Glühwein, Weihnachtsfeiern in der Firma und Wichteln. Viele Gespräche drehen sich jetzt um Pläne: Wann sehen wir uns noch auf einen Glühwein?",
+ q:["Wann ist 2026 der erste Advent?","Welche Weihnachtsmärkte in Hamburg sind die bekanntesten?","Was ist Wichteln und wie funktioniert es?","Was kostet ein Glühwein dieses Jahr und wie hoch ist das Tassenpfand?"],
+ v:[["auf den Weihnachtsmarkt gehen","пойти на рождественскую ярмарку"],["einen Glühwein trinken","выпить глинтвейн"],["Pfand für die Tasse zahlen","платить залог за кружку"],["im Team wichteln","играть в тайного Санту в команде"],["eine Kerze anzünden","зажечь свечу"],["zur Weihnachtsfeier gehen","пойти на корпоратив"]],
+ s:[["Wollen wir mal auf einen Glühwein gehen?","Сходим на глинтвейн?"],["Vor Weihnachten ist immer so viel los.","Перед Рождеством всегда столько всего."],["Die Tasse bring ich zurück, wegen Pfand.","Кружку я верну, из-за залога."],["Wir wichteln dieses Jahr im Team.","В этом году у нас в команде тайный Санта."],["Ich freu mich schon auf Weihnachten.","Я уже жду Рождество."]],
+ a:[["Einstieg","Dein Lieblingsmoment im Advent."],["Traditionen","Kranz, Kalender, Markt."],["Hamburg","Die besten Märkte und Tipps."],["Vergleich","Wie feiert man bei dir zu Hause?"],["Frage","Wer geht mit auf den Weihnachtsmarkt?"]],
+ d:["Welchen Weihnachtsmarkt empfehlt ihr?","Feiert ihr Weihnachten oder eher Silvester?","Was schenkt man beim Wichteln?"],
+ f:["Ich freue mich für Weihnachten.","Ich freue mich auf Weihnachten.","ждать с радостью auf, а für радоваться за кого-то"]}
+];
+
+
+/* Weitere typische Fehler russischsprachiger Lernender, pro Thema: [falsch, richtig, warum] */
+const X={"Das WM-Aus gegen Paraguay":[["Ich habe das Spiel im Fernseher gesehen.","Ich habe das Spiel im Fernsehen gesehen.","Fernseher это аппарат, а «по телевизору» = im Fernsehen"],["Ich interessiere mich mit Fußball.","Ich interessiere mich für Fußball.","интересоваться чем-то = sich interessieren für"]],"Mieten in Hamburg":[["Ich miete die Wohnung von 2022.","Ich miete die Wohnung seit 2022.","«с 2022 года и до сих пор» = seit, а не von"],["Ich wohne bei Altona.","Ich wohne in Altona.","bei значит «у кого-то» или «рядом», район = in"]],"Deutschlandticket: Lohnt es sich noch?":[["Ich fahre auf dem Bus.","Ich fahre mit dem Bus.","«ехать на автобусе» = mit dem Bus"],["Das Ticket kostet 63 Euro in Monat.","Das Ticket kostet 63 Euro im Monat.","«в месяц» = im Monat или pro Monat"]],"Ausbildung oder Studium?":[["Ich lerne an der Universität.","Ich studiere an der Universität.","учиться в вузе = studieren, lernen это учить что-то"],["Ich arbeite als ein Designer.","Ich arbeite als Designer.","после als профессия без артикля"]],"Was wird aus dem Elbtower?":[["Das ist eine große Problem.","Das ist ein großes Problem.","das Problem среднего рода, хотя «проблема» женского"],["Ich habe davon in Internet gelesen.","Ich habe davon im Internet gelesen.","das Internet с артиклем: im Internet"]],"Die Elbphilharmonie":[["Ich war in der Elbphilharmonie auf Konzert.","Ich war in der Elbphilharmonie im Konzert.","«на концерте» = im Konzert"],["Wir waren in Sonntag in der Elphi.","Wir waren am Sonntag in der Elphi.","дни недели с am"]],"Was ist typisch Hamburg?":[["Ich habe mich zum Wetter gewöhnt.","Ich habe mich an das Wetter gewöhnt.","привыкнуть к = sich gewöhnen an"],["Ich fühle mich hier als zu Hause.","Ich fühle mich hier wie zu Hause.","«как дома» = wie zu Hause, als значит «в роли»"]],"Der Hamburger Hafen":[["Ich habe eine Hafenrundfahrt genommen.","Ich habe eine Hafenrundfahrt gemacht.","экскурсию не берут, а machen"],["Viele Menschen arbeiten in Hafen.","Viele Menschen arbeiten im Hafen.","der Hafen с артиклем: im Hafen"]],"Die Bahn mal wieder":[["Ich bin auf den Zug zu spät gekommen.","Ich habe den Zug verpasst.","«опоздать на поезд» = den Zug verpassen"],["Ich warte den Zug.","Ich warte auf den Zug.","ждать кого-то/что-то = warten auf"]],"Urlaub: Malle, Ostsee oder weit weg?":[["Nächste Woche gehe ich im Urlaub.","Nächste Woche gehe ich in den Urlaub.","куда = in den Urlaub, где = im Urlaub"],["Wir fliegen nach die Türkei.","Wir fliegen in die Türkei.","страны с артиклем идут с in, а не nach"]],"HSV oder St. Pauli?":[["Ich bin für St. Pauli krank.","Ich bin für St. Pauli. / Ich halte zu St. Pauli.","«болеть за команду» не переводится через krank"],["Ich gehe auf Fußball.","Ich gehe zum Fußball.","«идти на футбол» = zum Fußball gehen"]],"Der Dönerpreis":[["Gib mir einen Döner.","Ich hätte gern einen Döner.","в лавке говорят ich hätte gern, повелительное звучит грубо"],["Der Döner kostet sieben Euros.","Der Döner kostet sieben Euro.","Euro после числа не получает -s"]],"Pfand und Mülltrennung":[["Ich sortiere den Müll.","Ich trenne den Müll.","сортировать мусор = Müll trennen"],["Ich werfe das in die Müll.","Ich werfe das in den Müll.","der Müll мужского рода"]],"Sonntagsruhe":[["Mein Nachbar hat auf mich beschwert.","Mein Nachbar hat sich über mich beschwert.","жаловаться на = sich beschweren über, и не забудь sich"],["Ich mache Einkäufe am Samstag.","Ich kaufe am Samstag ein.","«делать покупки» = einkaufen"]],"Duzen oder Siezen?":[["Wie geht es Sie?","Wie geht es Ihnen?","после es geht нужен Dativ: Ihnen, dir"],["Ich habe ihm Du angeboten.","Ich habe ihm das Du angeboten.","das Du с артиклем"]],"Termin beim Amt":[["Ich habe einen Termin auf Montag.","Ich habe am Montag einen Termin.","запись на понедельник = am Montag или für Montag"],["Ich muss die Dokumente bringen.","Ich muss die Unterlagen mitbringen.","в ведомстве говорят Unterlagen, «принести с собой» = mitbringen"]],"Mauerfall und Deutsche Einheit":[["Die Mauer wurde gefallen.","Die Mauer ist gefallen.","fallen не бывает в пассиве"],["Viele Menschen sind aus DDR geflohen.","Viele Menschen sind aus der DDR geflohen.","die DDR всегда с артиклем"]],"Das Sommermärchen und das 7:1":[["Das Spiel war sehr spannendes.","Das Spiel war sehr spannend.","прилагательное после sein не склоняется"],["Wir haben in Public Viewing geschaut.","Wir haben beim Public Viewing geschaut.","на мероприятии = bei"]],"Ossis und Wessis heute":[["Er ist aus Osten.","Er kommt aus dem Osten.","der Osten с артиклем, откуда родом = kommen aus"],["Ich war in Ostdeutschland nie.","Ich war noch nie in Ostdeutschland.","«никогда ещё не» = noch nie, перед местом"]],"Die Sturmflut 1962":[["Viele Menschen sind von der Flut gestorben.","Bei der Flut sind viele Menschen gestorben.","«погибли при наводнении» = bei der Flut"],["Er hat die Menschen von dem Wasser gerettet.","Er hat die Menschen vor dem Wasser gerettet.","спасти от = retten vor"]],"Tatort am Sonntagabend":[["Ich schaue Tatort jede Sonntag.","Ich schaue jeden Sonntag Tatort.","der Sonntag: jeden Sonntag (Akkusativ)"],["Wer ist der Mörder in diese Folge?","Wer ist der Mörder in dieser Folge?","in + где = Dativ: dieser"]],"Loriot und deutscher Humor":[["Ich habe auf den Witz gelacht.","Ich habe über den Witz gelacht.","смеяться над = lachen über"],["Er spaßt immer.","Er macht immer Witze.","«шутить» = Witze machen"]],"Deutschland beim Eurovision":[["Ich habe für Schweden gewählt.","Ich habe für Schweden abgestimmt.","wählen это выборы, голосовать в шоу = abstimmen"],["Ich gefalle den Song nicht.","Der Song gefällt mir nicht.","gefallen наоборот: песня нравится мне"]],"Hamburg und die Beatles":[["Ich höre Musik von Beatles.","Ich höre Musik von den Beatles.","die Beatles с артиклем"],["Wir waren auf Reeperbahn.","Wir waren auf der Reeperbahn.","улицы с артиклем: auf der Reeperbahn"]],"Reformationstag oder Halloween?":[["Ich arbeite nicht, weil es ist Feiertag.","Ich arbeite nicht, weil es ein Feiertag ist.","после weil глагол уходит в конец"],["Die Kinder bitten Süßigkeiten.","Die Kinder bitten um Süßigkeiten.","просить что-то = bitten um"]],"Laternelaufen":[["Die Kinder haben gesungen Lieder.","Die Kinder haben Lieder gesungen.","Partizip всегда в конце"],["Mein Sohn geht in Kita.","Mein Sohn geht in die Kita.","die Kita с артиклем"]],"Der 11.11.: Karneval im Norden?":[["Ich habe mich als Pirat angezogen.","Ich habe mich als Pirat verkleidet.","«нарядиться кем-то» = sich verkleiden als"],["Karneval beginnt im 11. November.","Karneval beginnt am 11. November.","даты с am"]],"Advent und Weihnachtsmarkt":[["Ich gehe in den Weihnachtsmarkt.","Ich gehe auf den Weihnachtsmarkt.","на рынок и ярмарку = auf"],["Wir treffen uns in Weihnachten.","Wir treffen uns an Weihnachten.","праздники: an Weihnachten или zu Weihnachten"]],"Rekordpreise beim Tanken und Heizen":[["Gestern ich habe getankt.","Gestern habe ich getankt.","Глагол всегда на втором месте: после 'gestern' сразу идёт 'habe'."],["Ich kann nicht leisten das Benzin.","Das Benzin kann ich mir nicht mehr leisten.","sich (Dat) etwas leisten können - позволить себе; обязательно 'mir'."]],"Wackelt die Regierung Merz?":[["Die CDU ist nicht in Landtag gekommen.","Die CDU ist nicht in den Landtag gekommen.","Куда? in + Akk: in den Landtag. Артикль в немецком не выпадает."],["Die Koalition hat sich nicht geeinigt über die Reformen.","Die Koalition hat sich nicht über die Reformen geeinigt.","Partizip II (geeinigt) стоит в самом конце предложения."]],"AfD-Rekord in Sachsen-Anhalt":[["Siegmund will Ministerpräsident gewählt werden lassen.","Siegmund will sich zum Ministerpräsidenten wählen lassen.","sich zu + Dat wählen lassen - выдвигаться на выборах; zum = zu dem, отсюда окончание -en."],["Der AfD fehlt drei Sitze.","Der AfD fehlen drei Sitze.","Подлежащее - 'drei Sitze' (мн. ч.), поэтому fehlen; кому не хватает - в Dativ (der AfD)."]],"Ex-BND-Chef unter Spionageverdacht":[["Der Anwalt sagt, Hanning hat Deutschland nicht schaden.","Der Anwalt sagt, Hanning habe Deutschland nicht geschadet.","Partizip II - geschadet; когда пересказывают чужие слова, часто берут Konjunktiv I (habe)."],["Hanning ist seit 1998 bis 2005 BND-Chef gewesen.","Hanning war von 1998 bis 2005 BND-Chef.","'с ... по' в прошлом - von ... bis; seit - только если действие длится до сих пор."]],"Jauch und die 3-Millionen-Woche":[["Er hat gewonnen 16.000 Euro.","Er hat 16.000 Euro gewonnen.","В перфекте причастие (gewonnen) стоит в самом конце предложения."],["Ich würde riskieren alles.","Ich würde alles riskieren.","С würde инфинитив всегда стоит в конце."]],"Zverev wird die Nummer eins":[["Er spielt in Tennis.","Er spielt Tennis.","По-немецки без предлога: Tennis spielen, Fußball spielen (рус. «играть в теннис»)."],["Er ist erste Nummer in der Welt.","Er ist die Nummer eins der Welt.","Устойчивое выражение: die Nummer eins (der Welt), с артиклем, число после слова Nummer."]],"Promi Big Brother: Staffel 14":[["Das Show ist lustig.","Die Show ist lustig.","die Show - женский род."],["Ich gucke das im Fernseher.","Ich gucke das im Fernsehen.","der Fernseher = прибор, das Fernsehen = телевидение: im Fernsehen laufen/kommen."]],"Babylon Berlin: Das große Finale":[["Die Serie geht über das Jahr 1933.","Die Serie spielt im Jahr 1933.","«Действие происходит» = spielen; «о чём» = es geht um / handelt von."],["Ich habe die Serie bis Ende geguckt.","Ich habe die Serie zu Ende geguckt.","«Досмотреть до конца» = zu Ende gucken, без bis."]]};
+
+/* Ein Video pro Thema: [YouTube-ID, Titel, Sender] */
+const VIDEO={"Das WM-Aus gegen Paraguay":["O0k27D5pzQ0","Deutschland verliert gegen Paraguay. Schon wieder frühes WM-Aus für die DFB-Elf","ZDFheute"],"Mieten in Hamburg":["JprXsEzFCXs","5 Personen, 1 Zimmer: Hamburgs bittere Wohnungsnot für Familien","NDR Info"],"Deutschlandticket: Lohnt es sich noch?":["G6zsNkANJeU","Preisanstieg beim Deutschlandticket – Kritiker sehen falsche Anreize","tagesschau"],"Ausbildung oder Studium?":["JOfnssqWpDA","Ist eine Ausbildung weniger wert als ein Studium?","SWR Aktuell"],"Was wird aus dem Elbtower?":["ZSyfQeyrnsI","Elbtower-Zukunft in Hamburg: Hamburgische Bürgerschaft streitet über teure Rettung","NDR Info"],"Die Elbphilharmonie":["t398Y2VGNhk","Elbphilharmonie in Hamburg: Wahrzeichen zwischen Himmel und Hafen","NDR Doku"],"Was ist typisch Hamburg?":["EsC5hy872NU","Von Aalsuppe bis Franzbrötchen: Hamburger Nationalgerichte","NDR Doku"],"Der Hamburger Hafen":["tZkvVgXq5dE","Willkommen im Hamburger Hafen!","NDR Doku"],"Die Bahn mal wieder":["-a1cjTXs3ZI","So will die Deutsche Bahn in Zukunft pünktlich werden","Quarks"],"Urlaub: Malle, Ostsee oder weit weg?":["PBbRijBVJzs","Reiseziel Mallorca: Wer verdient hier an den Urlaubern?","Galileo"],"HSV oder St. Pauli?":["O0FdMcFCX9c","Die große Stadtderby-Vorschau: HSV oder St. Pauli - Wer regiert Hamburg?","kicker"],"Der Dönerpreis":["9Wps1M7FUvw","Warum wird der Döner schon wieder teurer?","rbb24"],"Pfand und Mülltrennung":["3BfmdOZe4nA","Die Wahrheit über das Pfandsystem","rbb24"],"Sonntagsruhe":["E_Du5BAR710","Warum dein Späti sonntags (nicht) öffnet","rbb24"],"Duzen oder Siezen?":["2tVoL3noERM","Du oder Sie? Antworten auf eine schwierige deutsche Frage","DW Deutsch"],"Termin beim Amt":["EJUoidrxBWE","Kommunale Verwaltung: Woran hapert es beim digitalen Bürgerservice?","BR24"],"Mauerfall und Deutsche Einheit":["RQgSE1ymHgw","Das letzte Jahr der DDR: 328 Tage zwischen Mauerfall und Deutscher Einheit","Terra X History"],"Das Sommermärchen und das 7:1":["MuUghYuoBJs","Deutscher Triumph für die Ewigkeit: So lief das 7:1 gegen Brasilien","SPORT1"],"Ossis und Wessis heute":["kzIoUJziazk","Studie: Unterschiede zwischen Ost- und Westdeutschland werden kleiner","tagesschau"],"Die Sturmflut 1962":["ggWESw1nIvM","Die Sturmflut 1962","NDR Doku"],"Tatort am Sonntagabend":["fMWITbSqwHo","Der Tatort im Ersten wird 50","tagesschau"],"Loriot und deutscher Humor":["T5yP748xixQ","Ein Jahrhundert feinsinniger Humor: Loriot im Interview (1993)","DER SPIEGEL"],"Deutschland beim Eurovision":["_ktQuUH8DI8","ESC: Warum ist Deutschland so schlecht?","DER SPIEGEL"],"Hamburg und die Beatles":["rzisQ1Tix7o","Der Tag, an dem die Beatles zum ersten Mal in Hamburg auftraten","Hamburger Morgenpost"],"Reformationstag oder Halloween?":["djQ1n7p9bRw","Mehr Gemeinsamkeiten als man denkt: Reformationstag und Halloween","quer vom BR"],"Laternelaufen":["CdJPDlO3m6s","Wer war St. Martin? Vom römischen Soldaten, der später Bischof wurde","WDR"],"Der 11.11.: Karneval im Norden?":["Kp0G0nEQOz4","#kurzerklärt: Woher kommt der Karneval?","tagesschau"],"Advent und Weihnachtsmarkt":["dxYUYw8GPmk","German Christmas Markets","Easy German"],"Rekordpreise beim Tanken und Heizen":["0eHe6zaXJNc","Presseclub: Tanken und Heizen am Limit – Was hilft gegen die hohen Preise? | 20.09.26","phoenix"],"Wackelt die Regierung Merz?":["OVU99cFDE0A","heute 19 Uhr vom 07.10.2026: Koalitionsausschuss, 3 Jahre Hamas-Überfall, Ex-BND-Chef in Haft","ZDFheute Nachrichten"],"AfD-Rekord in Sachsen-Anhalt":["JZyLWJTy6F0","AfD, Siegmund, Sachsen-Anhalt: Was diese Wahl verändert I 11KM - der tagesschau-Podcast","tagesschau"],"Ex-BND-Chef unter Spionageverdacht":["tJaoGeiEusA","Warum die Vorwürfe gegen Ex-BND-Chef Hanning so gravierend sind – ARD-Rechtsexperte ordnet ein","tagesschau"],"Jauch und die 3-Millionen-Woche":["VgUPrGkZpck","ER ist der große GEWINNER 💵😍| Wer wird Millionär? 3-Millionen-Euro-Woche","RTL"],"Zverev wird die Nummer eins":["EGQ5roD8ekM","Zverev 🇩🇪 vs. Shelton 🇺🇸 - Finale | US Open 2026 | Highlights - Sky Sport Tennis","Sky Sport Tennis"],"Promi Big Brother: Staffel 14":["Sk4YOusFEqk","🔴 Promi Big Brother 2026 | Exklusiver Livestream","Reality Shows by SAT.1 & Joyn"],"Babylon Berlin: Das große Finale":["ZrMnQizCoOY","Babylon Berlin: Das Ende einer Ära - Der offizielle Trailer","ARD"]};
+
+/* Wortschatz nach den Schritten des 5-Minuten-Plans: [Schritt, [[de, ru], ...]] */
+const WG={"Das WM-Aus gegen Paraguay":[["Einstieg",[["das Spiel in der Kneipe gucken","смотреть матч в баре","Ich hab das Spiel mit Freunden in einer Kneipe auf St. Pauli geguckt."],["richtig mitfiebern","переживать всей душой, болеть","Wir haben bis zum letzten Elfmeter richtig mitgefiebert."]]],["Fakten",[["rausfliegen (aus + Dat.)","вылететь (из турнира)","Deutschland ist schon im Sechzehntelfinale gegen Paraguay rausgeflogen."],["im Elfmeterschießen verlieren","проиграть по пенальти","Nach der Verlängerung stand es 1:1, dann haben wir im Elfmeterschießen 3:4 verloren."]]],["Reaktionen",[["Das war (echt) 'ne Blamage.","Это был (реально) позор.","Im Sechzehntelfinale gegen Paraguay raus, das war echt 'ne Blamage."],["(als Trainer) aufhören","уйти (с поста тренера)","Am 3. Juli hat Nagelsmann aufgehört, jetzt ist Klopp Bundestrainer."]]],["Meinung",[["mit etwas nicht viel anfangen können","не особо интересоваться чем-то, не моё","Ehrlich gesagt kann ich mit Fußball nicht so viel anfangen."],["eine große Rolle spielen","играть большую роль","Bei uns spielt Fußball keine so große Rolle wie hier."]]],["Frage an die Gruppe",[["Findet ihr Klopp als neuen Bundestrainer eine gute Wahl?","Как вы считаете, Клопп - хороший выбор на пост тренера сборной?",""],["Schaut ihr Fußball mit deutschen Freunden oder Kollegen?","Вы смотрите футбол с немецкими друзьями или коллегами?",""]]]],"Mieten in Hamburg":[["Einstieg",[["ewig nach etwas suchen","целую вечность что-то искать","Ich hab ewig nach einer Wohnung gesucht, fast … Monate."],["Schlange stehen","стоять в очереди","Bei meiner ersten Besichtigung standen 50 Leute Schlange."]]],["Fakten",[["mindestens … Euro kosten","стоить минимум … евро","Ein Quadratmeter kostet in Hamburg kalt mindestens … Euro."],["locker … Euro hinlegen","спокойно выложить … евро","Für ein WG-Zimmer legt man locker … Euro hin, doppelt so viel wie früher."]]],["Hintergrund",[["Es gibt einfach zu wenig …","Просто не хватает …","Es gibt einfach zu wenig bezahlbare Wohnungen in Hamburg."],["nicht hinterherkommen (mit + Dat.)","не успевать, не справляться","Die Stadt baut zwar, aber sie kommt mit dem Bauen nicht hinterher."]]],["Meinung",[["Wenn ich was zu sagen hätte, …","Если бы решала я, …","Wenn ich was zu sagen hätte, würde ich die Mieten erst mal einfrieren."],["Es kann doch nicht sein, dass …","Ну не может же быть, чтобы …","Es kann doch nicht sein, dass ein WG-Zimmer doppelt so viel kostet."]]],["Frage an die Gruppe",[["Wie habt ihr eure Wohnung in Hamburg gefunden?","Как вы нашли свою квартиру в Гамбурге?",""],["Würdet ihr für eine günstige Wohnung an den Stadtrand ziehen?","Вы бы переехали на окраину ради дешёвой квартиры?",""]]]],"Deutschlandticket: Lohnt es sich noch?":[["Einstieg",[["mit der U-Bahn kommen","приехать на метро","Ich bin heute mit der U-Bahn gekommen, wie fast jeden Tag."],["einfach einsteigen und losfahren","просто сесть и поехать","Mit dem Deutschlandticket kann ich einfach einsteigen und losfahren."]]],["Fakten",[["am Anfang nur … kosten","сначала стоить всего …","Am Anfang hat das Ticket nur 49 Euro gekostet."],["immer teurer werden","становиться всё дороже","Dann ist es immer teurer geworden, jetzt sind's 63 Euro."]]],["Hintergrund",[["sich die Kosten teilen","делить расходы","Bund und Länder teilen sich die Kosten für das Ticket."],["sich streiten über + Akk.","ругаться, спорить из-за чего-то","Das Geld ist bis 2030 gesichert, aber über den Preis streiten sie weiter."]]],["Meinung",[["sich lohnen (für + Akk.)","окупаться, иметь смысл","Für mich lohnt sich das Ticket noch, weil ich jeden Tag fahre."],["das Abo kündigen","отказаться от подписки","Wenn's ab 2027 66,80 Euro kostet, kündige ich vielleicht das Abo."]]],["Frage an die Gruppe",[["Wie viel würdet ihr maximal für das Deutschlandticket bezahlen?","Сколько вы максимум готовы платить за Deutschlandticket?",""],["Was nervt euch am HVV und was findet ihr gut?","Что вас бесит в HVV, а что вам нравится?",""]]]],"Ausbildung oder Studium?":[["Einstieg",[["als Kind … werden wollen","в детстве хотеть стать …","Als Kind wollte ich unbedingt Ärztin werden."],["etwas ganz anderes machen","заниматься совсем другим","Heute mache ich beruflich was ganz anderes."]]],["Fakten",[["eine Ausbildung machen (als …)","учиться на профессию (…)","Wenn man eine Ausbildung macht, lernt man im Betrieb und in der Berufsschule."],["schon Geld verdienen","уже зарабатывать","Und man verdient während der Ausbildung schon sein eigenes Geld."]]],["Trend",[["kaum noch … kriegen","почти невозможно найти …","Man kriegt ja kaum noch einen Handwerker, die werden überall gesucht."],["nur schwer einen Job finden","с трудом находить работу","Manche finden nach dem Studium nur schwer einen Job."]]],["Vergleich",[["mehr zählen (als …)","цениться больше (чем …)","Bei uns zählt ein Studium viel mehr als eine Ausbildung."],["an die Uni gehen","идти учиться в универ","Bei uns geht fast jeder nach der Schule direkt an die Uni."]]],["Frage an die Gruppe",[["Wurde euer Abschluss in Deutschland anerkannt?","Ваш диплом признали в Германии?",""],["Würdet ihr heute in Deutschland eine Ausbildung machen?","Вы бы сейчас пошли на профобучение в Германии?",""]]]],"Was wird aus dem Elbtower?":[["Einstieg",[["Hier seht ihr …","Вот здесь вы видите …","Hier seht ihr den Elbtower in der HafenCity."],["etwas von … aus sehen","видеть что-то откуда-то","Er steht an den Elbbrücken, man sieht ihn schon von der S-Bahn aus."]]],["Geschichte",[["… hoch werden sollen","должен был стать высотой …","Der Turm sollte rund 245 Meter hoch werden, Hamburgs höchstes Gebäude."],["pleitegehen","обанкротиться, прогореть","Dann ist Benkos Signa pleitegegangen, und Ende 2023 war Baustopp."]]],["Heute",[["(halb fertig) rumstehen","стоять (недостроенным) без дела","Seitdem steht der Turm bei etwa 100 Metern halb fertig rum."],["Es heißt, (dass) …","Говорят, (что) …","Es heißt, dass vielleicht … in den Turm einzieht."]]],["Meinung",[["etwas aus + Dat. machen","сделать что-то из чего-то","Ich würde aus dem Turm ein Haus mit bezahlbaren Wohnungen machen."],["Ich fänd's cool, wenn …","Было бы круто, если бы …","Ich fänd's cool, wenn da oben eine Aussichtsplattform für alle wäre."]]],["Frage an die Gruppe",[["Braucht Hamburg eurer Meinung nach Hochhäuser?","Как вы думаете, Гамбургу нужны небоскрёбы?",""],["Kennt ihr ähnliche Bauruinen aus eurer Heimat?","Вы знаете похожие недострои у себя на родине?",""]]]],"Die Elbphilharmonie":[["Einstieg",[["hin und weg sein","быть в полном восторге","Als ich die Elphi zum ersten Mal gesehen hab, war ich hin und weg."],["mit der Rolltreppe hochfahren","подняться на эскалаторе","Beim ersten Besuch bin ich mit der langen Rolltreppe hochgefahren."]]],["Geschichte",[["Jahre zu spät fertig werden","быть достроенным на годы позже","Die Elphi ist Jahre zu spät fertig geworden, erst im Januar 2017."],["viel teurer als geplant","намного дороже, чем планировали","Am Ende war sie viel teurer als geplant: 866 statt 77 Millionen."]]],["Heute",[["auch ohne Konzertkarte","даже без билета на концерт","Auch ohne Konzertkarte kann man auf die Plaza und über den Hafen gucken."],["eine Führung machen","сходить на экскурсию","Man kann auch eine Führung durch das ganze Gebäude machen."]]],["Meinung",[["Das hat sich gelohnt.","Оно того стоило.","Ich finde, das hat sich gelohnt, die ganze Welt kennt die Elphi."],["Das ist rausgeschmissenes Geld.","Это деньги на ветер.","Andere sagen: 866 Millionen, das war rausgeschmissenes Geld."]]],["Frage an die Gruppe",[["Hat sich das Geld für die Elphi eurer Meinung nach gelohnt?","Как вы считаете, Эльфи стоила этих денег?",""],["Welches Gebäude ist das Wahrzeichen eurer Heimatstadt?","Какое здание - символ вашего родного города?",""]]]],"Was ist typisch Hamburg?":[["Einstieg",[["mit „Moin“ begrüßt werden","когда с тобой здороваются «Moin»","Abends um acht hat mich jemand mit „Moin“ begrüßt, ich war total verwirrt."],["keine Ahnung haben","понятия не иметь","Ich hatte keine Ahnung, dass man das den ganzen Tag sagt."]]],["Typisch",[["sich (beim Bäcker) etwas holen","взять себе что-то (в пекарне)","Morgens hol ich mir beim Bäcker ein Franzbrötchen."],["auch bei Schietwetter rausgehen","выходить даже в мерзкую погоду","Hamburger gehen auch bei Schietwetter raus, natürlich mit Regenjacke."]]],["Menschen",[["am Anfang kühl wirken","поначалу казаться холодными","Hamburger wirken am Anfang ein bisschen kühl."],["mit jemandem warm werden","сблизиться с кем-то, оттаять","Aber wenn man mit ihnen warm wird, sind sie total loyal."]]],["Meinung",[["sich etwas angewöhnen","перенять привычку, приучиться к чему-то","Ich hab mir „Moin“ sofort angewöhnt, sogar abends."],["sich an etwas (Akk.) gewöhnen","никак не привыкнуть к …","An das Schietwetter werde ich mich nie gewöhnen."]]],["Frage an die Gruppe",[["Was habt ihr von den Hamburgern übernommen?","Что вы переняли у гамбуржцев?",""],["Welches Hamburg-Klischee stimmt für euch und welches nicht?","Какой стереотип о Гамбурге, по-вашему, правда, а какой нет?",""]]]],"Der Hamburger Hafen":[["Einstieg",[["sich ans Wasser setzen","сесть у воды","Am liebsten setz ich mich an den Landungsbrücken ans Wasser."],["richtig abschalten können","по-настоящему отключиться, расслабиться","Da gucke ich den Containerschiffen zu und kann richtig abschalten."]]],["Fakten",[["an etwas (Dat.) hängen","зависеть от чего-то (о работе, деньгах)","Am Hafen hängen Zehntausende Jobs, es ist ja der größte Hafen Deutschlands."],["Das ist echt eine Menge.","Это реально много.","Hier kommen jedes Jahr rund … Millionen Container an, das ist echt eine Menge."]]],["Diskussion",[["es geht um + Akk.","речь идёт о …","Bei der Elbvertiefung geht es darum, dass größere Schiffe nach Hamburg kommen können."],["sich aufregen über + Akk.","возмущаться чем-то","Viele regen sich darüber auf, dass MSC bei der HHLA eingestiegen ist."]]],["Meinung",[["etwas kritisch sehen","относиться к чему-то критически","Den Einstieg von MSC seh ich ehrlich gesagt eher kritisch."],["einerseits …, andererseits …","с одной стороны …, с другой стороны …","Einerseits brauchen wir die Jobs, andererseits leidet die Elbe darunter."]]],["Frage an die Gruppe",[["Habt ihr schon mal eine Hafenrundfahrt gemacht?","Вы уже были на экскурсии по порту?",""],["Was ist euch wichtiger: Wirtschaft oder Umwelt?","Что для вас важнее: экономика или экология?",""]]]],"Die Bahn mal wieder":[["Einstieg",[["den Anschluss verpassen","пропустить пересадку","Wegen der Verspätung hab ich natürlich meinen Anschluss verpasst."],["irgendwo festsitzen","застрять где-то","Danach saßen wir zwei Stunden mitten im Nirgendwo im Zug fest."]]],["Fakten",[["als … zählen","считаться …","Fünf Minuten zu spät zählt bei der Bahn noch als pünktlich!"],["Verspätung haben","опаздывать (о поезде)","Ungefähr … Prozent der Fernzüge haben Verspätung."]]],["Warum",[["an etwas (Dat.) liegen","объясняться чем-то, быть из-за чего-то","Das liegt vor allem an den vielen Baustellen."],["an etwas (Dat.) sparen","экономить на чём-то","Jahrelang hat man einfach an der Bahn gespart."]]],["Vergleich",[["mit dem Nachtzug fahren","ехать ночным поездом","Bei uns fährt man lange Strecken oft mit dem Nachtzug."],["die Uhr danach stellen können","можно сверять часы","Bei uns sind die Züge so pünktlich, da kannst du die Uhr danach stellen."]]],["Frage an die Gruppe",[["Habt ihr schon mal eine Entschädigung beantragt?","Вы уже запрашивали компенсацию?",""],["Fahrt ihr trotzdem lieber Bahn als Auto?","Вы всё равно предпочитаете поезд машине?",""]]]],"Urlaub: Malle, Ostsee oder weit weg?":[["Einstieg",[["Pech mit dem Wetter haben","не повезти с погодой","An der Ostsee hatten wir eine Woche lang Pech mit dem Wetter."],["schiefgehen","пойти не так","In dem Urlaub ist echt alles schiefgegangen, was schiefgehen kann."]]],["Fakten",[["an die Ostsee fahren","поехать на Балтику","Viele Deutsche fahren im Sommer einfach an die Ostsee."],["Bock haben auf + Akk.","хотеть чего-то, быть в настроении","Andere haben Bock auf Sonne und Party und fliegen nach Malle."]]],["Kultur",[["Urlaub buchen","бронировать отпуск","Viele buchen ihren Sommerurlaub schon im Januar."],["Na, wie war der Urlaub?","Ну, как отпуск?","Danach fragt dich im Büro jeder: Na, wie war der Urlaub?"]]],["Vergleich",[["auf die Datscha fahren","поехать на дачу","Bei uns fährt man im Sommer oft einfach auf die Datscha."],["Urlaub machen bei/in + Dat.","проводить отпуск у кого-то / где-то","Viele machen bei uns Urlaub bei Verwandten in einer anderen Stadt."]]],["Frage an die Gruppe",[["Wohin fahrt ihr als Nächstes?","Куда вы поедете в следующий раз?",""],["Plant ihr euren Urlaub auch so früh wie die Deutschen?","Вы тоже планируете отпуск так рано, как немцы?",""]]]],"HSV oder St. Pauli?":[["Einstieg",[["zu jemandem halten","болеть за кого-то, быть на чьей-то стороне","Ich frag euch gleich mal: Zu wem haltet ihr, HSV oder St. Pauli?"],["sich für eine Seite entscheiden","выбрать сторону","In Hamburg muss man sich irgendwann für eine Seite entscheiden."]]],["Zwei Vereine",[["für etwas stehen","олицетворять что-то","Der HSV aus dem Volkspark steht für Tradition."],["kein Geheimnis aus etwas machen","не делать из чего-то секрета","St. Pauli ist politisch eher links und macht kein Geheimnis draus."]]],["Aktuell",[["auf Platz … stehen","занимать … место","Der HSV steht gerade auf Platz … in der Tabelle."],["in der … Liga spielen","играть в … лиге","St. Pauli spielt in dieser Saison in der … Liga."]]],["Meinung",[["jemanden sympathisch finden","находить кого-то симпатичным","Ich find St. Pauli einfach sympathischer, mir gefällt die Haltung."],["bei jedem Spiel mitfiebern","переживать на каждом матче","Ich fiebere bei jedem Spiel mit, auch wenn ich nicht im Stadion bin."]]],["Frage an die Gruppe",[["Wart ihr schon mal im Volksparkstadion oder am Millerntor?","Вы уже были на стадионе HSV или St. Pauli?",""],["Ist Fußball bei euch zu Hause auch so wichtig?","А у вас на родине футбол тоже так важен?",""]]]],"Der Dönerpreis":[["Einstieg",[["für etwas … Euro zahlen","заплатить … евро за что-то","Für meinen letzten Döner hab ich … Euro gezahlt."],["einen Döner mit allem bestellen","заказать дёнер со всем","Ich bestell meinen Döner immer mit allem und scharf."]]],["Geschichte",[["ursprünglich aus … kommen","изначально быть родом из …","Der Drehspieß kommt ursprünglich aus der Türkei."],["Das wissen viele nicht.","Многие этого не знают.","Das wissen viele nicht: Der Döner im Brot wurde in Berlin erfunden."]]],["Preise",[["immer teurer werden","становиться всё дороже","Der Döner wird immer teurer, früher hat er drei, vier Euro gekostet."],["etwas an etwas (Dat.) merken","замечать что-то по чему-то","Am Döner merkt man sofort, wie alles teurer wird."]]],["Meinung",[["sich etwas nicht mehr leisten können","больше не мочь себе позволить","Jeden Tag einen Döner kann ich mir nicht mehr leisten."],["Das ist es mir nicht wert.","Оно того не стоит (для меня).","Sieben Euro für einen Döner? Ehrlich, das ist es mir nicht wert."]]],["Frage an die Gruppe",[["Wo gibt es in Hamburg den besten Döner?","Где в Гамбурге самый вкусный дёнер?",""],["Welches Streetfood aus der Heimat fehlt euch hier?","Какой уличной еды с родины вам здесь не хватает?",""]]]],"Pfand und Mülltrennung":[["Einstieg",[["Der Automat nimmt … nicht.","Автомат не принимает …","Der Automat nimmt meine Flasche einfach nicht, schon wieder!"],["keine Ahnung haben","понятия не иметь","Ich hatte keine Ahnung, dass auf der Flasche gar kein Pfand ist."]]],["Fakten",[["Pfand drauf sein (auf + Dat.)","на что-то берут залог","Auf Dosen und Plastikflaschen sind meistens 25 Cent Pfand drauf."],["in die … Tonne kommen","выбрасываться в … бак","Verpackungen aus Plastik und Metall kommen in die gelbe Tonne."]]],["Kultur",[["Pfandflaschen neben den Mülleimer stellen","ставить залоговые бутылки рядом с урной","In Hamburg stellt man Pfandflaschen neben den Mülleimer, nicht rein."],["sich freuen über + Akk.","радоваться чему-то","Wer Flaschen sammelt, freut sich über jede einzelne."]]],["Vergleich",[["den Müll trennen","сортировать мусор","Ehrlich gesagt hab ich früher nie den Müll getrennt."],["alles in eine Tonne schmeißen","кидать всё в один бак","Bei uns schmeißt man einfach alles in eine Tonne."]]],["Frage an die Gruppe",[["Trennt ihr wirklich alles?","Вы правда всё сортируете?",""],["Was hat euch am Anfang am meisten verwirrt?","Что вас поначалу больше всего сбивало с толку?",""]]]],"Sonntagsruhe":[["Einstieg",[["vor verschlossenen Türen stehen","поцеловать замок","An meinem ersten Sonntag stand ich beim Supermarkt vor verschlossenen Türen."],["zuhaben","быть закрытым","Ich wusste nicht, dass hier sonntags fast alles zuhat."]]],["Regeln",[["… ist angesagt.","… положено, полагается","Sonntags ist Ruhe angesagt, nicht mal Flaschen einwerfen darf man."],["Ärger kriegen mit + Dat.","получить проблемы с кем-то","Wer sonntags bohrt, kriegt schnell Ärger mit den Nachbarn."]]],["Warum",[["aus etwas (Dat.) kommen","происходить из чего-то","Das kommt eigentlich aus der christlichen Tradition."],["im Gesetz stehen","быть прописанным в законе","Der Sonntag als Ruhetag steht sogar im Grundgesetz."]]],["Meinung",[["zur Ruhe kommen","отдохнуть и прийти в себя","Am Sonntag komm ich endlich mal zur Ruhe."],["sich an etwas (Akk.) gewöhnen","привыкнуть к чему-то","Erst fand ich das nervig, aber inzwischen hab ich mich dran gewöhnt."]]],["Frage an die Gruppe",[["Hattet ihr schon mal Ärger mit den Nachbarn?","У вас уже были проблемы с соседями?",""],["Sollen die Läden sonntags öffnen dürfen?","Должны ли магазины работать по воскресеньям?",""]]]],"Duzen oder Siezen?":[["Einstieg",[["ins Fettnäpfchen treten","попасть впросак","Bei meinem ersten Job in Hamburg bin ich richtig ins Fettnäpfchen getreten."],["Das war mir total peinlich.","Мне было ужасно неловко.","Ich hab meine Chefin aus Versehen geduzt, das war mir total peinlich."]]],["Regeln",[["jemandem das Du anbieten","предложить перейти на ты","Im Büro siezt man sich, bis der Chef einem das Du anbietet."],["Das kommt drauf an.","Смотря где / по-разному.","Das kommt drauf an: Beim Sport und im Netz duzt man sich sofort."]]],["Hamburg",[["jemanden beim Vornamen nennen","называть кого-то по имени","Beim Hamburger Sie nennt man Kollegen beim Vornamen, sagt aber trotzdem Sie."],["eher zurückhaltend sein","быть скорее сдержанным","Hamburger sind eher zurückhaltend, die brauchen erst mal ein bisschen Abstand."]]],["Vergleich",[["jemanden mit Vor- und Vatersnamen ansprechen","обращаться по имени-отчеству","Bei uns spricht man Lehrer mit Vor- und Vatersnamen an."],["Das ist so ähnlich wie bei uns.","У нас примерно так же.","Mit Du und Sie ist das so ähnlich wie bei uns im Russischen."]]],["Frage an die Gruppe",[["Seid ihr mit euren Kollegen per Du?","Вы с коллегами на ты?",""],["Ist euch das Sie manchmal zu distanziert?","Вам вы иногда кажется слишком холодным?",""]]]],"Termin beim Amt":[["Einstieg",[["endlich einen Termin kriegen","наконец-то получить запись","Nach drei Wochen hab ich endlich einen Termin gekriegt."],["umsonst hingehen","сходить зря","Mir hat ein Formular gefehlt, also bin ich umsonst hingegangen."]]],["Fakten",[["sich im Kundenzentrum anmelden","прописаться в Kundenzentrum","Nach dem Umzug muss man sich im Kundenzentrum anmelden."],["den Führerschein umschreiben lassen","обменять водительские права","Den Führerschein aus der Heimat muss man oft umschreiben lassen."]]],["Diskussion",[["sich aufregen über + Akk.","возмущаться, беситься из-за","Sogar die Deutschen regen sich über Formulare und Faxgeräte auf."],["etwas online erledigen","сделать что-то онлайн","Manches kann man in Hamburg inzwischen schon online erledigen."]]],["Vergleich",[["einfach ohne Termin hingehen","просто прийти без записи","Bei uns kann man oft einfach ohne Termin hingehen."],["Schlange stehen","стоять в очереди","Dafür steht man bei uns manchmal stundenlang Schlange."]]],["Frage an die Gruppe",[["Wie seid ihr an euren Termin gekommen?","Как вы получили запись?",""],["Was war euer schlimmstes Erlebnis beim Amt?","Какой у вас был самый неприятный случай в ведомстве?",""]]]],"Mauerfall und Deutsche Einheit":[["Einstieg",[["Ich hab sofort das Bild im Kopf.","У меня сразу картинка перед глазами.","Ich hab sofort das Bild im Kopf: Leute tanzen auf der Mauer."],["sich in den Armen liegen","обниматься (от радости)","Am 9. November 1989 haben sich wildfremde Leute in den Armen gelegen."]]],["Geschichte",[["Damals war Deutschland geteilt.","Тогда Германия была разделена.","Damals war Deutschland geteilt, in die BRD und die DDR."],["Dann kam die Wiedervereinigung.","А потом было объединение.","Die Mauer ist 1989 gefallen, und 1990 kam dann die Wiedervereinigung."]]],["Heute",[["frei haben","иметь выходной","Am 3. Oktober haben alle frei, aber groß gefeiert wird eher nicht."],["Ich hab das Gefühl, dass …","Мне кажется, что...","Ich hab das Gefühl, dass Ost und West immer noch ein Thema sind."]]],["Persönlich",[["etwas im Fernsehen sehen","видеть что-то по телевизору","Meine Eltern haben die Bilder damals im Fernsehen gesehen."],["etwas miterleben","застать, пережить что-то","Bei uns hat man zur gleichen Zeit die Perestroika miterlebt."]]],["Frage an die Gruppe",[["Wisst ihr, wo eure Eltern 1989 waren?","Вы знаете, где были ваши родители в 1989 году?",""],["Habt ihr schon mal mit Deutschen über die Wende gesprochen?","Вы уже говорили с немцами о событиях 1989 года?",""]]]],"Das Sommermärchen und das 7:1":[["Einstieg",[["das Spiel gucken","смотреть матч","2014 hab ich das Finale mit Freunden in einer Kneipe geguckt."],["mitfiebern","болеть, переживать","Wir haben bis zur letzten Minute mitgefiebert."]]],["2006",[["Da war eine Riesenstimmung.","Атмосфера была просто огонь.","2006 war die WM in Deutschland, und überall war eine Riesenstimmung."],["Fahnen schwenken","размахивать флагами","Plötzlich haben alle schwarz-rot-goldene Fahnen geschwenkt, das war neu."]]],["2014",[["Das war der Wahnsinn.","Это было что-то невероятное.","Im Halbfinale 7:1 gegen Brasilien, das war echt der Wahnsinn."],["Weltmeister werden","стать чемпионом мира","Und ein paar Tage später ist Deutschland dann Weltmeister geworden."]]],["Meinung",[["Gänsehaut kriegen","мурашки по коже","Bei diesen Bildern kriegen viele Deutsche heute noch Gänsehaut."],["stolz sein auf + Akk.","гордиться чем-то","Ich glaube, damals durfte man zum ersten Mal einfach stolz auf Deutschland sein."]]],["Frage an die Gruppe",[["Welcher Sportmoment ist in eurem Land legendär?","Какой спортивный момент у вас стал легендой?",""],["Habt ihr schon mal beim Public Viewing mitgefeiert?","Вы уже праздновали на публичном просмотре?",""]]]],"Ossis und Wessis heute":[["Einstieg",[["aus dem Osten kommen","быть родом с Востока","Meine Nachbarin kommt aus dem Osten, aus der Nähe von Leipzig."],["nach der Wende in den Westen ziehen","переехать на Запад после падения Стены","Nach der Wende ist ihre Familie in den Westen gezogen."]]],["Fakten",[["weniger verdienen als …","зарабатывать меньше, чем...","Im Osten verdient man im Schnitt immer noch weniger als im Westen."],["Das merkt man an + Dat.","Это заметно по...","Das merkt man vor allem an den Löhnen und Renten."]]],["Kultur",[["etwas vermissen","скучать по чему-то","Manche vermissen ein bisschen die DDR-Zeit, das nennt man Ostalgie."],["Kult sein","быть культовой вещью","Das Ampelmännchen und die Spreewaldgurken sind heute Kult."]]],["Vergleich",[["über jemanden lästern","перемывать кому-то косточки","Bei uns lästern die Moskauer gern über die Provinz, und umgekehrt."],["Das ist wie bei uns mit …","Это как у нас с...","Das ist wie bei uns mit Moskau und dem Rest des Landes."]]],["Frage an die Gruppe",[["Wart ihr schon mal in Ostdeutschland?","Вы уже бывали в Восточной Германии?",""],["Könnt ihr Ostalgie verstehen?","Вам понятна остальгия?",""]]]],"Die Sturmflut 1962":[["Einstieg",[["die Deiche brechen","дамбы прорывает","In der Nacht zum 17. Februar 1962 sind in Hamburg die Deiche gebrochen."],["mitten in der Nacht","посреди ночи","Das Wasser kam mitten in der Nacht, die meisten haben noch geschlafen."]]],["Fakten",[["unter Wasser stehen","оказаться под водой","Große Teile von Wilhelmsburg standen unter Wasser."],["ums Leben kommen","погибнуть","In dieser Nacht sind in Hamburg 315 Menschen ums Leben gekommen."]]],["Helmut Schmidt",[["die Sache in die Hand nehmen","взять дело в свои руки","Helmut Schmidt hat die Sache in die Hand genommen und die Bundeswehr geholt."],["sich einen Namen machen","сделать себе имя","Damit hat er sich in ganz Deutschland einen Namen gemacht."]]],["Heute",[["die Deiche erhöhen","поднять дамбы","Danach hat man die Deiche in Hamburg ordentlich erhöht."],["sich erinnern an + Akk.","помнить о чём-то","Viele Hamburger Familien erinnern sich bis heute an diese Nacht."]]],["Frage an die Gruppe",[["Gab es in eurer Heimat ein ähnliches Unglück?","Была ли у вас на родине похожая катастрофа?",""],["Habt ihr schon mal eine Sturmflut am Fischmarkt gesehen?","Вы уже видели штормовой прилив на Фишмаркте?",""]]]],"Tatort am Sonntagabend":[["Einstieg",[["jemandem etwas vorsummen","напеть кому-то что-то","Ich summ euch mal kurz die Titelmelodie vor."],["Kennt ihr das?","Знакомо?","Na, kennt ihr das? Fast jeder Deutsche erkennt die Melodie sofort."]]],["Fakten",[["im Fernsehen laufen","идти по телевизору","Der Tatort läuft seit 1970 jeden Sonntag um Viertel nach acht im Ersten."],["seine eigenen … haben","иметь своих...","Jede Stadt hat ihre eigenen Kommissare, auch Hamburg."]]],["Ritual",[["sich zum Tatort-Gucken treffen","собираться посмотреть Tatort","Manche treffen sich sonntags in der Kneipe zum Tatort-Gucken."],["Hast du gestern Tatort geguckt?","Смотрел вчера Tatort?","Montags im Büro heißt es dann: Hast du gestern Tatort geguckt?"]]],["Meinung",[["wissen, wer's war","знать, кто это сделал","Meistens weiß ich schon nach zwanzig Minuten, wer's war."],["Das zieht sich.","Тянется, затянуто.","Ehrlich gesagt zieht sich der Tatort oft ganz schön."]]],["Frage an die Gruppe",[["Welche Krimiserie war in eurer Heimat Kult?","Какой детективный сериал был культовым у вас на родине?",""],["Schaut ihr deutsche Krimis zum Deutschlernen?","Вы смотрите немецкие детективы, чтобы учить язык?",""]]]],"Loriot und deutscher Humor":[["Einstieg",[["einen Witz nicht kapieren","не понять шутку","Letztes Jahr hab ich einen Witz von meinem Kollegen echt nicht kapiert."],["auf dem Schlauch stehen","тупить, не врубаться","Alle haben gelacht, und ich stand total auf dem Schlauch."]]],["Loriot",[["(absolut) Kult sein","быть культовым","Loriot, also Vicco von Bülow, ist in Deutschland absolut Kult."],["es geht um + Akk.","речь идёт о чём-то","In dem Sketch geht es um ein ganz normales Missverständnis im Alltag."]]],["Humor",[["einen trockenen Humor haben","иметь сухой юмор","Viele Deutsche haben einen ziemlich trockenen Humor."],["sich kaputtlachen (über + Akk.)","умирать со смеху над чем-то","Über Loriot lach ich mich jedes Mal kaputt."]]],["Vergleich",[["sich lustig machen über + Akk.","подшучивать над чем-то","Bei uns macht man sich gern über Politiker lustig."],["über sich selbst lachen","смеяться над собой","In meiner Heimat lacht man oft über sich selbst."]]],["Frage an die Gruppe",[["Welcher Comedian ist in eurer Heimat Kult?","Какой комик у вас на родине культовый?",""],["Wann habt ihr zuletzt auf Deutsch gelacht?","Когда вы в последний раз смеялись на немецком?",""]]]],"Deutschland beim Eurovision":[["Einstieg",[["Ich weiß noch genau, wie …","я до сих пор помню, как …","Ich weiß noch genau, wie Lena 2010 auf der Bühne stand."],["Gänsehaut kriegen","покрыться мурашками","Bei Lenas Sieg 2010 hab ich sofort Gänsehaut gekriegt."]]],["Fakten",[["es schaffen","суметь, получиться","Nur zweimal hat Deutschland es geschafft: 1982 mit Nicole und 2010 mit Lena."],["weit hinten landen","оказаться в самом хвосте","Meistens landet Deutschland aber ziemlich weit hinten."]]],["Dieses Jahr",[["für Deutschland antreten","выступать за Германию","Dieses Jahr ist … für Deutschland angetreten."],["auf Platz … landen","занять …-е место","Am Ende ist Deutschland auf Platz … gelandet."]]],["Meinung",[["es liegt an + Dat.","дело в чём-то","Ich glaub, es liegt einfach an der Songauswahl."],["(gut) ankommen bei + Dat.","заходить, нравиться кому-то","Die deutschen Songs kommen beim Publikum oft nicht so gut an."]]],["Frage an die Gruppe",[["Wie wichtig ist der ESC in eurem Land?","Насколько важно Евровидение в вашей стране?",""],["Ist der ESC für euch politisch?","Евровидение, по-вашему, политический конкурс?",""]]]],"Hamburg und die Beatles":[["Einstieg",[["einen Song kurz anspielen","включить кусочек песни","Ich spiel euch mal kurz einen Beatles-Song an."],["eine Ahnung haben, wo/woher …","знать, догадываться","Habt ihr eine Ahnung, woher die Beatles eigentlich kommen?"]]],["Geschichte",[["auf dem Kiez auftreten","выступать на Кице (Санкт-Паули)","Von 1960 bis 1962 sind die Beatles auf dem Kiez aufgetreten."],["erwachsen werden","повзрослеть","Lennon soll gesagt haben: «Ich bin in Hamburg erwachsen geworden.»"]]],["Heute",[["bekannt sein für + Akk.","славиться чем-то","Hamburg ist bis heute für seine Musikszene bekannt."],["auf ein Konzert gehen","сходить на концерт","In Hamburg kann man fast jeden Abend auf ein Konzert gehen."]]],["Meinung",[["einen Ohrwurm haben","песня засела в голове","Von diesem deutschen Song hab ich seit Wochen einen Ohrwurm."],["etwas bringt (echt) was","это реально помогает, есть толк","Deutsche Songs bringen fürs Deutschlernen echt was."]]],["Frage an die Gruppe",[["Welche deutsche Musik hört ihr?","Какую немецкую музыку вы слушаете?",""],["Welche Band hat eure Jugend geprägt?","Какая группа определила вашу юность?",""]]]],"Reformationstag oder Halloween?":[["Einstieg",[["frei haben","иметь выходной","Letztes Jahr am 31. Oktober hatte ich frei."],["bei jemandem klingeln","звонить кому-то в дверь","Abends haben bei mir verkleidete Kinder geklingelt."]]],["Reformation",[["es geht um + Akk.","речь идёт о ком-то/чём-то","Bei dem Feiertag geht's um Martin Luther und das Jahr 1517."],["etwas ins Rollen bringen","запустить, дать начало чему-то","Luther hat 1517 die Reformation ins Rollen gebracht."]]],["Halloween",[["aus den USA rüberschwappen","прийти (о моде) из США","Halloween ist erst vor ein paar Jahrzehnten aus den USA rübergeschwappt."],["von Tür zu Tür gehen","ходить от двери к двери","Abends gehen Kinder verkleidet von Tür zu Tür und rufen «Süßes oder Saures»."]]],["Vergleich",[["ein ganz normaler Arbeitstag sein","обычный рабочий день","Bei uns ist der 31. Oktober ein ganz normaler Arbeitstag."],["etwas nur aus Filmen kennen","знать что-то только по фильмам","Halloween kannte ich früher nur aus amerikanischen Filmen."]]],["Frage an die Gruppe",[["Feiert ihr Halloween?","Вы отмечаете Хэллоуин?",""],["Welche Feiertage fehlen euch hier?","Каких праздников вам здесь не хватает?",""]]]],"Laternelaufen":[["Einstieg",[["mitmachen bei + Dat.","участвовать в чём-то","Letzten November hab ich zum ersten Mal beim Laternelaufen mitgemacht."],["etwas zufällig mitkriegen","случайно застать, заметить","Meinen ersten Laternenumzug hab ich zufällig in meiner Straße mitgekriegt."]]],["Geschichte",[["auf etwas (Akk.) zurückgehen","восходить к чему-то, идти от","Das Ganze geht auf Sankt Martin zurück."],["etwas mit jemandem teilen","поделиться чем-то с кем-то","Sankt Martin hat seinen Mantel mit einem armen Bettler geteilt."]]],["Heute",[["eine Laterne basteln","смастерить фонарик","In der Kita basteln die Kinder ihre Laternen selbst."],["durch die Straßen ziehen","идти по улицам (толпой)","Abends ziehen sie mit den Laternen durch die Straßen und singen."]]],["Vergleich",[["So was gibt's bei uns nicht.","у нас такого нет","So was wie Laternelaufen gibt's bei uns eigentlich nicht."],["Pilze sammeln gehen","ходить за грибами","Im Herbst gehen bei uns fast alle Pilze sammeln."]]],["Frage an die Gruppe",[["Gibt es in eurer Heimat ein ähnliches Fest?","У вас на родине есть похожий праздник?",""],["Wart ihr schon mal bei einem Laternenumzug?","Вы уже бывали на шествии с фонариками?",""]]]],"Der 11.11.: Karneval im Norden?":[["Einstieg",[["Ich zeig euch mal …","сейчас покажу вам …","Ich zeig euch mal ein Foto vom Karneval in Köln."],["sich verkleiden als + Nom.","нарядиться кем-то","Guckt mal, der hier hat sich als Pirat verkleidet."]]],["Fakten",[["es geht los mit + Dat.","начинается (что-то)","Am 11.11. um 11:11 Uhr geht's mit dem Karneval los."],["Da ist richtig was los.","там вовсю кипит жизнь","In Köln, Düsseldorf und Mainz ist dann richtig was los."]]],["Nord gegen Süd",[["nichts anfangen können mit + Dat.","не понимать, не цеплять","Viele im Norden können mit Karneval einfach nichts anfangen."],["anders ticken","быть устроенным по-другому","Hamburg tickt da einfach anders."]]],["Meinung",[["nicht so mein Ding sein","не моё","Ehrlich gesagt ist Karneval nicht so mein Ding."],["einfach mal mitfeiern","просто взять и повеселиться со всеми","Trotzdem würde ich in Köln gern einfach mal mitfeiern."]]],["Frage an die Gruppe",[["Wart ihr schon mal beim Karneval?","Вы уже бывали на карнавале?",""],["Welche deutsche Region ist euch am fremdesten?","Какой регион Германии вам самый чужой?",""]]]],"Advent und Weihnachtsmarkt":[["Einstieg",[["sich freuen auf + Akk.","ждать с радостью","Ich freu mich jedes Jahr schon im Oktober auf die Adventszeit."],["es sich gemütlich machen","устроиться поуютнее","Im Advent mach ich es mir mit Kerzen und Tee gemütlich."]]],["Traditionen",[["eine Kerze anzünden","зажечь свечу","An jedem Adventssonntag zündet man am Kranz eine Kerze mehr an."],["ein Türchen aufmachen","открыть окошко (в календаре)","Im Dezember macht man jeden Morgen ein Türchen im Adventskalender auf."]]],["Hamburg",[["sich lohnen","стоить того","Der Weihnachtsmarkt am Rathaus lohnt sich echt."],["das Pfand zurückkriegen","получить залог обратно","Bringt die Glühweintasse zurück, dann kriegt ihr das Pfand zurück."]]],["Vergleich",[["Weihnachten im Januar feiern","праздновать Рождество в январе","Bei uns feiert man Weihnachten erst am 7. Januar."],["Silvester groß feiern","широко отмечать Новый год","Bei uns feiert man vor allem Silvester groß."]]],["Frage an die Gruppe",[["Welchen Weihnachtsmarkt könnt ihr empfehlen?","Какую рождественскую ярмарку вы посоветуете?",""],["Was schenkt ihr beim Wichteln?","Что вы дарите на тайном Санте?",""]]]],"Rekordpreise beim Tanken und Heizen":[["Einstieg",[["an der Tankstelle stehen","стоять на заправке","Letzte Woche stand ich an der Tankstelle und hab erst mal geschluckt."],["sich über etw. (Akk) ärgern","злиться из-за чего-то","Ich ärgere mich jedes Mal über die Preise an der Zapfsäule."]]],["Fakten",[["im Schnitt kosten","стоить в среднем","Mitte September hat ein Liter E10 im Schnitt 2,27 Euro gekostet."],["auf ... Prozent steigen","вырасти до ... процентов","Die Inflation ist im September auf 3,3 Prozent gestiegen."]]],["Reaktionen",[["einen Preisdeckel fordern","требовать потолка цен","Die SPD fordert einen Preisdeckel wie in Belgien, Ministerin Reiche lehnt das ab."],["etw. an die Kunden weitergeben","передавать что-то покупателям","Laut ADAC wird der Rabatt beim Benzin nicht voll an die Kunden weitergegeben."]]],["Vergleich",[["im Vergleich zu (+ Dat)","по сравнению с","Im Vergleich zu Deutschland war Tanken in meiner Heimat viel billiger."],["auf etw. (Akk) verzichten","отказываться от чего-то","Ich verzichte jetzt öfter aufs Auto und nehme das Deutschlandticket."]]],["Frage an die Gruppe",[]]],"Wackelt die Regierung Merz?":[["Einstieg",[["jdn. persönlich betreffen","касаться кого-то лично","Die Rente betrifft mich persönlich, ich will ja auch mal in Rente gehen."],["sich für Politik interessieren","интересоваться политикой","Ehrlich gesagt interessiere ich mich erst seit Kurzem für deutsche Politik."]]],["Fakten",[["an der Fünf-Prozent-Hürde scheitern","не преодолеть пятипроцентный барьер","In Mecklenburg-Vorpommern ist die CDU mit 4,9 Prozent an der Hürde gescheitert."],["unter Druck stehen","быть под давлением","Seitdem steht Kanzler Merz ziemlich unter Druck."]]],["Streitpunkte",[["sich über etw. (Akk) streiten","спорить о чём-то","Union und SPD streiten sich über Rente, Pflege, Steuern und den Haushalt."],["sich auf etw. (Akk) einigen","договориться о чём-то","Nach vier Stunden gab's keine Pressekonferenz, und ob sie sich geeinigt haben, blieb offen."]]],["Vergleich",[["den Kurs ändern","изменить курс","Ich bin nicht sicher, ob die Regierung jetzt ihren Kurs ändern sollte."],["bei uns läuft das anders","у нас это происходит по-другому","Bei uns zu Hause läuft Politik ganz anders, deshalb ist das für mich neu."]]],["Frage an die Gruppe",[]]],"AfD-Rekord in Sachsen-Anhalt":[["Einstieg",[["schon mal in ... gewesen sein","уже бывать где-то","Ich war schon mal in Magdeburg, das ist die Hauptstadt von Sachsen-Anhalt."],["etw. in den Nachrichten hören","услышать что-то в новостях","Von der Wahl hab ich zuerst in den Nachrichten gehört."]]],["Fakten",[["stärkste Kraft werden","стать самой сильной партией","Die AfD ist mit 43,8 Prozent stärkste Kraft geworden."],["jdm. fehlen (zu etw.)","кому-то не хватает (до чего-то)","Mit 39 Sitzen fehlen der AfD drei Sitze zur absoluten Mehrheit."]]],["Ausblick",[["sich zur Wahl stellen","баллотироваться, выставить свою кандидатуру","Siegmund will sich im Dezember zur Wahl als Ministerpräsident stellen."],["sich (der Stimme) enthalten","воздержаться (при голосовании)","Das BSW will sich enthalten, und im dritten Wahlgang zählen Enthaltungen nicht."]]],["Debatte",[["mit jdm. zusammenarbeiten","сотрудничать с кем-то","Die Frage ist, ob andere Parteien mit der AfD zusammenarbeiten sollen oder nicht."],["eine klare Meinung zu etw. haben","иметь чёткое мнение о чём-то","Ich hab dazu noch keine klare Meinung, was denkt ihr?"]]],["Frage an die Gruppe",[]]],"Ex-BND-Chef unter Spionageverdacht":[["Einstieg",[["wie im Film","как в кино","Als ich die Nachricht gelesen hab, dachte ich: Das ist ja wie im Film."],["beim BND arbeiten","работать в БНД","Hanning hat von 1998 bis 2005 beim BND gearbeitet, sogar als Präsident."]]],["Fakten",[["unter Verdacht stehen","находиться под подозрением","Hanning steht unter Verdacht, fast 2.000 interne Dokumente bekommen zu haben."],["in Untersuchungshaft sitzen","сидеть под стражей до суда","Seit dem 7. Oktober sitzt er in Untersuchungshaft."]]],["Reaktionen",[["die Vorwürfe zurückweisen","отвергать обвинения","Sein Anwalt weist die Vorwürfe zurück: Hanning habe Deutschland nicht geschadet."],["Konsequenzen fordern","требовать последствий","Einige Politiker fordern jetzt Konsequenzen, zum Beispiel eine lebenslange Karenzzeit."]]],["Meinung",[["als Berater arbeiten","работать консультантом","Ob Ex-Chefs als Berater arbeiten dürfen, finde ich eine schwierige Frage."],["es gilt die Unschuldsvermutung","действует презумпция невиновности","Wichtig ist: Bis zu einem Urteil gilt die Unschuldsvermutung."]]],["Frage an die Gruppe",[]]],"Jauch und die 3-Millionen-Woche":[["Einstieg",[["eine Sendung gucken","смотреть передачу","Ich gucke die Sendung ab und zu mit Freunden."],["um viel Geld spielen","играть на большие деньги","Diese Woche spielen die Kandidaten um bis zu 3 Millionen Euro."]]],["Fakten",[["nach Alter getrennt sein","быть разделёнными по возрасту","Die Kandidaten waren nach Alter getrennt: Junge, Ü30 und Rentner."],["ins Finale kommen","выйти в финал","Wer mindestens 16.000 Euro gewonnen hat, kommt ins Finale."]]],["Reaktionen",[["vor dem Fernseher sitzen","сидеть перед телевизором","Am Montag saßen fast 2,9 Millionen Leute vor dem Fernseher."],["gute Quoten haben","иметь хорошие рейтинги","Der Rentner-Abend hatte richtig gute Quoten, auch bei den Jüngeren."]]],["Meinung",[["auf Nummer sicher gehen","не рисковать, перестраховаться","Ich würde auf Nummer sicher gehen und das Geld nehmen."],["alles aufs Spiel setzen","поставить всё на кон","Für 3 Millionen würde ich vielleicht doch alles aufs Spiel setzen."]]],["Frage an die Gruppe",[]]],"Zverev wird die Nummer eins":[["Einstieg",[["sich für Tennis interessieren","интересоваться теннисом","Ich interessiere mich eigentlich nicht so für Tennis, aber das ist spannend."],["einen Titel holen","завоевать титул","Zverev hat dieses Jahr gleich zwei Grand-Slam-Titel geholt."]]],["Fakten",[["ein Finale gewinnen","выиграть финал","Er hat das Finale gegen Ben Shelton in vier Sätzen gewonnen."],["einen Satz abgeben","отдать сет","Nur den dritten Satz hat er mit 5:7 abgegeben."]]],["Hintergrund",[["die Saison beenden","завершить сезон","Sinner hat am 6. Oktober per Video gesagt, dass er die Saison beendet."],["hinter jemandem zurückliegen","отставать от кого-то","Im Februar lag Zverev noch rund 5.700 Punkte hinter Sinner zurück."]]],["Meinung",[["etwas verdient haben","заслужить что-то","Mit zwei Grand-Slam-Titeln hat er Platz eins verdient, finde ich."],["an der Spitze stehen","быть на вершине, лидировать","Er wäre der erste Deutsche an der Spitze seit Boris Becker."]]],["Frage an die Gruppe",[]]],"Promi Big Brother: Staffel 14":[["Einstieg",[["unter Beobachtung stehen","быть под наблюдением","Bei „Promi Big Brother“ stehen die Leute ständig unter Beobachtung."],["eine Sendung moderieren","вести передачу","Marlene Lufen und Jochen Schropp moderieren die Sendung."]]],["Fakten",[["ins Haus einziehen","въехать в дом","Am 5. Oktober sind 14 Prominente ins Haus eingezogen."],["mit dabei sein","участвовать, быть в составе","Mit dabei sind zum Beispiel Axel Schulz und Nadja Benaissa."]]],["Reaktionen",[["Zuschauer verlieren","терять зрителей","Die Show verliert jeden Abend Zuschauer, am Mittwoch war es eine Million."],["knapp vorne liegen","немного опережать","Am Dienstag lag „TV Total“ bei den Jüngeren knapp vorne."]]],["Meinung",[["gegen die Regeln verstoßen","нарушить правила","Tessa Bergmeier hat gegen die Regeln verstoßen und musste in den Garten."],["sich etwas nebenbei angucken","смотреть что-то фоном","Ich guck mir so was höchstens mal nebenbei an."]]],["Frage an die Gruppe",[]]],"Babylon Berlin: Das große Finale":[["Einstieg",[["in der Mediathek gucken","смотреть в онлайн-медиатеке","Alle acht Folgen kann man in der ARD Mediathek gucken."],["eine Serie zu Ende gucken","досмотреть сериал","Ich will die Serie unbedingt noch zu Ende gucken."]]],["Fakten",[["im Jahr 1933 spielen","происходить в 1933 году","Die letzten Folgen spielen im Februar 1933, kurz nach Hitlers Ernennung."],["um etwas gehen","речь идёт о чём-то","Es geht um die Zeit zwischen Hitlers Ernennung und dem Reichstagsbrand."]]],["Hintergrund",[["in viele Länder verkauft werden","продаваться во многие страны","Die Serie wurde in mehr als 140 Länder verkauft."],["auf Platz eins landen","оказаться на первом месте","Beim Streaming ist sie im September auf Platz eins gelandet."]]],["Meinung",[["etwas aktuell finden","считать что-то актуальным","Ich finde das Thema gerade heute total aktuell."],["ein würdiger Abschluss sein","быть достойным завершением","Für mich ist das düstere Ende ein würdiger Abschluss."]]],["Frage an die Gruppe",[]]]};
+
+/* Plan als Rückgrat: pro Schritt was sagen, was vorbereiten, Video-Aufgabe */
+const LINK={"Das WM-Aus gegen Paraguay":[{"h":"Einstieg","say":"Erzähl, wo du das Spiel geguckt und ob du mitgefiebert hast.","prep":"Notiere dein eigenes Erlebnis mit dem Spiel: Wo warst du und mit wem?","video":""},{"h":"Fakten","say":"Erzähl in drei Sätzen, wann und wie Deutschland ausgeschieden ist.","prep":"Wie lief das Spiel gegen Paraguay genau ab?","video":"Schau das Video und notiere, wie Deutschland gegen Paraguay verloren hat."},{"h":"Reaktionen","say":"Erzähl, warum viele von einer Blamage sprachen und was mit Nagelsmann passierte.","prep":"Was haben die Zeitungen nach dem Aus geschrieben, und wer ist jetzt Bundestrainer?","video":""},{"h":"Meinung","say":"Sag, ob du dich für Fußball interessierst und wie es in deiner Heimat ist.","prep":"Wer ist Weltmeister 2026 geworden, und wie lief die WM für dein Herkunftsland?","video":""}],"Mieten in Hamburg":[{"h":"Einstieg","say":"Erzähl in einem Satz, wie lange du nach einer Wohnung gesucht hast.","prep":"In welchen Stadtteilen ist es am teuersten, wo noch bezahlbar? Wo liegt deiner?","video":""},{"h":"Fakten","say":"Nenn Zahlen: den Preis pro Quadratmeter und was ein WG-Zimmer kostet.","prep":"Was kostet ein Quadratmeter Miete im Hamburger Durchschnitt?","video":""},{"h":"Hintergrund","say":"Erklär, warum es zu wenig bezahlbare Wohnungen gibt und was die Stadt tut.","prep":"Was tut die Stadt: Was ist ein WBS (Wohnberechtigungsschein) und wer bekommt ihn?","video":"Schau das Video: Wie wohnt die Familie? Notiere zwei Folgen der Wohnungsnot."},{"h":"Meinung","say":"Sag, was du ändern würdest, zum Beispiel die Mieten einfrieren.","prep":"Was ist die Mietpreisbremse und hilft sie?","video":""}],"Deutschlandticket: Lohnt es sich noch?":[{"h":"Einstieg","say":"Erzähl, wie du heute zum Treffen gekommen bist, zum Beispiel mit der U-Bahn.","prep":"Wie viele Menschen nutzen das Deutschlandticket?","video":""},{"h":"Fakten","say":"Erzähl die Preisgeschichte: mit 49 Euro gestartet, jetzt 63 Euro.","prep":"Wie viel hat das Ticket 2023 am Anfang gekostet?","video":""},{"h":"Hintergrund","say":"Erklär, wie Bund und Länder sich die Kosten teilen und warum sie streiten.","prep":"Was ist für 2027 geplant, und warum streiten Bund und Länder über den Preis?","video":"Schau das Video und notiere, was die Kritiker am Preisanstieg stört."},{"h":"Meinung","say":"Sag, ob sich das Ticket für dich lohnt oder ob du kündigen würdest.","prep":"Gibt es in Hamburg ein günstigeres Ticket für bestimmte Gruppen?","video":""}],"Ausbildung oder Studium?":[{"h":"Einstieg","say":"Erzähl, was du als Kind werden wolltest und was du heute machst.","prep":"Notiere dein eigenes Erlebnis: Was wolltest du als Kind werden, und warum?","video":""},{"h":"Fakten","say":"Erklär: Man lernt im Betrieb und in der Berufsschule und verdient Geld.","prep":"Was ist eine duale Ausbildung, wie lange dauert sie und was verdient ein Azubi?","video":""},{"h":"Trend","say":"Erklär, warum Betriebe Fachkräfte suchen und Absolventen schwer einen Job finden.","prep":"Welche Berufe werden in Hamburg am meisten gesucht?","video":""},{"h":"Vergleich","say":"Vergleiche: Welchen Stellenwert hat eine Ausbildung in deiner Heimat?","prep":"Kann man in Deutschland auch mit 30 oder 40 noch eine Ausbildung machen? Und bei dir zu Hause?","video":"Schau das Video und notiere ein Argument für die Ausbildung und eins fürs Studium."}],"Was wird aus dem Elbtower?":[{"h":"Einstieg","say":"Zeig ein Foto vom Turm und sag, wo er steht.","prep":"Such ein Foto vom Elbtower und notiere, was du darauf siehst.","video":""},{"h":"Geschichte","say":"Erzähl: 245 Meter waren geplant, dann ging Signa in die Insolvenz.","prep":"Wer war René Benko und was ist mit Signa passiert?","video":""},{"h":"Heute","say":"Erzähl, warum der Turm als Bauruine steht und was im Gespräch ist.","prep":"Wie ist der aktuelle Stand beim Elbtower, und wer will ihn weiterbauen?","video":"Schau das Video und notiere, worüber die Bürgerschaft beim Elbtower streitet."},{"h":"Meinung","say":"Sag, was du aus dem Turm machen würdest, zum Beispiel eine Aussichtsplattform.","prep":"Was soll in den Turm hinein? Such auch einen Kommentar oder eine Umfrage von Hamburgern.","video":""}],"Die Elbphilharmonie":[{"h":"Einstieg","say":"Erzähl, wann du die Elphi zum ersten Mal gesehen hast.","prep":"Notiere dein eigenes Erlebnis: Wann und wo hast du die Elphi zum ersten Mal gesehen?","video":"Noch nicht dort gewesen? Schau das Video und beschreib deinen ersten Eindruck."},{"h":"Geschichte","say":"Erzähl: Sie wurde Jahre zu spät eröffnet und viel teurer als geplant.","prep":"Warum wurde der Bau so viel teurer?","video":""},{"h":"Heute","say":"Erklär, was man dort machen kann, auch ohne Konzertkarte.","prep":"Was ist die Plaza und kostet der Eintritt etwas? Notiere auch ein Konzert diesen Monat.","video":""},{"h":"Meinung","say":"Sag, ob sich die 866 Millionen gelohnt haben oder ob es Verschwendung war.","prep":"Wie kommt man an Konzertkarten und was kosten sie? Ist die Elphi für alle da?","video":""}],"Was ist typisch Hamburg?":[{"h":"Einstieg","say":"Erzähl, wann du zum ersten Mal mit „Moin“ begrüßt wurdest.","prep":"Woher kommt das Wort Moin?","video":""},{"h":"Typisch","say":"Nenn drei typisch Hamburger Dinge, zum Beispiel Franzbrötchen oder Schietwetter.","prep":"Was ist ein Franzbrötchen und wo gibt es das beste?","video":"Schau das Video und notiere zwei typische Hamburger Gerichte."},{"h":"Menschen","say":"Beschreib, wie Hamburger am Anfang wirken und wie man mit ihnen warm wird.","prep":"Was bedeutet hanseatisch?","video":""},{"h":"Meinung","say":"Sag, was du dir angewöhnt hast und woran du dich nie gewöhnst.","prep":"Welche Klischees über Hamburger gibt es in anderen Teilen Deutschlands? Welches stimmt für dich?","video":""}],"Der Hamburger Hafen":[{"h":"Einstieg","say":"Erzähl, wo du dich gern ans Wasser setzt und den Schiffen zuschaust.","prep":"Wann ist der nächste Hafengeburtstag? Notiere auch deinen Lieblingsplatz am Wasser.","video":""},{"h":"Fakten","say":"Nenn Zahlen: Container, Arbeitsplätze, der größte Hafen Deutschlands.","prep":"Wie viele Container werden jährlich umgeschlagen?","video":"Schau das Video und notiere zwei Dinge, die du über den Hafen lernst."},{"h":"Diskussion","say":"Erklär einen Streitpunkt: den Einstieg von MSC bei der HHLA oder die Elbvertiefung.","prep":"Was war der Streit um MSC und die HHLA, und warum war die Elbvertiefung umstritten?","video":""},{"h":"Meinung","say":"Sag, was du kritisch siehst und wie du Wirtschaft und Umwelt abwägst.","prep":"Such ein Argument der Wirtschaft und eins von Umweltschützern zum Hafen.","video":""}],"Die Bahn mal wieder":[{"h":"Einstieg","say":"Erzähl deine schlimmste Bahngeschichte, zum Beispiel einen verpassten Anschluss.","prep":"Welche Entschädigung gibt es bei Verspätung? Hast du schon mal Geld zurückbekommen?","video":""},{"h":"Fakten","say":"Nenn Zahlen: Wie viele Fernzüge kommen pünktlich an?","prep":"Wie pünktlich war der Fernverkehr der Bahn im letzten Jahr?","video":""},{"h":"Warum","say":"Erklär die Gründe: viele Baustellen und zu wenig Geld für die Schiene.","prep":"Welche großen Baustellen gibt es gerade rund um Hamburg?","video":"Schau das Video und notiere, was die Bahn für mehr Pünktlichkeit plant."},{"h":"Vergleich","say":"Erzähl, wie man in deinem Herkunftsland Zug fährt, zum Beispiel im Nachtzug.","prep":"Ab wie vielen Minuten gilt ein Zug in Deutschland als verspätet? Und bei dir zu Hause?","video":""}],"Urlaub: Malle, Ostsee oder weit weg?":[{"h":"Einstieg","say":"Erzähl von deinem schönsten oder schrägsten Urlaub, zum Beispiel mit Pech beim Wetter.","prep":"Notiere dein eigenes Erlebnis: Wo war dein schönster oder schrägster Urlaub?","video":""},{"h":"Fakten","say":"Erzähl, wohin Deutsche am liebsten fahren: an die Ostsee oder nach Malle?","prep":"Was sind die beliebtesten Urlaubsziele der Deutschen, und welche Ostseeorte liegen nah bei Hamburg?","video":"Schau das Video und notiere, wer auf Mallorca an den Urlaubern verdient."},{"h":"Kultur","say":"Erklär das Ritual: Deutsche planen den Urlaub lange und erzählen gern davon.","prep":"Was ist Malle und warum hat es einen Ruf?","video":""},{"h":"Vergleich","say":"Erzähl, wie man bei dir zu Hause Urlaub macht, zum Beispiel auf der Datscha.","prep":"Wie viele Urlaubstage haben Deutsche im Schnitt, und wie viele hat man bei dir zu Hause?","video":""}],"HSV oder St. Pauli?":[{"h":"Einstieg","say":"Frag die Runde: HSV oder St. Pauli? Zu welchem Verein haltet ihr?","prep":"Was ist das Stadtderby und wie ging das letzte aus?","video":""},{"h":"Zwei Vereine","say":"Erklär: Der HSV steht für Tradition, St. Pauli zeigt eine politische Haltung.","prep":"Warum hat St. Pauli einen Totenkopf als Symbol, und was bedeutet beim HSV die Uhr?","video":""},{"h":"Aktuell","say":"Sag, in welcher Liga beide spielen und auf welchem Platz sie stehen.","prep":"In welcher Liga spielen beide Vereine gerade?","video":"Schau das Video und notiere, wie beide Vereine vor dem Derby dastehen."},{"h":"Meinung","say":"Sag, mit welchem Verein du dich identifizierst und warum.","prep":"Frag zwei Hamburger: Für welchen Verein sind sie und warum?","video":""}],"Der Dönerpreis":[{"h":"Einstieg","say":"Sag, wie viel du für deinen letzten Döner gezahlt hast.","prep":"Was kostet ein Döner in deinem Viertel?","video":""},{"h":"Geschichte","say":"Erzähl, ob der Döner aus der Türkei stammt oder aus Berlin.","prep":"Wer hat den Döner erfunden? Es gibt zwei Geschichten.","video":""},{"h":"Preise","say":"Erklär, warum der Döner als Inflationsmesser dient und immer teurer wird.","prep":"Wie stark sind Lebensmittelpreise in den letzten Jahren gestiegen?","video":"Schau das Video und notiere zwei Gründe, warum der Döner teurer wird."},{"h":"Meinung","say":"Sag, was du dir nicht mehr leisten kannst oder worauf du verzichtest.","prep":"Was war die Idee mit der Dönerpreisbremse? Findest du sie gut?","video":""}],"Pfand und Mülltrennung":[{"h":"Einstieg","say":"Erzähl, wie der Automat deine Flasche nicht angenommen hat.","prep":"Notiere dein eigenes Erlebnis mit dem Pfandautomaten: Was ist passiert?","video":""},{"h":"Fakten","say":"Erklär, wofür man Pfand zahlt und was in die gelbe Tonne kommt.","prep":"Wie viel Pfand gibt es auf Einweg- und Mehrwegflaschen, und welche Tonne ist in Hamburg für was?","video":"Schau das Video und notiere eine Sache, die dich am Pfandsystem überrascht."},{"h":"Kultur","say":"Erklär, warum Leute Pfandflaschen neben den Mülleimer stellen.","prep":"Seit wann gibt es das Pfandsystem?","video":""},{"h":"Vergleich","say":"Trennt man in deiner Heimat den Müll oder wirft man alles in eine Tonne?","prep":"Was passiert mit dem Plastik aus der gelben Tonne? Und wie ist es bei dir zu Hause?","video":""}],"Sonntagsruhe":[{"h":"Einstieg","say":"Erzähl, wie du am ersten Sonntag vor verschlossenen Türen standest.","prep":"Was sind verkaufsoffene Sonntage in Hamburg? Notiere auch deinen ersten Sonntag hier.","video":""},{"h":"Regeln","say":"Erklär, was sonntags verboten ist, zum Beispiel Flaschen in den Container werfen.","prep":"Was ist laut Gesetz am Sonntag erlaubt und was nicht?","video":"Schau das Video und notiere, wann ein Späti sonntags öffnen darf."},{"h":"Warum","say":"Erklär, woher die Regel kommt: christliche Tradition und Grundgesetz.","prep":"Woher kommt die Sonntagsruhe historisch?","video":""},{"h":"Meinung","say":"Sag: nervig oder genial? Kommst du sonntags zur Ruhe oder nicht?","prep":"Was steht in deiner Hausordnung zu Ruhezeiten? Findest du das gut?","video":""}],"Duzen oder Siezen?":[{"h":"Einstieg","say":"Erzähl, wie du jemanden aus Versehen geduzt hast und ins Fettnäpfchen getreten bist.","prep":"Wann ist Duzen eine Beleidigung? Notiere ein Beispiel.","video":""},{"h":"Regeln","say":"Erkläre, wer wem das Du anbietet und wo man sich sofort duzt.","prep":"Wer bietet wem das Du an? Gibt es feste Regeln?","video":"Schau das Video und notiere zwei Situationen: Wann duzt man, wann siezt man?"},{"h":"Hamburg","say":"Erkläre das Hamburger Sie und warum Hamburger Wert auf Distanz legen.","prep":"Was ist das Hamburger Sie?","video":""},{"h":"Vergleich","say":"Erkläre, wie man in deiner Sprache höflich anspricht, z. B. mit Vatersnamen.","prep":"Duzen sich Kollegen in Start-ups und alten Firmen anders? Und in deinem Land?","video":""}],"Termin beim Amt":[{"h":"Einstieg","say":"Deine Amt-Geschichte in drei Sätzen: Wie hast du einen Termin ergattert?","prep":"Notiere dein eigenes Erlebnis beim Amt: Wurdest du schon mal nach Hause geschickt?","video":""},{"h":"Fakten","say":"Erkläre, was man wo erledigt: Anmeldung im Kundenzentrum, Führerschein umschreiben.","prep":"Was ist das Kundenzentrum, und innerhalb wie vieler Tage muss man sich nach einem Umzug anmelden?","video":""},{"h":"Diskussion","say":"Diskutiere: Warum stöhnen viele über Bürokratie? Was kann man schon online erledigen?","prep":"Warum gibt es in deutschen Ämtern noch Faxgeräte?","video":"Schau das Video und notiere zwei Gründe, warum der digitale Bürgerservice hapert."},{"h":"Vergleich","say":"Vergleiche mit deinem Land: Kann man ohne Termin hingehen? Steht man Schlange?","prep":"Was kann man in Hamburg schon online erledigen, und was bei dir zu Hause?","video":""}],"Mauerfall und Deutsche Einheit":[{"h":"Einstieg","say":"Beschreibe ein Bild vom 9. November 1989: Menschen tanzen auf der Mauer.","prep":"Was war Günter Schabowskis berühmter Satz am 9. November 1989?","video":""},{"h":"Geschichte","say":"Erzähl kurz: Deutschland war in zwei Staaten geteilt und wurde 1990 wiedervereinigt.","prep":"Warum ist der Feiertag am 3. Oktober und nicht am 9. November? Was passierte am 9. November noch?","video":"Schau das Video und notiere drei Etappen zwischen Mauerfall und Einheit."},{"h":"Heute","say":"Erzähl, wie man den 3. Oktober feiert und wo man Unterschiede spürt.","prep":"Wo in Hamburg kann man heute etwas zur Teilung sehen oder lernen?","video":""},{"h":"Persönlich","say":"Wie hat man in deinem Land die Zeit erlebt? Perestroika, Bilder im Fernsehen?","prep":"Frag deine Familie: Wie habt ihr den Mauerfall und die Perestroika erlebt?","video":""}],"Das Sommermärchen und das 7:1":[{"h":"Einstieg","say":"Ein Satz: Wo hast du 2014 das Finale geschaut? Hast du mitgefiebert?","prep":"Was ist Public Viewing? Hast du schon mal mitgemacht?","video":""},{"h":"2006","say":"Erzähl, wie Deutschland 2006 die WM ausrichtete und alle die Fahne schwenkten.","prep":"Warum heißt 2006 Sommermärchen und welchen Platz holte Deutschland?","video":""},{"h":"2014","say":"Erzähl, wie Deutschland Brasilien 7:1 schlug und Weltmeister wurde.","prep":"Wer schoss 2014 im Finale das Siegtor?","video":"Schau das Video und notiere drei Momente aus dem 7:1 gegen Brasilien."},{"h":"Meinung","say":"Erkläre, warum Deutsche bei diesen Momenten Gänsehaut bekommen und stolz sind.","prep":"Was war später der Skandal um das Sommermärchen? Ändert er das Bild?","video":""}],"Ossis und Wessis heute":[{"h":"Einstieg","say":"Erzähl von jemandem, der im Osten geboren ist. Ist er in den Westen gezogen?","prep":"Notiere dein eigenes Erlebnis: Wen kennst du aus dem Osten, und was erzählt er?","video":""},{"h":"Fakten","say":"Erkläre, wo es noch Unterschiede bei Löhnen und Renten gibt.","prep":"Wie groß ist der Lohnunterschied zwischen Ost und West heute?","video":"Schau das Video und notiere, wo die Unterschiede zwischen Ost und West kleiner werden."},{"h":"Kultur","say":"Erkläre Ostalgie: Wer trauert den alten Zeiten nach? Was hat Kultstatus?","prep":"Was ist Ostalgie? Welche DDR-Produkte und Symbole wie das Ampelmännchen gibt es noch?","video":""},{"h":"Vergleich","say":"Gibt es bei dir Vorurteile zwischen Regionen oder zwischen Hauptstadt und Provinz?","prep":"Welche Vorurteile gibt es in deinem Land über andere Regionen? Notiere zwei Beispiele.","video":""}],"Die Sturmflut 1962":[{"h":"Einstieg","say":"Beschreibe die Nacht in drei Sätzen: Die Deiche brechen, die Menschen schlafen.","prep":"Frag Hamburger Bekannte: Kennen sie Geschichten aus der Flutnacht?","video":""},{"h":"Fakten","say":"Erkläre, welche Stadtteile unter Wasser standen und wie viele ums Leben kamen.","prep":"Warum war Wilhelmsburg so stark betroffen?","video":"Schau das Video und notiere drei Fakten: wann, wo, wie viele Opfer."},{"h":"Helmut Schmidt","say":"Erzähl, wie Schmidt die Bundeswehr holte und als Krisenmanager bekannt wurde.","prep":"Was genau hat Helmut Schmidt gemacht?","video":""},{"h":"Heute","say":"Erkläre, wie Hamburg die Deiche erhöht hat und an die Opfer erinnert.","prep":"Wie schützt sich Hamburg heute vor Sturmfluten, und wo erinnert man an die Flut?","video":""}],"Tatort am Sonntagabend":[{"h":"Einstieg","say":"Summ die Titelmelodie. Erkennt die Gruppe sie sofort wieder?","prep":"Warum ist die Melodie so berühmt?","video":""},{"h":"Fakten","say":"Erkläre: Seit 1970 läuft der Tatort im Ersten, jede Stadt hat eigene Kommissare.","prep":"Wer ermittelt gerade im Hamburger Tatort?","video":"Schau das Video und notiere zwei Fakten über 50 Jahre Tatort."},{"h":"Ritual","say":"Beschreib das Ritual: Tatort-Abend in der Kneipe, montags Gespräche im Büro.","prep":"Wo kann man in Hamburg Tatort in einer Kneipe schauen?","video":""},{"h":"Meinung","say":"Dein Urteil: Errätst du den Mörder? Ist die Handlung zu langsam?","prep":"Welcher Tatort ist am beliebtesten und warum? Schau eine Folge an.","video":""}],"Loriot und deutscher Humor":[{"h":"Einstieg","say":"Erzähl: Wann hast du einen Witz nicht verstanden und auf dem Schlauch gestanden?","prep":"Notiere dein eigenes Erlebnis mit einem deutschen Witz, den du nicht verstanden hast.","video":""},{"h":"Loriot","say":"Erkläre, warum Loriot als Klassiker gilt, und erzähl kurz einen Sketch.","prep":"Welche Loriot-Sketche sind am bekanntesten? Woher kommt «Früher war mehr Lametta»?","video":"Schau das Interview und notiere zwei Dinge, die Loriot über Humor sagt."},{"h":"Humor","say":"Erkläre deutschen Humor: oft trocken, man lacht gern über den Alltag.","prep":"Was ist der Unterschied zwischen Ironie und Sarkasmus auf Deutsch?","video":""},{"h":"Vergleich","say":"Worüber lacht man bei dir? Kann man über sich selbst lachen?","prep":"Wer sind heute bekannte Comedians in Deutschland, und wer bei dir zu Hause?","video":""}],"Deutschland beim Eurovision":[{"h":"Einstieg","say":"Erzähl von einem legendären ESC-Auftritt, bei dem du Gänsehaut bekommen hast.","prep":"Notiere deinen ESC-Lieblingsmoment: Welches Jahr, welches Land, welcher Song?","video":""},{"h":"Fakten","say":"Erkläre die Bilanz: zweimal gewonnen, 1982 und 2010, oft weit hinten gelandet.","prep":"Was sind die Big Five, und warum ist Deutschland immer im Finale?","video":""},{"h":"Dieses Jahr","say":"Erzähl, wer zuletzt für Deutschland antrat und auf welchem Platz er landete.","prep":"Wer hat zuletzt für Deutschland gesungen, wie wurde der Act ausgewählt und welchen Platz gab es?","video":""},{"h":"Meinung","say":"Deine Meinung: Liegt es an der Songauswahl? Was kommt beim Publikum gut an?","prep":"Wie funktioniert die Punktevergabe, und warum bekommt Deutschland so wenige Punkte?","video":"Schau das Video und notiere zwei Gründe, warum Deutschland oft schlecht abschneidet."}],"Hamburg und die Beatles":[{"h":"Einstieg","say":"Spiel kurz einen Beatles-Song an: Wer weiß, woher die Band stammt?","prep":"Was ist der Beatles-Platz? Ein Foto davon ist ein guter Einstieg.","video":""},{"h":"Geschichte","say":"Erzähl, wo die Beatles auf der Reeperbahn spielten und wie sie erwachsen wurden.","prep":"Wie lange und wo genau haben die Beatles in Hamburg gespielt?","video":"Schau das Video und notiere, wann und wo die Beatles zuerst auftraten."},{"h":"Heute","say":"Erkläre, warum Hamburg als Musikstadt bekannt ist und wo du auf Konzerte gehst.","prep":"Was ist das Reeperbahn Festival?","video":""},{"h":"Meinung","say":"Welcher deutsche Song ist dein Ohrwurm? Hilft er dir beim Deutschlernen?","prep":"Welche Hamburger Bands und Musiker sind heute bekannt? Such einen Song auf Deutsch.","video":""}],"Reformationstag oder Halloween?":[{"h":"Einstieg","say":"Erzähl: Hattest du letztes Jahr am 31. Oktober frei? Hat jemand geklingelt?","prep":"Warum ist der Tag in Hamburg erst seit 2018 Feiertag, und welche Bundesländer haben ihn noch?","video":""},{"h":"Reformation","say":"Erkläre in drei Sätzen, an wen der Tag erinnert: Luther und 1517.","prep":"Was passierte 1517 und wer war Martin Luther?","video":""},{"h":"Halloween","say":"Erkläre, wie Halloween aus den USA kam und Kinder verkleidet um die Häuser ziehen.","prep":"Wie feiern Kinder in Hamburg Halloween?","video":"Schau das Video und notiere eine Gemeinsamkeit von Halloween und Reformationstag."},{"h":"Vergleich","say":"Was feiert man bei dir Ende Oktober? Oder ist es ein normaler Arbeitstag?","prep":"Frag Freunde zu Hause: Feiert man bei euch Halloween oder kennt man es nur aus Filmen?","video":""}],"Laternelaufen":[{"h":"Einstieg","say":"Erzähl: Bist du schon beim Laternenumzug mitgelaufen oder hast ihn zufällig gesehen?","prep":"Welche Laternenlieder kennt jedes Kind? Hör dir eins an.","video":""},{"h":"Geschichte","say":"Erzähl die Legende: Sankt Martin teilt seinen Mantel mit einem Bettler.","prep":"Wer war Sankt Martin und was hat er mit dem Mantel gemacht?","video":"Schau das Video und notiere, wie Martin vom Soldaten zum Bischof wurde."},{"h":"Heute","say":"Beschreibe das Ritual: Kinder basteln Laternen und ziehen singend durch die Straßen.","prep":"Wo gibt es in Hamburg große Laternenumzüge, und warum basteln Kinder ihre Laternen selbst?","video":""},{"h":"Vergleich","say":"Welche Herbsttradition gibt es bei dir? Feiert man die Ernte, sammelt man Pilze?","prep":"Notiere eine Herbsttradition aus deinem Land: Wann ist sie, und was macht man?","video":""}],"Der 11.11.: Karneval im Norden?":[{"h":"Einstieg","say":"Zeig der Gruppe ein Karnevalsfoto aus Köln: Wer trägt welches Kostüm?","prep":"Was rufen die Leute in Köln und was in Mainz?","video":""},{"h":"Fakten","say":"Erkläre: Am 11.11. um 11:11 Uhr eröffnen die Karnevalshochburgen die Saison.","prep":"Warum beginnt der Karneval am 11.11. um 11:11 Uhr?","video":"Schau das Video und notiere, woher der Karneval kommt."},{"h":"Nord gegen Süd","say":"Erkläre, warum Hamburger anders ticken und oft kopfschüttelnd zuschauen.","prep":"Was ist der Unterschied zwischen Karneval, Fasching und Fastnacht? Wo sagt man was?","video":""},{"h":"Meinung","say":"Würdest du einfach mal mitfeiern, oder ist das nicht so dein Ding?","prep":"Wird in Hamburg überhaupt Karneval gefeiert? Wo könntest du mitfeiern?","video":""}],"Advent und Weihnachtsmarkt":[{"h":"Einstieg","say":"Erzähl deinen Lieblingsmoment im Advent: Wie machst du es dir gemütlich?","prep":"Wann ist 2026 der erste Advent? Notiere, worauf du dich freust.","video":""},{"h":"Traditionen","say":"Erkläre die Traditionen: Kerze am Adventskranz anzünden, Türchen im Kalender öffnen.","prep":"Was ist Wichteln und wie funktioniert es?","video":""},{"h":"Hamburg","say":"Gib Tipps: Auf welchen Weihnachtsmarkt sollte man gehen? Wie funktioniert das Tassenpfand?","prep":"Welche Weihnachtsmärkte in Hamburg sind die bekanntesten? Was kosten Glühwein und Tassenpfand?","video":"Schau das Video und notiere drei Dinge, die es auf Weihnachtsmärkten gibt."},{"h":"Vergleich","say":"Erzähl, wie man bei dir feiert: Weihnachten im Januar, Silvester groß?","prep":"Notiere, wann und wie man bei dir Weihnachten und Silvester feiert.","video":""}],"Rekordpreise beim Tanken und Heizen":[{"h":"Einstieg","say":"Erzähl kurz, wann du zuletzt getankt hast und was es gekostet hat.","prep":"Was kostet ein Liter E10 gerade bei dir in der Nähe?","video":""},{"h":"Fakten","say":"Nenn die Rekordpreise, die Inflation und den Grund: die Blockade der Straße von Hormus.","prep":"Warum ist Öl seit Februar 2026 so teuer?","video":""},{"h":"Reaktionen","say":"Erklär den Tankrabatt und den Streit über einen Preisdeckel.","prep":"Was wollen SPD und Wirtschaftsministerin Reiche gegen die Preise tun?","video":"Guck den Presseclub: Welche Ideen gegen die hohen Preise werden genannt?"},{"h":"Vergleich","say":"Vergleich die Preise mit deinem Herkunftsland und sag, was du selbst denkst.","prep":"Wie haben sich die Spritpreise in deinem Herkunftsland entwickelt?","video":""}],"Wackelt die Regierung Merz?":[{"h":"Einstieg","say":"Sag, welches Thema dich persönlich betrifft: Rente, Pflege oder Steuern.","prep":"Welches Thema aus der Bundespolitik betrifft dich persönlich?","video":""},{"h":"Fakten","say":"Erzähl von den Landtagswahlen im September und den schlechten Umfragewerten der Union.","prep":"Wie hat die CDU bei den Landtagswahlen im September abgeschnitten?","video":""},{"h":"Streitpunkte","say":"Erklär, worüber Union und SPD streiten und was beim Koalitionsausschuss passiert ist.","prep":"Worüber streiten Union und SPD gerade genau?","video":"Guck den Teil zum Koalitionsausschuss: Was ist am 7. Oktober rausgekommen?"},{"h":"Vergleich","say":"Vergleich das mit deinem Herkunftsland und sag, ob die Koalition umsteuern sollte.","prep":"Was passiert in deinem Herkunftsland, wenn eine Regierung Wahlen verliert?","video":""}],"AfD-Rekord in Sachsen-Anhalt":[{"h":"Einstieg","say":"Sag, ob du schon mal in Sachsen-Anhalt warst oder was du darüber weißt.","prep":"Was weißt du schon über Sachsen-Anhalt?","video":""},{"h":"Fakten","say":"Nenn die Ergebnisse, die Sitzverteilung und wer jetzt Landtagspräsident ist.","prep":"Wie viele Sitze haben die Parteien im Landtag von Sachsen-Anhalt?","video":""},{"h":"Ausblick","say":"Erklär, was im Dezember passieren kann und warum das BSW wichtig ist.","prep":"Wie reagieren CDU und BSW auf Siegmunds Plan?","video":"Hör in den Podcast rein: Was verändert diese Wahl laut 11KM?"},{"h":"Debatte","say":"Erklär die Debatte um die Brandmauer und frag die Gruppe nach ihrer Meinung.","prep":"Was bedeutet der Begriff 'Brandmauer' in der deutschen Politik?","video":""}],"Ex-BND-Chef unter Spionageverdacht":[{"h":"Einstieg","say":"Fang mit einer Frage an: Wer guckt gern Spionagefilme?","prep":"Was macht der BND eigentlich?","video":""},{"h":"Fakten","say":"Erzähl, was Hanning vorgeworfen wird, und sag klar: Es ist ein Verdacht.","prep":"Was wirft die Bundesanwaltschaft Hanning genau vor?","video":"Guck das Video: Warum sind die Vorwürfe laut ARD-Rechtsexperte so gravierend?"},{"h":"Reaktionen","say":"Sag, was sein Anwalt sagt und was Politiker jetzt fordern.","prep":"Was sagt Hannings Anwalt, und was fordern Politiker jetzt?","video":""},{"h":"Meinung","say":"Sag, ob Ex-Geheimdienstchefs Berater werden dürfen, und vergleich mit deinem Land.","prep":"Gibt es in deinem Herkunftsland Regeln für ehemalige Geheimdienstchefs?","video":""}],"Jauch und die 3-Millionen-Woche":[{"h":"Einstieg","say":"Erzähl, dass bei Jauch diese Woche um 3 Millionen gespielt wurde.","prep":"Was ist bei dieser Sonderwoche anders als sonst?","video":""},{"h":"Fakten","say":"Erklär kurz den Ablauf: drei Altersgruppen, dann das Finale am Donnerstag.","prep":"Wer durfte ins Finale, und wann läuft es?","video":""},{"h":"Reaktionen","say":"Erzähl, wie viele zugeguckt haben und dass der Rentner-Abend stark war.","prep":"Welcher Abend hatte die besten Quoten?","video":"Guck den Clip: Wer gewinnt, und wie reagiert er darauf?"},{"h":"Meinung","say":"Sag ehrlich: Würdest du das sichere Geld nehmen oder alles riskieren?","prep":"Was bietet Jauch den Kandidaten im Finale an?","video":""}],"Zverev wird die Nummer eins":[{"h":"Einstieg","say":"Frag, wer Tennis guckt, und nenn Zverevs zwei große Titel.","prep":"Welche Grand-Slam-Turniere hat Zverev 2026 gewonnen?","video":""},{"h":"Fakten","say":"Erzähl vom US-Open-Finale gegen Shelton und vom Ergebnis.","prep":"Gegen wen hat er das US-Open-Finale gewonnen, und wie ging es aus?","video":"Guck die Highlights: Welcher Moment im Finale ist für dich der spannendste?"},{"h":"Hintergrund","say":"Erklär, dass Sinner die Saison beendet hat, und vergleich die Punkte.","prep":"Was hat Sinner am 6. Oktober verkündet, und wie war der Punktestand?","video":""},{"h":"Meinung","say":"Sag, ob Platz eins verdient ist, wenn der Rivale fehlt.","prep":"Wann genau kann Zverev Platz eins übernehmen?","video":""}],"Promi Big Brother: Staffel 14":[{"h":"Einstieg","say":"Erklär kurz das Format: Prominente wohnen zusammen, Kameras sind immer dabei.","prep":"Wie funktioniert das Format, und wer moderiert?","video":"Guck kurz in den Livestream: Was machen die Bewohner gerade?"},{"h":"Fakten","say":"Nenn zwei, drei bekannte Bewohner und sag, wann die Staffel gestartet ist.","prep":"Welche Prominenten sind diesmal dabei?","video":""},{"h":"Reaktionen","say":"Erzähl, wie die Quoten gesunken sind und wer am Dienstag vorne lag.","prep":"Wie haben sich die Einschaltquoten in der ersten Woche entwickelt?","video":""},{"h":"Meinung","say":"Sag deine Meinung: gute Unterhaltung oder einfach nur Trash?","prep":"Welche Regeln gibt es, und was passiert bei einem Regelbruch?","video":""}],"Babylon Berlin: Das große Finale":[{"h":"Einstieg","say":"Erzähl, ob du die Serie kennst und wo man sie gucken kann.","prep":"Wann und wo kann man die letzte Staffel sehen?","video":"Guck den Trailer: Welche Stimmung hat er, eher hell oder düster?"},{"h":"Fakten","say":"Erklär, dass die letzte Staffel im Februar 1933 spielt.","prep":"In welcher Zeit spielt die finale Staffel?","video":""},{"h":"Hintergrund","say":"Nenn ein paar Zahlen: Start 2017, über 140 Länder, Platz eins.","prep":"Wie erfolgreich ist die Serie in Deutschland und im Ausland?","video":""},{"h":"Meinung","say":"Sag, ob das düstere Ende passt und ob das Thema heute aktuell ist.","prep":"Warum finden viele das Thema der Serie heute aktuell?","video":""}]};
+
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+let filter="alle", cur=-1;
+
+/* Bereiche */
+$("chips").innerHTML=`<button class="chip" type="button" data-r="alle" aria-pressed="true">Alle</button>`+
+ Object.entries(R).map(([k,v])=>`<button class="chip" type="button" data-r="${k}" aria-pressed="false">${v}</button>`).join("");
+$("chips").addEventListener("click",e=>{
+ const b=e.target.closest(".chip");if(!b)return;
+ filter=b.dataset.r;
+ document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"));
+});
+const pool=()=>T.map((x,i)=>i).filter(i=>filter==="alle"||T[i].r===filter);
+
+/* Karte */
+function render(i){
+ cur=i;const d=T[i];
+ $("title").textContent=d.t;
+ const vd=VIDEO[d.t],va=$("video");
+ if(vd){va.hidden=false;va.href="https://www.youtube.com/watch?v="+vd[0];$("vThumb").src="https://i.ytimg.com/vi/"+vd[0]+"/hqdefault.jpg";$("vThumb").parentNode.classList.remove("noimg");$("vTitle").textContent=vd[1];$("vSrc").textContent=vd[2]+" · YouTube";}else{va.hidden=true}
+ $("worum").textContent=d.w;
+ const TIMES=["0:00","0:30","2:00","3:30","4:30"];
+ const groups=WG[d.t]||[];
+ const vurl=vd?"https://www.youtube.com/watch?v="+vd[0]:"";
+ const voc=k=>((groups[k]||[0,[]])[1]).filter(x=>x[2]).map(([de,ru,bsp])=>`<li tabindex="0" role="button" data-copy="${esc(de+" - "+ru)}" title="Wort und Übersetzung kopieren"><span class="de">${esc(de)}</span><span class="ru">${esc(ru)}</span><span class="bsp">${esc(bsp)}</span></li>`).join("");
+ const steps=(LINK[d.t]||d.a.slice(0,4).map(([h,x])=>({h,say:x,prep:"",video:""}))).map((st,k)=>`<li class="st">
+  <span class="st-time">${TIMES[k]}</span>
+  <div class="st-body">
+   <h4>${esc(st.h)}</h4>
+   <p class="st-say">${esc(st.say)}</p>
+   ${(st.prep||st.video&&vurl)?`<div class="st-prep"><span class="st-lab">Vorbereitung</span>
+    ${st.prep?`<p class="pr-q">${esc(st.prep)}</p>`:""}
+    ${st.video&&vurl?`<p class="pr-v"><a href="${vurl}" target="_blank" rel="noopener">${esc(st.video)}</a></p>`:""}</div>`:""}
+   <span class="st-lab">Wendungen</span>
+   <ul class="vocab">${voc(k)}</ul>
+  </div></li>`);
+ steps.push(`<li class="st">
+  <span class="st-time">4:30</span>
+  <div class="st-body">
+   <h4>Frage an die Gruppe</h4>
+   <p class="st-say">Stell eine dieser Fragen und lass die anderen antworten.</p>
+   <ul class="q">${d.d.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  </div></li>`);
+ $("steps").innerHTML=steps.join("");
+ $("say").innerHTML=d.s.map(([de,ru])=>`<button type="button" data-copy="${esc(de)}"><span class="de">${esc(de)}</span><span class="ru">${esc(ru)}</span></button>`).join("");
+ $("fehler").innerHTML=[d.f,...(X[d.t]||[])].map(([f,r,w])=>`<li><span class="richtig">${esc(r)}</span><del>${esc(f)}</del><span class="warum">${esc(w)}</span></li>`).join("");
+}
+
+/* Ziehen: Stapel mischt kurz, dann erscheint die Karte */
+function draw(){
+ const p=pool();if(!p.length)return;
+ let pick;do{pick=p[Math.floor(Math.random()*p.length)]}while(pick===cur&&p.length>1);
+ const btn=$("drawBtn"),st=document.querySelector(".stack"),reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ btn.disabled=true;st.classList.add("shuffle");
+ setTimeout(()=>{
+  st.classList.remove("shuffle");btn.disabled=false;
+  render(pick);
+  $("deckHint").textContent="Nicht dein Thema? Zieh eine neue Karte.";$("drawLbl").textContent="Neu ziehen";
+  const c=$("card");c.hidden=false;c.classList.remove("flip");void c.offsetWidth;c.classList.add("flip");
+  c.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});
+ },reduce?0:900);
+}
+$("drawBtn").addEventListener("click",draw);
+$("deckMeta").innerHTML=`<b>${T.length}</b> Themen<br><b>${Object.keys(R).length}</b> Bereiche`;
+
+$("vThumb").addEventListener("error",e=>e.target.parentNode.classList.add("noimg"));
+
+/* Kopieren */
+function copy(text,el){
+ const done=()=>{el.classList.add("ok");setTimeout(()=>el.classList.remove("ok"),1000)};
+ try{navigator.clipboard.writeText(text).then(done,done)}catch(_){done()}
+}
+$("say").addEventListener("click",e=>{const b=e.target.closest("button");if(b)copy(b.dataset.copy,b)});
+/* Nur Wendung + Übersetzung (ohne Fragen und Beispielsätze) */
+const pairs=d=>(WG[d.t]||[["",d.v.map(x=>[x[0],x[1],"x"])]]).flatMap(([h,it])=>it).filter(x=>x[2]).map(x=>[x[0],x[1]]);
+$("copyVocab").addEventListener("click",e=>{if(cur<0)return;const b=e.currentTarget;copy(pairs(T[cur]).map(([a,r])=>a+"\t"+r).join("\n"),b);b.textContent="Kopiert";setTimeout(()=>b.textContent="Alle kopieren",1200)});
+$("cardsVocab").addEventListener("click",async e=>{
+ if(cur<0)return;const d=T[cur],msg=$("vMsg");
+ const txt=pairs(d).map(([a,r])=>a+"\t"+r).join("\n")+"\n";
+ const name="Lernkarten - "+d.t.replace(/[\\/:*?"<>|]/g,"")+".txt";
+ if(!dl){copy(txt,e.currentTarget);msg.textContent="Download geht hier nicht, die Karten sind kopiert. In Quizlet: Importieren > einfügen.";return}
+ try{await dl.save({filename:name,data:txt});msg.textContent="Gespeichert. Import in Quizlet oder Anki: Trennzeichen Tab."}
+ catch(err){const c=err&&err.code;if(c==="declined"){msg.textContent=""}else{copy(txt,e.currentTarget);msg.textContent="Download ging nicht, die Karten sind kopiert."}}
+});
+$("steps").addEventListener("click",e=>{const li=e.target.closest(".vocab li");if(li)copy(li.dataset.copy,li)});
+$("steps").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const li=e.target.closest(".vocab li");if(li){e.preventDefault();copy(li.dataset.copy,li)}}});
+
+/* PDF: Plan und Karte als Bilder blockweise auf A4, dann über downloads speichern */
+let dl=null;
+(async()=>{try{dl=await window.claude?.use?.("downloads")}catch(_){dl=null}})();
+const loadScript=src=>new Promise((ok,err)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=err;document.head.appendChild(s)});
+async function buildPdf(){
+ await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+ await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+ const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4"});
+ const PW=210,PH=297,M=14,CW=PW-2*M;let y=M,first=true;
+ const d=T[cur];
+ document.body.classList.add("pdf-mode");
+ try{
+ const blocks=[...document.querySelectorAll("#card .card-head,#card .video,#plan > .label,#steps > li,#card .panel.blue .block")].filter(el=>el&&!el.hidden&&el.offsetParent);
+ for(const el of blocks){
+  const c=await html2canvas(el,{scale:2,backgroundColor:"#ffffff",logging:false,useCORS:true,ignoreElements:n=>n.tagName==="IMG"||n.classList?.contains("v-actions")});
+  const h=c.height*CW/c.width;
+  if(!first&&y+h>PH-M){pdf.addPage();y=M}
+  pdf.addImage(c.toDataURL("image/jpeg",.92),"JPEG",M,y,CW,h);
+  if(el.classList.contains("video")&&VIDEO[d.t])pdf.link(M,y,CW,h,{url:"https://www.youtube.com/watch?v="+VIDEO[d.t][0]});
+  y+=h+5;first=false;
+ }
+ return pdf.output("arraybuffer");
+ }finally{document.body.classList.remove("pdf-mode")}
+}
+$("pdfBtn").addEventListener("click",async e=>{
+ if(cur<0)return;const btn=e.currentTarget,msg=$("pdfMsg");
+ if(!dl){window.print();return}
+ btn.disabled=true;msg.textContent="PDF wird erstellt…";
+ try{
+  const data=await buildPdf();
+  const name="Pitch-Runde - "+T[cur].t.replace(/[\\/:*?"<>|]/g,"")+".pdf";
+  msg.textContent="";
+  await dl.save({filename:name,data});
+  msg.textContent="Gespeichert.";
+ }catch(err){
+  const c=err&&err.code;
+  if(c==="declined")msg.textContent="";
+  else if(c==="rate_limited")msg.textContent="Bitte kurz warten und nochmal versuchen.";
+  else if(c&&["unavailable","not_granted","capability_disabled","capability_removed","extension_not_enabled"].includes(c)){msg.textContent="";dl=null;window.print()}
+  else msg.textContent="PDF konnte nicht erstellt werden. Tipp: Drucken > Als PDF speichern.";
+ }finally{btn.disabled=false}
+});
+</script>
