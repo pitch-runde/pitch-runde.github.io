@@ -635,6 +635,23 @@ h1{font-size:34px}
 .how-sec .how span{font-size:14px}
 .draw-hint,.draw-act .draw-hint,.st-time{font-size:14px}
 @media (max-width:560px){.how-sec .how span,.draw-act .draw-hint,.st-time{font-size:14px}}
+.dl-link{color:var(--ink);text-decoration:underline;font-weight:500}
+/* Links blau mit blauer Unterstreichung */
+.v-actions .copy-all{color:#3a4a94;text-decoration:underline;text-decoration-color:#3a4a94;text-decoration-thickness:1.5px;text-underline-offset:4px;border-bottom:0;box-shadow:none;background:none}
+.v-actions .copy-all:hover{color:#3a4a94;text-decoration-color:#3a4a94}
+.dl-link{color:#3a4a94;text-decoration-color:#3a4a94;text-underline-offset:4px}
+@media (max-width:560px){
+ .v-actions{flex-direction:row;flex-wrap:wrap;gap:6px 20px}
+ .v-actions .copy-all{width:auto;min-height:36px;border:0;border-radius:0;padding:0;text-align:left;text-decoration:underline;text-decoration-color:#3a4a94;text-decoration-thickness:1.5px;text-underline-offset:4px}
+}
+/* Hover für Links */
+.v-actions .copy-all,.dl-link{transition:color .15s ease,text-decoration-color .15s ease}
+.v-actions .copy-all:hover,.dl-link:hover{color:#222e66;text-decoration-color:#9aa6d4}
+/* Linien im Plan: hellgrau, kaum sichtbar */
+#plan .pitch > li.st::before{background:#efede9}
+#plan .vocab li{border-bottom-color:#f0eeea}
+#plan .st-body{border-bottom-color:#f0eeea}
+#plan .bsp{border-left-color:#ebe9e5}
 </style>
 
 <div class="wrap">
@@ -1088,7 +1105,7 @@ $("cardsVocab").addEventListener("click",async e=>{
  if(cur<0)return;const d=T[cur],msg=$("vMsg");
  const txt=pairs(d).map(([a,r])=>a+"\t"+r).join("\n")+"\n";
  const name="Lernkarten - "+d.t.replace(/[\\/:*?"<>|]/g,"")+".txt";
- if(!dl){copy(txt,e.currentTarget);msg.textContent="Download geht hier nicht, die Karten sind kopiert. In Quizlet: Importieren > einfügen.";return}
+ if(!dl){copy(txt,e.currentTarget);saveDirect(name,txt,"text/plain;charset=utf-8",msg);msg.prepend("Gespeichert und kopiert. Import in Quizlet oder Anki: Trennzeichen Tab. ");return}
  try{await dl.save({filename:name,data:txt});msg.textContent="Gespeichert. Import in Quizlet oder Anki: Trennzeichen Tab."}
  catch(err){const c=err&&err.code;if(c==="declined"){msg.textContent=""}else{copy(txt,e.currentTarget);msg.textContent="Download ging nicht, die Karten sind kopiert."}}
 });
@@ -1098,6 +1115,17 @@ $("steps").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const
 /* PDF: Plan und Karte als Bilder blockweise auf A4, dann über downloads speichern */
 let dl=null;
 (async()=>{try{dl=await window.claude?.use?.("downloads")}catch(_){dl=null}})();
+/* Direkter Download ohne Claude (GitHub Pages, Handy): Blob + Link, plus sichtbarer Link als Rückfall */
+function saveDirect(name,data,type,msg){
+ const blob=data instanceof Blob?data:new Blob([data],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download=name;a.rel="noopener";
+ document.body.appendChild(a);
+ try{a.click()}catch(_){}
+ a.remove();
+ if(msg){msg.innerHTML="";const l=document.createElement("a");l.href=url;l.download=name;l.target="_blank";l.rel="noopener";l.textContent="Download startet nicht? Hier tippen.";l.className="dl-link";msg.appendChild(l)}
+ setTimeout(()=>URL.revokeObjectURL(url),120000);
+}
 const loadScript=src=>new Promise((ok,err)=>{if(document.querySelector('script[src="'+src+'"]'))return ok();const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=err;document.head.appendChild(s)});
 async function buildPdf(){
  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
@@ -1121,19 +1149,19 @@ async function buildPdf(){
 }
 $("pdfBtn").addEventListener("click",async e=>{
  if(cur<0)return;const btn=e.currentTarget,msg=$("pdfMsg");
- if(!dl){window.print();return}
  btn.disabled=true;msg.textContent="PDF wird erstellt…";
  try{
   const data=await buildPdf();
   const name="Pitch-Runde - "+T[cur].t.replace(/[\\/:*?"<>|]/g,"")+".pdf";
   msg.textContent="";
+  if(!dl){saveDirect(name,data,"application/pdf",msg);return}
   await dl.save({filename:name,data});
   msg.textContent="Gespeichert.";
  }catch(err){
   const c=err&&err.code;
   if(c==="declined")msg.textContent="";
   else if(c==="rate_limited")msg.textContent="Bitte kurz warten und nochmal versuchen.";
-  else if(c&&["unavailable","not_granted","capability_disabled","capability_removed","extension_not_enabled"].includes(c)){msg.textContent="";dl=null;window.print()}
+  else if(c&&["unavailable","not_granted","capability_disabled","capability_removed","extension_not_enabled"].includes(c)){dl=null;msg.textContent="Bitte nochmal tippen."}
   else msg.textContent="PDF konnte nicht erstellt werden. Tipp: Drucken > Als PDF speichern.";
  }finally{btn.disabled=false}
 });
