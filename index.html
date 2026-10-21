@@ -2563,4 +2563,31 @@ paintWhere();paintAll();
 <script>document.querySelector(".fan").addEventListener("click",()=>{const b=document.getElementById("drawBtn");if(!b.disabled)b.click()});</script>
 
 
+<script>
+/* Statistik: GoatCounter (ohne Cookies, keine personenbezogenen Daten). Läuft nur auf pitch-runde.github.io und der Netlify-Version. */
+(function(){
+ var GC="pitch-runde";               // GoatCounter-Code (https://pitch-runde.goatcounter.com)
+ if(!/^(pitch-runde\.github\.io|inspiring-creponne-15b780\.netlify\.app|pitch-runde\.netlify\.app)$/.test(location.hostname))return;
+ var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://"+GC+".goatcounter.com/count");document.head.appendChild(s);
+ var slug=function(t){return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)};
+ var q=[];function track(name,title){var e={path:name,title:title||name,event:true};if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count(e);else q.push(e)}
+ var t=setInterval(function(){if(window.goatcounter&&window.goatcounter.count){clearInterval(t);q.splice(0).forEach(function(e){window.goatcounter.count(e)})}},500);setTimeout(function(){clearInterval(t)},15000);
+ var drawn=0;
+ var M=[["#tabClub","tab-club","Tab: Aus dem Club"],["#tabTreffen","tab-treffen","Tab: Treffen"],["#tabMine","tab-mein-bereich","Tab: Mein Bereich"],["#nsOpen","suche","Suche geöffnet"],["#filterBtn","filter-geoeffnet","Bereich-Filter geöffnet"],
+  ["#dwGo","neu-ziehen-trotz-warnung","Trotzdem neu ziehen"],["#emptyDraw","thema-ziehen-aus-leer","Zum Thema ziehen (leer)"],
+  ["#saveBtn, #sbSave, #dwSave","thema-gespeichert","Thema gespeichert"],["#pdfBtn, #sbPdf","pdf-heruntergeladen","PDF heruntergeladen"],
+  ["#video, .pr-v a","video-geoeffnet","Video geöffnet"],["#learnBtn","lernen-gestartet","Lernkarten gestartet"],["#fcKnow","karte-kann-ich","Lernkarte: Kann ich"],["#fcAgain","karte-nochmal","Lernkarte: Nochmal"],
+  ["#trSubmit","treffen-angelegt","Treffen angelegt"],["[data-tr=on]","treffen-zusage","Treffen: Ich komme"],["[data-tr=off]","treffen-absage","Treffen: Abmelden"],
+  ["#say button, .vocab li, [data-copy]","phrase-kopiert","Wendung kopiert"]];
+ document.addEventListener("click",function(e){
+  var el=e.target;if(!el.closest)return;
+  var chip=el.closest(".chip");if(chip)return track("bereich-"+slug(chip.dataset.r||chip.textContent),"Bereich: "+chip.textContent.trim());
+  if(el.closest("#drawBtn")){drawn++;return track(drawn>1?"neu-ziehen":"thema-ziehen",drawn>1?"Neu ziehen":"Thema ziehen")}
+  for(var i=0;i<M.length;i++){if(el.closest(M[i][0]))return track(M[i][1],M[i][2])}
+ },true);
+ var title=document.getElementById("title");
+ if(title)new MutationObserver(function(){var x=title.textContent.trim();if(x)track("thema-"+slug(x),"Thema: "+x)}).observe(title,{childList:true,characterData:true,subtree:true});
+})();
+</script>
+
 </body></html>
