@@ -3,13 +3,15 @@
 /* Pitch-Runde · Telegram Mini App: Anmeldung und Daten über /api */
 (function(){
  var tg=window.Telegram&&window.Telegram.WebApp, init=tg&&tg.initData;
- window.PR_TG=!!init; window.PR_WEBAPP=tg||null;
- if(!init) return;
- try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#f5f6f8");tg.setBackgroundColor&&tg.setBackgroundColor("#f5f6f8")}catch(e){}
- var H={"x-telegram-init-data":init,"content-type":"application/json"};
+ var login=null;try{login=localStorage.getItem("pr_tglogin")}catch(e){}
+ window.PR_TG=!!init; window.PR_WEBAPP=init?tg:null; window.PR_WEB_LOGIN=!init&&!!login;
+ if(!init&&!login) return;
+ if(init)try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#f5f6f8");tg.setBackgroundColor&&tg.setBackgroundColor("#f5f6f8")}catch(e){}
+ var H=init?{"x-telegram-init-data":init,"content-type":"application/json"}:{"x-telegram-login":login,"content-type":"application/json"};
  async function api(method,route,params,body){
   var u=new URL("/api/"+route,location.origin);for(var k in (params||{}))u.searchParams.set(k,params[k]);
   var r=await fetch(u,{method:method,headers:H,body:body?JSON.stringify(body):undefined});
+  if(r.status===401&&!init){try{localStorage.removeItem("pr_tglogin")}catch(_){}}
   if(!r.ok){var e=new Error("db "+r.status);e.code=r.status===403||r.status===400?"invalid_argument":r.status===401?"unauthenticated":"unavailable";throw e}
   return r.json();
  }
@@ -2440,7 +2442,7 @@ function themaSelect(t,mine,taken){
 async function paintTreffen(){
  const list=$("trList"),note=$("trNote");
  $("trAdmin").hidden=!TR.admin;
- if(TR.state==="nodb"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Öffne die Pitch-Runde in Telegram, um die Treffen zu sehen und dich anzumelden.";if(window.PR_BOT_LINK){const a=document.createElement("a");a.href=window.PR_BOT_LINK;a.textContent=" In Telegram öffnen";a.className="tr-off";note.appendChild(a)}return}
+ if(TR.state==="nodb"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Melde dich mit Telegram an oder öffne die Pitch-Runde in Telegram, um die Treffen zu sehen.";if(window.PR_BOT_LINK){const a=document.createElement("a");a.href=window.PR_BOT_LINK;a.textContent=" In Telegram öffnen";a.className="tr-off";note.appendChild(a)}return}
  if(TR.state==="loading"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Treffen werden geladen …";return}
  const today=new Date().toISOString().slice(0,10);
  const up=TR.list.filter(t=>t.datum>=today).sort((a,b)=>(a.datum+a.zeit)<(b.datum+b.zeit)?-1:1);
@@ -2590,4 +2592,24 @@ paintWhere();paintAll();
 })();
 </script>
 
+<script>
+/* Anmelden mit Telegram im normalen Browser */
+(function(){
+ if(window.PR_TG)return;
+ window.onTelegramAuth=function(u){try{localStorage.setItem("pr_tglogin",encodeURIComponent(JSON.stringify(u)))}catch(e){}location.reload()};
+ function widget(box,name){if(!box||box.dataset.done)return;box.dataset.done=1;var s=document.createElement("script");s.async=true;s.src="https://telegram.org/js/telegram-widget.js?22";s.setAttribute("data-telegram-login",name);s.setAttribute("data-size","large");s.setAttribute("data-radius","8");s.setAttribute("data-onauth","onTelegramAuth(user)");s.setAttribute("data-request-access","write");box.appendChild(s)}
+ function ui(name){
+  var css=document.createElement("style");css.textContent=".pr-login{margin:4px 0 8px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;gap:10px}.pr-login p{margin:0;font-size:var(--t-sm,13px);color:var(--muted)}.pr-login b{color:var(--gr);font-size:var(--t-md,15px)}.pr-out{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0;align-self:flex-start}";document.head.appendChild(css);
+  if(window.PR_WEB_LOGIN){
+   var w=document.getElementById("where");if(w){var b=document.createElement("button");b.className="pr-out";b.type="button";b.textContent="Abmelden";b.onclick=function(){try{localStorage.removeItem("pr_tglogin")}catch(e){}location.reload()};w.parentNode.insertBefore(b,w.nextSibling)}
+   return}
+  if(!name)return;
+  var mk=function(id){var d=document.createElement("div");d.className="pr-login";d.innerHTML="<b>Mit Telegram anmelden</b><p>Dann siehst du deine Themen auf allen Geräten und kannst dich für Treffen anmelden. Gleiches Konto wie in der Telegram-App.</p><div class=\"pr-w\"></div>";return d};
+  var w=document.getElementById("where");if(w){var a=mk();w.parentNode.insertBefore(a,w.nextSibling);widget(a.querySelector(".pr-w"),name)}
+  var tl=document.getElementById("trList");if(tl){var c=mk();tl.parentNode.insertBefore(c,tl);widget(c.querySelector(".pr-w"),name)}
+ }
+ function go(){fetch("/api/config").then(function(r){return r.ok?r.json():{}}).then(function(c){ui(c.botName||"")}).catch(function(){ui("")})}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();
+})();
+</script>
 </body></html>
