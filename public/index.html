@@ -3,13 +3,15 @@
 /* Pitch-Runde · Telegram Mini App: Anmeldung und Daten über /api */
 (function(){
  var tg=window.Telegram&&window.Telegram.WebApp, init=tg&&tg.initData;
- window.PR_TG=!!init; window.PR_WEBAPP=tg||null;
- if(!init) return;
- try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#f5f6f8");tg.setBackgroundColor&&tg.setBackgroundColor("#f5f6f8")}catch(e){}
- var H={"x-telegram-init-data":init,"content-type":"application/json"};
+ var login=null;try{login=localStorage.getItem("pr_tglogin")}catch(e){}
+ window.PR_TG=!!init; window.PR_WEBAPP=init?tg:null; window.PR_WEB_LOGIN=!init&&!!login;
+ if(!init&&!login) return;
+ if(init)try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#f5f6f8");tg.setBackgroundColor&&tg.setBackgroundColor("#f5f6f8")}catch(e){}
+ var H=init?{"x-telegram-init-data":init,"content-type":"application/json"}:{"x-telegram-login":login,"content-type":"application/json"};
  async function api(method,route,params,body){
   var u=new URL("/api/"+route,location.origin);for(var k in (params||{}))u.searchParams.set(k,params[k]);
   var r=await fetch(u,{method:method,headers:H,body:body?JSON.stringify(body):undefined});
+  if(r.status===401&&!init){try{localStorage.removeItem("pr_tglogin")}catch(_){}}
   if(!r.ok){var e=new Error("db "+r.status);e.code=r.status===403||r.status===400?"invalid_argument":r.status===401?"unauthenticated":"unavailable";throw e}
   return r.json();
  }
@@ -40,7 +42,7 @@
 </script>
 <script>fetch("/api/config").then(r=>r.ok?r.json():{}).then(c=>{window.PR_BOT_LINK=c.botLink||""}).catch(()=>{})</script>
 </head><body>
-<title>Zungenlöser Pitch-Runde</title>
+<title>Mundwerk Pitch-Runde</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
@@ -1216,11 +1218,21 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
  .navbar .tab .count{margin-left:-2px}
 }
 @media (max-width:360px){.navbar .nav-brand{font-size:15px}.navbar .tab{font-size:13px}}
+
+.tr-who li{display:grid!important;grid-template-columns:minmax(80px,max-content) minmax(0,1fr) auto;column-gap:14px;align-items:baseline}
+.tr-who .tr-kick{justify-self:end;white-space:nowrap}
+.tr-who .tr-name{min-width:0}
+
+.tr-who .tr-kick{display:grid;place-items:center;min-width:28px;height:28px;border-radius:8px;text-decoration:none;color:var(--muted)}
+.tr-who .tr-kick svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.tr-who .tr-kick:hover{background:#fdf0ef;color:#b3261e}
+.tr-who .tr-kick[data-sure="1"]{background:#b3261e;color:#fff;padding:0 8px;font-weight:600}
+.tr-who li{grid-template-columns:minmax(64px,max-content) minmax(0,1fr) auto!important;align-items:center!important}
 </style>
 
 <div class="wrap">
   <nav class="tabs navbar" aria-label="Hauptnavigation">
-    <button type="button" class="nav-brand" id="tabDraw" aria-pressed="true" title="Zur Startseite">Zungenlöser<span>.</span></button>
+    <button type="button" class="nav-brand" id="tabDraw" aria-pressed="true" title="Zur Startseite">Mundwerk<span>.</span></button>
     <button type="button" class="tab" id="tabClub" aria-pressed="false" hidden><span class="lg">Aus dem Club</span><span class="sm">Club</span></button>
     <div class="nav-search" id="navSearch">
       <button type="button" class="ns-open" id="nsOpen" aria-label="Suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button>
@@ -2430,7 +2442,7 @@ function themaSelect(t,mine,taken){
 async function paintTreffen(){
  const list=$("trList"),note=$("trNote");
  $("trAdmin").hidden=!TR.admin;
- if(TR.state==="nodb"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Öffne die Pitch-Runde in Telegram, um die Treffen zu sehen und dich anzumelden.";if(window.PR_BOT_LINK){const a=document.createElement("a");a.href=window.PR_BOT_LINK;a.textContent=" In Telegram öffnen";a.className="tr-off";note.appendChild(a)}return}
+ if(TR.state==="nodb"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Melde dich mit Telegram an oder öffne die Pitch-Runde in Telegram, um die Treffen zu sehen.";if(window.PR_BOT_LINK){const a=document.createElement("a");a.href=window.PR_BOT_LINK;a.textContent=" In Telegram öffnen";a.className="tr-off";note.appendChild(a)}return}
  if(TR.state==="loading"){list.innerHTML="";$("trEmpty").hidden=true;note.hidden=false;note.textContent="Treffen werden geladen …";return}
  const today=new Date().toISOString().slice(0,10);
  const up=TR.list.filter(t=>t.datum>=today).sort((a,b)=>(a.datum+a.zeit)<(b.datum+b.zeit)?-1:1);
@@ -2444,7 +2456,7 @@ async function paintTreffen(){
   const inList=myPos>-1,onWait=myPos>=cap,free=Math.max(0,cap-ok.length);
   const taken=new Set(ppl.map(p=>p.thema).filter(Boolean));
   const nThemen=ok.filter(p=>p.thema).length;
-  const row=(p,w)=>`<li class="${p.id===TR.me?"me":""}${w?" wait":""}"><span class="tr-name">${esc(p.id===TR.me?"Du":TR.names[p.id]||"Jemand")}${w?` <em>Warteliste</em>`:""}</span><span class="tr-pt">${p.thema?esc(p.thema):`<i>noch kein Thema</i>`}</span>${TR.admin&&p.id!==TR.me?`<button type="button" class="tr-kick" data-tr="kick" data-id="${esc(t.id)}" data-u="${esc(p.id)}" aria-label="Von diesem Treffen entfernen">Entfernen</button>`:""}</li>`;
+  const row=(p,w)=>`<li class="${p.id===TR.me?"me":""}${w?" wait":""}"><span class="tr-name">${esc(p.id===TR.me?"Du":TR.names[p.id]||"Jemand")}${w?` <em>Warteliste</em>`:""}</span><span class="tr-pt">${p.thema?esc(p.thema):`<i>noch kein Thema</i>`}</span>${TR.admin&&p.id!==TR.me?`<button type="button" class="tr-kick" data-tr="kick" data-id="${esc(t.id)}" data-u="${esc(p.id)}" aria-label="Von diesem Treffen entfernen" title="Entfernen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`:""}</li>`;
   let act="";
   if(TR.write!==false&&TR.me){
    act=inList?`<span class="tr-state${onWait?" wait":""}">${onWait?`Warteliste, Platz ${myPos-cap+1}`:"Du bist dabei"}</span><button type="button" class="tr-off" data-tr="off" data-id="${esc(t.id)}">Abmelden</button>`
@@ -2478,7 +2490,7 @@ $("trList").addEventListener("click",async e=>{
  else if(b.dataset.tr==="off"&&TR.me){const m=trMine(TR.me);delete m[id];trWriteSign(TR.me,m,"Du bist abgemeldet")}
  else if(b.dataset.tr==="kick"){
   const u=b.dataset.u;
-  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich?";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.textContent="Entfernen"}},4000);return}
+  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich?";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'}},4000);return}
   const m=trMine(u);delete m[id];trWriteSign(u,m,"Von diesem Treffen entfernt");
  }
  else if(b.dataset.tr==="edit"){
@@ -2553,4 +2565,51 @@ paintWhere();paintAll();
 <script>document.querySelector(".fan").addEventListener("click",()=>{const b=document.getElementById("drawBtn");if(!b.disabled)b.click()});</script>
 
 
+<script>
+/* Statistik: GoatCounter (ohne Cookies, keine personenbezogenen Daten). Läuft nur auf pitch-runde.github.io und der Netlify-Version. */
+(function(){
+ var GC="pitch-runde";               // GoatCounter-Code (https://pitch-runde.goatcounter.com)
+ if(!/^(pitch-runde\.github\.io|inspiring-creponne-15b780\.netlify\.app|pitch-runde\.netlify\.app)$/.test(location.hostname))return;
+ var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://"+GC+".goatcounter.com/count");document.head.appendChild(s);
+ var slug=function(t){return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)};
+ var q=[];function track(name,title){var e={path:name,title:title||name,event:true};if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count(e);else q.push(e)}
+ var t=setInterval(function(){if(window.goatcounter&&window.goatcounter.count){clearInterval(t);q.splice(0).forEach(function(e){window.goatcounter.count(e)})}},500);setTimeout(function(){clearInterval(t)},15000);
+ var drawn=0;
+ var M=[["#tabClub","tab-club","Tab: Aus dem Club"],["#tabTreffen","tab-treffen","Tab: Treffen"],["#tabMine","tab-mein-bereich","Tab: Mein Bereich"],["#nsOpen","suche","Suche geöffnet"],["#filterBtn","filter-geoeffnet","Bereich-Filter geöffnet"],
+  ["#dwGo","neu-ziehen-trotz-warnung","Trotzdem neu ziehen"],["#emptyDraw","thema-ziehen-aus-leer","Zum Thema ziehen (leer)"],
+  ["#saveBtn, #sbSave, #dwSave","thema-gespeichert","Thema gespeichert"],["#pdfBtn, #sbPdf","pdf-heruntergeladen","PDF heruntergeladen"],
+  ["#video, .pr-v a","video-geoeffnet","Video geöffnet"],["#learnBtn","lernen-gestartet","Lernkarten gestartet"],["#fcKnow","karte-kann-ich","Lernkarte: Kann ich"],["#fcAgain","karte-nochmal","Lernkarte: Nochmal"],
+  ["#trSubmit","treffen-angelegt","Treffen angelegt"],["[data-tr=on]","treffen-zusage","Treffen: Ich komme"],["[data-tr=off]","treffen-absage","Treffen: Abmelden"],
+  ["#say button, .vocab li, [data-copy]","phrase-kopiert","Wendung kopiert"]];
+ document.addEventListener("click",function(e){
+  var el=e.target;if(!el.closest)return;
+  var chip=el.closest(".chip");if(chip)return track("bereich-"+slug(chip.dataset.r||chip.textContent),"Bereich: "+chip.textContent.trim());
+  if(el.closest("#drawBtn")){drawn++;return track(drawn>1?"neu-ziehen":"thema-ziehen",drawn>1?"Neu ziehen":"Thema ziehen")}
+  for(var i=0;i<M.length;i++){if(el.closest(M[i][0]))return track(M[i][1],M[i][2])}
+ },true);
+ var title=document.getElementById("title");
+ if(title)new MutationObserver(function(){var x=title.textContent.trim();if(x)track("thema-"+slug(x),"Thema: "+x)}).observe(title,{childList:true,characterData:true,subtree:true});
+})();
+</script>
+
+<script>
+/* Anmelden mit Telegram im normalen Browser */
+(function(){
+ if(window.PR_TG)return;
+ window.onTelegramAuth=function(u){try{localStorage.setItem("pr_tglogin",encodeURIComponent(JSON.stringify(u)))}catch(e){}location.reload()};
+ function widget(box,name){if(!box||box.dataset.done)return;box.dataset.done=1;var s=document.createElement("script");s.async=true;s.src="https://telegram.org/js/telegram-widget.js?22";s.setAttribute("data-telegram-login",name);s.setAttribute("data-size","large");s.setAttribute("data-radius","8");s.setAttribute("data-onauth","onTelegramAuth(user)");s.setAttribute("data-request-access","write");box.appendChild(s)}
+ function ui(name){
+  var css=document.createElement("style");css.textContent=".pr-login{margin:4px 0 8px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;gap:10px}.pr-login p{margin:0;font-size:var(--t-sm,13px);color:var(--muted)}.pr-login b{color:var(--gr);font-size:var(--t-md,15px)}.pr-out{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0;align-self:flex-start}";document.head.appendChild(css);
+  if(window.PR_WEB_LOGIN){
+   var w=document.getElementById("where");if(w){var b=document.createElement("button");b.className="pr-out";b.type="button";b.textContent="Abmelden";b.onclick=function(){try{localStorage.removeItem("pr_tglogin")}catch(e){}location.reload()};w.parentNode.insertBefore(b,w.nextSibling)}
+   return}
+  if(!name)return;
+  var mk=function(id){var d=document.createElement("div");d.className="pr-login";d.innerHTML="<b>Mit Telegram anmelden</b><p>Dann siehst du deine Themen auf allen Geräten und kannst dich für Treffen anmelden. Gleiches Konto wie in der Telegram-App.</p><div class=\"pr-w\"></div>";return d};
+  var w=document.getElementById("where");if(w){var a=mk();w.parentNode.insertBefore(a,w.nextSibling);widget(a.querySelector(".pr-w"),name)}
+  var tl=document.getElementById("trList");if(tl){var c=mk();tl.parentNode.insertBefore(c,tl);widget(c.querySelector(".pr-w"),name)}
+ }
+ function go(){fetch("/api/config").then(function(r){return r.ok?r.json():{}}).then(function(c){ui(c.botName||"")}).catch(function(){ui("")})}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();
+})();
+</script>
 </body></html>
