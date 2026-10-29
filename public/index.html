@@ -12,11 +12,11 @@
   var u=new URL("/api/"+route,location.origin);for(var k in (params||{}))u.searchParams.set(k,params[k]);
   var r=await fetch(u,{method:method,headers:H,body:body?JSON.stringify(body):undefined});
   if(r.status===401&&!init){try{localStorage.removeItem("pr_tglogin")}catch(_){}}
-  if(!r.ok){var e=new Error("db "+r.status);e.code=r.status===403||r.status===400?"invalid_argument":r.status===401?"unauthenticated":"unavailable";throw e}
+  if(!r.ok){var e=new Error("db "+r.status);e.code=r.status===409?"conflict":r.status===403||r.status===400?"invalid_argument":r.status===401?"unauthenticated":"unavailable";throw e}
   return r.json();
  }
  var listeners=new Set();function refreshAll(){listeners.forEach(function(f){f()})}
- setInterval(function(){if(!document.hidden)refreshAll()},20000);
+ setInterval(function(){if(!document.hidden)refreshAll()},8000);
  document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshAll()});
  function snap(id,data){return {id:id,exists:true,data:function(){return data},metadata:{fromCache:false}}}
  function col(path){return {
@@ -1086,7 +1086,10 @@ html body :is(#viewDraw .top h1,#viewMine .mine-head h1,#card .card-head .head-r
 .tr-date b{display:block;font-size:24px;line-height:1;font-weight:700;color:var(--head)}
 .tr-date span{display:block;font-size:var(--t-label);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
 .tr-main h2{margin:0;font-size:var(--t-h);font-weight:700;letter-spacing:-.02em;color:var(--head);line-height:1.25}
-.tr-meta{margin:4px 0 0;font-size:var(--t-md);color:var(--gr)}
+.tr-meta{margin:6px 0 0;font-size:var(--t-lg);font-weight:500;color:var(--gr);display:flex;align-items:center;gap:6px;line-height:1.3}
+.pin{width:18px;height:18px;flex:none;color:var(--head)}
+html body #viewMine .mt-ort{margin:6px 0 0;font-size:var(--t-md);font-weight:500;color:var(--gr);display:flex;align-items:center;gap:6px}
+html body #viewMine .mt-ort .pin{width:16px;height:16px}
 .tr-notiz{margin:4px 0 0;font-size:var(--t-sm);color:var(--muted)}
 .tr-plaetze{margin:10px 0 0;font-size:var(--t-sm);color:var(--muted)}
 .tr-plaetze b{color:var(--gr);font-weight:600}
@@ -1228,6 +1231,28 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
 .tr-who .tr-kick:hover{background:#fdf0ef;color:#b3261e}
 .tr-who .tr-kick[data-sure="1"]{background:#b3261e;color:#fff;padding:0 8px;font-weight:600}
 .tr-who li{grid-template-columns:minmax(64px,max-content) minmax(0,1fr) auto!important;align-items:center!important}
+
+/* Ein Thema pro Treffen */
+#viewMine #savedList,#viewMine #empty{display:none!important}
+#myThema{display:flex;flex-direction:column;gap:12px}
+.mt-box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.mt-box p{margin:0;font-size:var(--t-md);color:var(--gr);line-height:1.5}
+.mt-box p.mt-sub{font-size:var(--t-sm);color:var(--muted)}
+.mt-box .draw{align-self:flex-start}
+.mt-acts{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.mt-drop{font:inherit;font-size:var(--t-sm);color:var(--muted);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.mt-drop[data-sure="1"]{color:#b3261e;font-weight:600}
+#myThema .saved .item .meta span:last-child{color:var(--gr)}
+html body #card #saveBtn:disabled{color:var(--muted);text-decoration:none;cursor:default}
+#sbSave:disabled{opacity:.45;cursor:default}
+
+@media (max-width:560px){#card .card-head .head-row{flex-direction:column;align-items:flex-start;gap:6px}}
+
+.tr-mine{margin:12px 0 0;font-size:var(--t-md);color:var(--gr);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+
+.savebar .sb-acts{flex-wrap:wrap}
+.savebar.is-saved .sb-redraw{display:inline-flex}
+@media (max-width:560px){.savebar .sb-acts{width:100%;display:grid;grid-template-columns:1fr auto auto;gap:8px}.savebar.is-saved .sb-acts{grid-template-columns:1fr auto}}
 </style>
 
 <div class="wrap">
@@ -1370,7 +1395,7 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
       <span class="sb-state" id="sbState"></span>
       <div class="sb-acts">
         <button type="button" class="save" id="sbSave"><span class="ic" aria-hidden="true"></span>Speichern</button>
-        <button type="button" class="sb-pdf" id="sbPdf">PDF</button>
+        <button type="button" class="sb-pdf sb-redraw" id="sbRedraw">Neu ziehen</button><button type="button" class="sb-pdf" id="sbPdf">PDF</button>
       </div>
     </div>
     <div class="pdf-row">
@@ -1397,7 +1422,7 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
   <section id="viewTreffen" class="view treffen" hidden aria-labelledby="trH">
     <div class="mine-head">
       <h1 id="trH">Treffen</h1>
-      <p class="mine-lead">Unsere nächsten Treffen. Melde dich an, damit wir wissen, wer kommt.</p>
+      <p class="mine-lead">Unsere nächsten Treffen. Zieh dir ein Thema und nimm es für ein Treffen, damit bist du angemeldet.</p>
     </div>
     <p class="tr-note" id="trNote" hidden></p>
     <ul class="tr-list" id="trList"></ul>
@@ -1418,14 +1443,15 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
   <section id="viewMine" class="view mine" hidden aria-labelledby="mineH">
     <div class="mine-head">
       <h1 id="mineH">Mein Bereich</h1>
-      <p class="mine-lead" id="hello">Deine gespeicherten Themen und deine Lernliste.</p>
+      <p class="mine-lead" id="hello">Dein Thema für das nächste Treffen und deine Lernliste.</p>
       <p class="where" id="where"></p>
     </div>
     <div class="search" hidden>
       <label for="mineQ" class="sr">In Mein Bereich suchen</label>
       <input id="mineQ" type="search" placeholder="In deinen Themen und deiner Lernliste suchen" autocomplete="off">
     </div>
-    <h2 class="mine-sec">Meine Themen</h2>
+    <h2 class="mine-sec">Mein Thema</h2>
+    <div id="myThema"></div>
     <ul class="saved" id="savedList"></ul>
     <div class="empty" id="empty" hidden>
       <p><b>Noch keine Themen gespeichert.</b><br>Zieh ein Thema und tippe auf „Speichern“. Dann findest du es hier wieder.</p>
@@ -2460,18 +2486,18 @@ async function paintTreffen(){
   let act="";
   if(TR.write!==false&&TR.me){
    act=inList?`<span class="tr-state${onWait?" wait":""}">${onWait?`Warteliste, Platz ${myPos-cap+1}`:"Du bist dabei"}</span><button type="button" class="tr-off" data-tr="off" data-id="${esc(t.id)}">Abmelden</button>`
-             :`<button type="button" class="save" data-tr="on" data-id="${esc(t.id)}">${free?"Ich komme":"Auf die Warteliste"}</button>`;
+             :`<button type="button" class="save" data-tr="pick" data-id="${esc(t.id)}">${free?"Thema ziehen und anmelden":"Thema ziehen (Warteliste)"}</button>`;
   }
   if(TR.admin)act+=`<span class="tr-mod"><button type="button" class="tr-del" data-tr="edit" data-id="${esc(t.id)}">Bearbeiten</button><button type="button" class="tr-del" data-tr="del" data-id="${esc(t.id)}">Löschen</button></span>`;
   return `<li class="tr-item">
    <div class="tr-date"><b>${d.getDate()}</b><span>${MO[d.getMonth()]}</span></div>
    <div class="tr-main">
     <h2>${WT[d.getDay()]}, ${d.getDate()}. ${MO[d.getMonth()]} um ${esc(t.zeit||"")} Uhr</h2>
-    <p class="tr-meta">${esc(t.ort||"")}</p>
+    <p class="tr-meta"><svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>${esc(t.ort||"")}</p>
     ${t.notiz?`<p class="tr-notiz">${esc(t.notiz)}</p>`:""}
     <p class="tr-plaetze"><b>${free?`${free} von ${cap} Plätzen frei`:"Ausgebucht"}</b>${wait.length?`, ${wait.length} auf der Warteliste`:""}${ok.length?` · ${nThemen} ${nThemen===1?"Thema":"Themen"} gewählt`:""}</p>
     <div class="tr-bar"><i style="width:${Math.min(100,ok.length/cap*100)}%"></i></div>
-    ${inList&&TR.write!==false?themaSelect(t,ppl[myPos].thema,taken):""}
+    ${inList&&TR.write!==false?`<p class="tr-mine">Dein Thema: <b>${ppl[myPos].thema?esc(ppl[myPos].thema):"noch keins"}</b> <button type="button" class="tr-off" data-tr="pick" data-id="${esc(t.id)}">${ppl[myPos].thema?"Thema wechseln":"Thema ziehen"}</button></p>`:""}
     ${ppl.length?`<ul class="tr-who" aria-label="Wer kommt und mit welchem Thema">${ok.map(p=>row(p,false)).join("")}${wait.map(p=>row(p,true)).join("")}</ul>`:""}
    </div>
    <div class="tr-act">${act}</div>
@@ -2480,14 +2506,16 @@ async function paintTreffen(){
 async function trWriteSign(uid,next,msg){
  if(TR.busy||!TR.db)return;TR.busy=true;
  try{await TR.db.doc("signups/"+uid).set(next);if(msg)toast(msg);if(uid===TR.me&&window.PR_WEBAPP&&window.PR_WEBAPP.requestWriteAccess&&!window.PR_WA){window.PR_WA=1;try{window.PR_WEBAPP.requestWriteAccess()}catch(_){}}}
- catch(e){if(e&&e.code==="invalid_argument"&&uid===TR.me){TR.write=false;paintTreffen();toast("Du hast hier keinen Zugang zum Anmelden.")}else toast("Das hat nicht geklappt. Versuch es gleich noch einmal.")}
+ catch(e){if(e&&e.code==="conflict"){toast("Dieses Thema hat gerade jemand anderes genommen. Zieh einfach neu.")}else if(e&&e.code==="invalid_argument"&&uid===TR.me){TR.write=false;paintTreffen();toast("Du hast hier keinen Zugang zum Anmelden.")}else toast("Das hat nicht geklappt. Versuch es gleich noch einmal.")}
  TR.busy=false;
 }
 function trMine(uid){const m={};Object.entries(TR.sign[uid]||{}).forEach(([k,v])=>{const x=signVal(v);if(x)m[k]=x});return m}
 $("trList").addEventListener("click",async e=>{
  const b=e.target.closest("button[data-tr]");if(!b)return;const id=b.dataset.id;
- if(b.dataset.tr==="on"&&TR.me){const m=trMine(TR.me);m[id]={at:new Date().toISOString(),thema:""};trWriteSign(TR.me,m,"Du bist angemeldet. Wähl jetzt dein Thema.")}
- else if(b.dataset.tr==="off"&&TR.me){const m=trMine(TR.me);delete m[id];trWriteSign(TR.me,m,"Du bist abgemeldet")}
+ if(b.dataset.tr==="pick"){TR.target=id;show("draw");if(cur<0)$("drawBtn").click();else{const c=$("card");c.hidden=false;paintTake();requestAnimationFrame(()=>c.scrollIntoView({block:"start"}))}toast("Zieh ein Thema und tippe auf „nehmen“.")}
+ else if(b.dataset.tr==="off"&&TR.me){
+  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich abmelden?";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.textContent="Abmelden"}},4000);return}
+  const m=trMine(TR.me);delete m[id];TR.target=null;TR.sign={...TR.sign,[TR.me]:{...m}};trWriteSign(TR.me,m,"Du bist abgemeldet, dein Thema ist wieder frei.")}
  else if(b.dataset.tr==="kick"){
   const u=b.dataset.u;
   if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich?";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'}},4000);return}
@@ -2532,6 +2560,85 @@ $("trForm").addEventListener("submit",async e=>{
  d.collection("signups").onSnapshot(s=>{const n={};s.docs.forEach(x=>{if(x.exists)n[x.id]=x.data()||{}});TR.sign=n;b=true;if(a)TR.state="ok";paintTreffen()},()=>{b=true;if(a)TR.state="ok";paintTreffen()});
 })();
 
+
+/* ---------- Ein Thema pro Treffen: nehmen = anmelden ---------- */
+const fmtShort=t=>{const d=new Date(t.datum+"T12:00:00");return `${WT[d.getDay()]}, ${d.getDate()}. ${MO[d.getMonth()]}`};
+function nextTreffen(){const today=new Date().toISOString().slice(0,10);const up=TR.list.filter(t=>t.datum>=today).sort((a,b)=>(a.datum+a.zeit)<(b.datum+b.zeit)?-1:1);
+ if(TR.target){const x=up.find(t=>t.id===TR.target);if(x)return x}
+ const mine=TR.me?up.find(t=>signVal((TR.sign[TR.me]||{})[t.id])):null;return mine||up[0]||null}
+function myThema(){const t=nextTreffen();if(!t||!TR.me)return {t,thema:"",inList:false};const v=signVal((TR.sign[TR.me]||{})[t.id]);return {t,thema:v?v.thema:"",inList:!!v}}
+function takenBy(t,title){return Object.entries(TR.sign).some(([id,m])=>id!==TR.me&&((signVal(m&&m[t.id])||{}).thema===title))}
+let takeSure=0;
+function isFull(t){const cap=Math.max(1,+t.plaetze||1);return trPeople(t.id).filter(p=>p.id!==TR.me).length>=cap}
+function takeState(){
+ if(cur<0)return null;const title=T[cur].t;
+ if(TR.state==="nodb"||(TR.state==="ok"&&(!TR.me||TR.write===false)))return {k:"login"};
+ if(TR.state!=="ok")return {k:"loading"};
+ const {t,thema}=myThema();
+ if(!t)return {k:"none"};
+ if(thema===title)return {k:"mine",t};
+ if(takenBy(t,title))return {k:"taken",t};
+ return {k:thema?"swap":"take",t,old:thema};
+}
+function paintTake(){
+ const s=takeState();if(!s)return;
+ const btn=$("saveBtn"),lbl=$("saveLbl"),bar=$("saveBar"),st=$("sbState"),sb=$("sbSave");
+ let label,state,dis=false,mine=false;const d=s.t?fmtShort(s.t):"";
+ if(s.k==="login"){label="Für ein Treffen nehmen";state="Melde dich an, um dieses Thema für ein Treffen zu nehmen."}
+ else if(s.k==="loading"){label="Für ein Treffen nehmen";state="Treffen werden geladen …";dis=true}
+ else if(s.k==="none"){label="Noch kein Treffen geplant";state="Sobald ein Treffen geplant ist, kannst du dieses Thema dafür nehmen.";dis=true}
+ else if(s.k==="mine"){const ppl=trPeople(s.t.id),pos=ppl.findIndex(p=>p.id===TR.me),cap=Math.max(1,+s.t.plaetze||1);label=`Dein Thema am ${d}`;state=pos>=cap?`Für ${d} ist das dein Thema. Du stehst auf der Warteliste (Platz ${pos-cap+1}).`:`Für ${d} ist das dein Thema, du bist angemeldet.`;mine=true}
+ else if(s.k==="taken"){label="Schon vergeben";state=`Für ${d} hat schon jemand dieses Thema. Zieh einfach neu.`;dis=true}
+ else if(s.k==="swap"){label=takeSure?"Wirklich wechseln?":"Thema wechseln";state=`Für ${d} hast du schon „${s.old}“. Mit diesem Thema ersetzt du es.`}
+ else if(isFull(s.t)){label=`Für ${d} nehmen (Warteliste)`;state=`Das Treffen am ${d} ist voll. Mit diesem Thema kommst du auf die Warteliste.`}
+ else {label=`Für ${d} nehmen`;state=`Nimm dieses Thema für das Treffen am ${d}, damit bist du auch angemeldet.`}
+ lbl.textContent=label;btn.disabled=dis;btn.setAttribute("aria-pressed",mine?"true":"false");btn.title=state;
+ sb.lastChild.textContent=s.k==="take"?"Thema nehmen":s.k==="swap"&&!takeSure?"Wechseln":label;sb.disabled=dis;st.textContent=state;
+ if(!bar.hidden)bar.classList.toggle("is-saved",mine);
+}
+paintSaveBar=function(){const bar=$("saveBar");if(cur<0||!$("card").classList.contains("t-new")){bar.hidden=true;return}bar.hidden=false;paintTake()};
+const _paintCardOld=paintCard;paintCard=function(){_paintCardOld();paintTake()};
+async function doTake(){
+ const s=takeState();if(!s)return;
+ if(s.k==="login"){show("treffen");return}
+ if(s.k==="mine"){show("mine");return}
+ if(s.k==="swap"&&!takeSure){takeSure=1;paintTake();setTimeout(()=>{takeSure=0;paintTake()},4000);return}
+ if(s.k!=="take"&&s.k!=="swap")return;
+ takeSure=0;const t=s.t,title=T[cur].t,m=trMine(TR.me),prev=m[t.id];
+ m[t.id]={at:prev?prev.at:new Date().toISOString(),thema:title};
+ TR.sign={...TR.sign,[TR.me]:{...m}};paintTake();paintMine();paintCount();
+ await trWriteSign(TR.me,m,`Thema genommen, du bist für ${fmtShort(t)} angemeldet.`);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("#saveBtn,#sbSave");if(!b)return;e.stopPropagation();e.preventDefault();if(!b.disabled)doTake()},true);
+function paintMine(){
+ const box=$("myThema");if(!box)return;
+ if(TR.state==="nodb"||!TR.me){box.innerHTML=`<div class="mt-box"><p>Melde dich an, dann siehst du hier dein Thema für das nächste Treffen.</p></div>`;return}
+ if(TR.state!=="ok"){box.innerHTML=`<div class="mt-box"><p class="mt-sub">Wird geladen …</p></div>`;return}
+ const {t,thema,inList}=myThema();
+ if(!t){box.innerHTML=`<div class="mt-box"><p>Gerade ist kein Treffen geplant.</p><p class="mt-sub">Sobald es ein Treffen gibt, kannst du hier dein Thema dafür wählen.</p></div>`;return}
+ const when=`${fmtShort(t)} um ${esc(t.zeit||"")} Uhr, ${esc(t.ort||"")}`;
+ if(thema&&BY.has(slug(thema))){const d=T[BY.get(slug(thema))];
+  box.innerHTML=`<ul class="saved"><li class="item tap" data-id="${slug(thema)}" role="button" tabindex="0" aria-label="${esc(thema)} öffnen"><div><div class="meta"><span class="mtag">${esc(R[d.r])}</span><span>für ${fmtShort(t)} um ${esc(t.zeit||"")} Uhr</span></div><h2>${esc(thema)}</h2>${t.ort?`<p class="mt-ort"><svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>${esc(t.ort)}</p>`:""}</div><div class="item-end"><span class="go" aria-hidden="true">→</span></div></li></ul>
+  <div class="mt-acts"><button type="button" class="mt-drop" data-mt="drop">Abmelden</button></div>`;return}
+ box.innerHTML=`<div class="mt-box"><p>${inList?`Du bist für <b>${when}</b> angemeldet, hast aber noch kein Thema.`:`Nächstes Treffen: <b>${when}</b>. Zieh ein Thema und nimm es dafür, damit bist du auch angemeldet.`}</p><button class="draw" type="button" data-mt="draw">Thema ziehen</button></div>`;
+}
+$("myThema").addEventListener("click",async e=>{
+ const li=e.target.closest(".item.tap");if(li){openSaved(li);return}
+ const b=e.target.closest("[data-mt]");if(!b)return;
+ if(b.dataset.mt==="draw"){show("draw");$("drawBtn").click();return}
+ if(b.dataset.mt==="drop"){
+  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich abmelden?";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.textContent="Abmelden"}},4000);return}
+  const t=nextTreffen();if(!t)return;const m=trMine(TR.me);if(!m[t.id])return;delete m[t.id];TR.target=null;
+  TR.sign={...TR.sign,[TR.me]:{...m}};paintMine();paintTake();
+  await trWriteSign(TR.me,m,"Du bist abgemeldet, dein Thema ist wieder frei.");
+ }
+});
+paintCount=function(){const {thema}=myThema();$("count").textContent=Object.keys(items).length+(thema?1:0)};
+const _paintTreffenOld=paintTreffen;paintTreffen=async function(){await _paintTreffenOld();paintTake();paintMine();paintCount()};
+paintMine();
+
+
+$("sbRedraw").addEventListener("click",()=>{$("drawBtn").click();setTimeout(()=>{const c=$("card");if(!c.hidden)c.scrollIntoView({behavior:"smooth",block:"start"})},1400)});
 /* ---------- Konto anbinden ---------- */
 paintWhere();paintAll();
 (async()=>{
@@ -2540,7 +2647,7 @@ paintWhere();paintAll();
   userNs=u||null;
   const me=userNs?await userNs.me():null;
   if(me&&me.id){
-   if(me.name)$("hello").textContent=`Hallo ${me.name.split(" ")[0]}! Deine gespeicherten Themen und deine Lernliste.`;
+   if(me.name)$("hello").textContent=`Hallo ${me.name.split(" ")[0]}! Dein Thema für das nächste Treffen und deine Lernliste.`;
    const a=$("ava");a.src=me.avatarUrl;a.hidden=false;
   }
   if(!d||!me||!me.id)return;
@@ -2601,7 +2708,7 @@ paintWhere();paintAll();
  function ui(name){
   var css=document.createElement("style");css.textContent=".pr-login{margin:4px 0 8px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card);display:flex;flex-direction:column;gap:10px}.pr-login p{margin:0;font-size:var(--t-sm,13px);color:var(--muted)}.pr-login b{color:var(--gr);font-size:var(--t-md,15px)}.pr-out{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0;align-self:flex-start}";document.head.appendChild(css);
   if(window.PR_WEB_LOGIN){
-   var w=document.getElementById("where");if(w){var b=document.createElement("button");b.className="pr-out";b.type="button";b.textContent="Abmelden";b.onclick=function(){try{localStorage.removeItem("pr_tglogin")}catch(e){}location.reload()};w.parentNode.insertBefore(b,w.nextSibling)}
+   var w=document.getElementById("where");if(w){var b=document.createElement("button");b.className="pr-out";b.type="button";b.textContent="Ausloggen";b.onclick=function(){try{localStorage.removeItem("pr_tglogin")}catch(e){}location.reload()};w.parentNode.insertBefore(b,w.nextSibling)}
    return}
   if(!name)return;
   var mk=function(id){var d=document.createElement("div");d.className="pr-login";d.innerHTML="<b>Mit Telegram anmelden</b><p>Dann siehst du deine Themen auf allen Geräten und kannst dich für Treffen anmelden. Gleiches Konto wie in der Telegram-App.</p><div class=\"pr-w\"></div>";return d};
