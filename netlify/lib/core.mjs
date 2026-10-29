@@ -59,12 +59,14 @@ export function allowed(seg, uid, isAdmin, op) {
 }
 
 /* ---------- Telegram Bot senden ---------- */
-export async function tgSend(botToken, chatId, text) {
-  if (!botToken) return false;
+export async function tgSend(botToken, chatId, text, button) {
+  if (!botToken || !chatId) return false;
   try {
+    const body = { chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true };
+    if (button && button.url) body.reply_markup = { inline_keyboard: [[{ text: button.text, url: button.url }]] };
     const r = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true }),
+      body: JSON.stringify(body),
     });
     return r.ok;
   } catch { return false; }
@@ -105,7 +107,11 @@ async function confirmedFor(store, tid, signups) {
 }
 
 /* ---------- API ---------- */
-export function makeApi({ store, botToken, adminIds = [], botLink = "", send = tgSend }) {
+export function makeApi({ store, botToken, adminIds = [], botLink = "", groupChatId = "", send = tgSend }) {
+  const btn = botLink ? { text: "Thema ziehen und anmelden", url: botLink } : null;
+  const toGroup = (text) => (groupChatId ? send(botToken, groupChatId, text, btn) : Promise.resolve(false));
+  const freeText = (t, all) => { const cap = Math.max(1, Number(t.plaetze) || 1); const n = all.length; return n >= cap ? "Ausgebucht, Warteliste offen." : `Noch ${cap - n} von ${cap} Plätzen frei.`; };
+  const nameOf = async (id) => { const p = await store.get("profiles/" + id, { type: "json" }); return (p && p.name) || "Jemand"; };
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
   return async function handle(req) {
     const url = new URL(req.url);
@@ -147,6 +153,9 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", send = t
         if (!body || typeof body !== "object") return json({ error: "bad_body" }, 400);
         const id = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
         await store.setJSON(path + "/" + id, body);
+        if (seg[0] === "treffen" && seg.length === 1 && body.datum) {
+          await toGroup(`📅 <b>Neues Treffen:</b> ${esc(fmtTreffen(body))}\n${Math.max(1, Number(body.plaetze) || 1)} Plätze. Zieh dir ein Thema und melde dich an!`);
+        }
         return json({ id });
       }
     }
@@ -160,9 +169,10 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", send = t
       if (!allowed(seg, uid, isAdmin, "write")) return json({ error: "forbidden" }, 403);
       // Wartelisten-Nachrücker merken (nur bei Abmeldungen relevant)
       const isSign = seg[0] === "signups" && seg.length === 2;
-      let before = null, touched = [];
+      let before = null, touched = [], oldDoc = {};
       if (isSign) {
         const old = (await store.get(path, { type: "json" })) || {};
+        oldDoc = old;
         touched = Object.keys(old);
         const all = await listDocs(store, "signups");
         before = {};
@@ -178,6 +188,20 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", send = t
       } else if (req.method === "DELETE") {
         await store.delete(path);
       } else return json({ error: "method" }, 405);
+      if (isSign && groupChatId) {
+        const newDoc = (await store.get(path, { type: "json" })) || {};
+        const all = await listDocs(store, "signups");
+        const who = await nameOf(seg[1]);
+        for (const tid of new Set([...Object.keys(oldDoc), ...Object.keys(newDoc)])) {
+          const o = signVal(oldDoc[tid]), n = signVal(newDoc[tid]);
+          const t = await store.get("treffen/" + tid, { type: "json" });
+          if (!t) continue;
+          const { all: ppl } = await confirmedFor(store, tid, all);
+          if (!o && n) await toGroup(`🙋 <b>${esc(who)}</b> kommt am ${esc(fmtTreffen(t))}${n.thema ? `\nThema: <b>${esc(n.thema)}</b>` : ""}\n${freeText(t, ppl)}`);
+          else if (o && n && n.thema && n.thema !== o.thema) await toGroup(`🔄 <b>${esc(who)}</b> hat ein neues Thema für ${esc(fmtTreffen(t))}: <b>${esc(n.thema)}</b>`);
+          else if (o && !n) await toGroup(`👋 <b>${esc(who)}</b> kommt doch nicht am ${esc(fmtTreffen(t))}.${o.thema ? ` Das Thema „${esc(o.thema)}“ ist wieder frei.` : ""}\n${freeText(t, ppl)}`);
+        }
+      }
       if (isSign && touched.length) {
         const all = await listDocs(store, "signups");
         for (const tid of touched) {
