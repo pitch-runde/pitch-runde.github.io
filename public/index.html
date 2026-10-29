@@ -2569,7 +2569,7 @@ paintWhere();paintAll();
 /* Statistik: GoatCounter (ohne Cookies, keine personenbezogenen Daten). Läuft nur auf pitch-runde.github.io und der Netlify-Version. */
 (function(){
  var GC="pitch-runde";               // GoatCounter-Code (https://pitch-runde.goatcounter.com)
- if(!/^(pitch-runde\.github\.io|inspiring-creponne-15b780\.netlify\.app|pitch-runde\.netlify\.app)$/.test(location.hostname))return;
+ if(!/^(pitch-runde\.github\.io|pitchrunde\.netlify\.app|inspiring-creponne-15b780\.netlify\.app|pitch-runde\.netlify\.app)$/.test(location.hostname))return;
  var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://"+GC+".goatcounter.com/count");document.head.appendChild(s);
  var slug=function(t){return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)};
  var q=[];function track(name,title){var e={path:name,title:title||name,event:true};if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count(e);else q.push(e)}
