@@ -21,6 +21,23 @@ export function verifyInitData(initData, botToken, maxAgeSec = 60 * 60 * 24 * 7)
   return user;
 }
 
+
+/* ---------- Telegram Login Widget (Browser am Computer) ---------- */
+export function verifyLoginWidget(raw, botToken, maxAgeSec = 60 * 60 * 24 * 30) {
+  if (!raw || !botToken) return null;
+  let d;
+  try { d = JSON.parse(decodeURIComponent(raw)); } catch { return null; }
+  if (!d || typeof d !== "object" || !d.hash || !d.id) return null;
+  const { hash, ...rest } = d;
+  const dcs = Object.keys(rest).filter((k) => rest[k] !== undefined && rest[k] !== null && rest[k] !== "").sort().map((k) => `${k}=${rest[k]}`).join("\n");
+  const secret = crypto.createHash("sha256").update(botToken).digest();
+  const calc = crypto.createHmac("sha256", secret).update(dcs).digest("hex");
+  const a = Buffer.from(calc, "hex"), b = Buffer.from(String(hash), "hex");
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  if (!d.auth_date || Date.now() / 1000 - Number(d.auth_date) > maxAgeSec) return null;
+  return { id: d.id, first_name: d.first_name || "", last_name: d.last_name || "", username: d.username || "", photo_url: d.photo_url || "" };
+}
+
 /* ---------- Pfade und Regeln ---------- */
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/;
 export function cleanPath(path) {
@@ -93,8 +110,8 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", send = t
   return async function handle(req) {
     const url = new URL(req.url);
     const route = url.pathname.replace(/^\/api\/?/, "");
-    if (route === "config") return json({ botLink: botLink || "" });
-    const user = verifyInitData(req.headers.get("x-telegram-init-data"), botToken);
+    if (route === "config") { const m = /t\.me\/([A-Za-z0-9_]+)/.exec(botLink || ""); return json({ botLink: botLink || "", botName: m ? m[1] : "" }); }
+    const user = verifyInitData(req.headers.get("x-telegram-init-data"), botToken) || verifyLoginWidget(req.headers.get("x-telegram-login"), botToken);
     if (!user) return json({ error: "unauthorized" }, 401);
     const uid = "tg" + user.id;
     const isAdmin = adminIds.includes(String(user.id));
