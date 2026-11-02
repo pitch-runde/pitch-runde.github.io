@@ -37,6 +37,7 @@ for (const d of topics) {
   need(d.a?.length === 5 && d.a.every(pair), "a: 5 Schritte");
   need(d.d?.length === 3, "d: 3 Fragen");
   need(triple(d.f), "f: [Fehler, richtig, Erklärung]");
+  need(/^\d{4}-\d{2}-\d{2}$/.test(d.stand || ""), "stand: Datum JJJJ-MM-TT (für das Archiv)");
 
   const w = WG[t];
   need(Array.isArray(w) && w.length === 5 && w.slice(0, 4).every((g) => g[1].length === 2 && g[1].every(triple)), "WG: 4 Schritte × 2 Einträge [de, ru, Beispiel] + Frage");
