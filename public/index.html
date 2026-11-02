@@ -1114,7 +1114,7 @@ html body #viewMine .mt-ort .pin{width:16px;height:16px}
 .tr-form .save{justify-self:start}
 @media (max-width:560px){
  .tr-item{grid-template-columns:auto minmax(0,1fr);padding:16px}
- .tr-act{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;margin-top:8px}
+ .tr-act{grid-column:1/-1;align-items:flex-start;gap:12px;margin-top:8px}
  .tr-form{grid-template-columns:1fr 1fr}.tr-form label.wide{grid-column:1/-1}
 }
 
@@ -2528,7 +2528,7 @@ async function paintTreffen(){
 }
 async function trWriteSign(uid,next,msg){
  if(TR.busy||!TR.db)return;TR.busy=true;
- try{await TR.db.doc("signups/"+uid).set(next);if(msg)toast(msg);if(uid===TR.me&&window.PR_WEBAPP&&window.PR_WEBAPP.requestWriteAccess&&!window.PR_WA){window.PR_WA=1;try{window.PR_WEBAPP.requestWriteAccess()}catch(_){}}}
+ try{if(uid===TR.me&&window.PR_WEBAPP&&window.PR_WEBAPP.requestWriteAccess&&!window.PR_WA){window.PR_WA=1;await new Promise(r=>{setTimeout(r,20000);try{window.PR_WEBAPP.requestWriteAccess(()=>r())}catch(_){r()}})}await TR.db.doc("signups/"+uid).set(next);if(msg)toast(msg)}
  catch(e){if(e&&e.code==="conflict"){toast("Dieses Thema hat gerade jemand anderes genommen. Zieh einfach neu.")}else if(e&&e.code==="invalid_argument"&&uid===TR.me){TR.write=false;paintTreffen();toast("Du hast hier keinen Zugang zum Anmelden.")}else toast("Das hat nicht geklappt. Versuch es gleich noch einmal.")}
  TR.busy=false;
 }

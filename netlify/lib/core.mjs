@@ -93,7 +93,7 @@ function fmtWhen(t) {
 // Text der "lebenden" Gruppennachricht zu einem Treffen
 export function groupText(t, ppl, names, cancelled = false) {
   const cap = Math.max(1, Number(t.plaetze) || 1);
-  const head = `📅 <b>Pitch-Runde</b>\n<b>${esc(fmtWhen(t))}</b>${t.ort ? `\n📍 ${esc(t.ort)}` : ""}${t.notiz ? `\n${esc(t.notiz)}` : ""}`;
+  const head = `📅 <b>Pitch-Runde</b>\n<b>${esc(fmtWhen(t))}</b>${t.ort ? `\n📍 ${esc(t.ort)}` : ""}\n🗣 Deutsch, Niveau B2–C1${t.notiz ? `\n${esc(t.notiz)}` : ""}`;
   if (cancelled) return `❌ <b>Abgesagt</b>\n<s>${esc(fmtWhen(t))}${t.ort ? `, ${esc(t.ort)}` : ""}</s>`;
   const ok = ppl.slice(0, cap), wait = ppl.slice(cap);
   const line = (p, i) => `${i + 1}. ${esc(names[p.id] || "Jemand")}${p.thema ? `: ${esc(p.thema)}` : ""}`;
@@ -250,6 +250,18 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
         const newDoc = (await store.get(path, { type: "json" })) || {};
         for (const tid of new Set([...Object.keys(oldDoc), ...Object.keys(newDoc)])) {
           if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid);
+        }
+      }
+      // Bestätigung im privaten Chat mit dem Bot: so findet man die Mini App jederzeit wieder
+      if (isSign && seg[1] === uid && req.method !== "DELETE") {
+        const newDoc = (await store.get(path, { type: "json" })) || {};
+        for (const tid of Object.keys(newDoc)) {
+          if (oldDoc[tid] || !newDoc[tid]) continue;
+          const t = await store.get("treffen/" + tid, { type: "json" });
+          if (!t) continue;
+          const th = signVal(newDoc[tid])?.thema;
+          const u = appLink(tid);
+          await send(botToken, user.id, `✅ Danke für deine Anmeldung!\n<b>${esc(fmtTreffen(t))}</b>${th ? `\nDein Thema: <b>${esc(th)}</b>` : ""}\n\nÜber den Button kommst du jederzeit zurück: Thema ändern, absagen, nächste Termine sehen.`, u ? { text: "Pitch-Runde öffnen", url: u } : null);
         }
       }
       if (isTreffen && groupChatId) {
