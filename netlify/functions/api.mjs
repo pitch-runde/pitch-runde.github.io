@@ -3,7 +3,7 @@ import { makeApi } from "../lib/core.mjs";
 
 export default async (req) => {
   const handle = makeApi({
-    store: getStore("pitchrunde"),
+    store: getStore({ name: "pitchrunde", consistency: "strong" }),
     botToken: process.env.BOT_TOKEN,
     botLink: process.env.BOT_LINK || "",
     groupChatId: process.env.GROUP_CHAT_ID || "",
