@@ -71,11 +71,37 @@ export async function tgSend(botToken, chatId, text, button) {
     return r.ok;
   } catch { return false; }
 }
+export async function tgCall(botToken, method, body) {
+  if (!botToken) return null;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${botToken}/${method}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => null);
+    return j ? (j.ok ? j.result : { error: String(j.description || "error") }) : null;
+  } catch { return null; }
+}
 const esc = (s) => String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 const WT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"], MO = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 export function fmtTreffen(t) {
   const d = new Date(t.datum + "T12:00:00Z");
   return `${WT[d.getUTCDay()]}, ${d.getUTCDate()}. ${MO[d.getUTCMonth()]} um ${t.zeit || ""} Uhr, ${t.ort || ""}`;
+}
+
+function fmtWhen(t) {
+  const d = new Date(t.datum + "T12:00:00Z");
+  return `${WT[d.getUTCDay()]}, ${d.getUTCDate()}. ${MO[d.getUTCMonth()]} um ${t.zeit || ""} Uhr`;
+}
+// Text der "lebenden" Gruppennachricht zu einem Treffen
+export function groupText(t, ppl, names, cancelled = false) {
+  const cap = Math.max(1, Number(t.plaetze) || 1);
+  const head = `📅 <b>Pitch-Runde</b>\n<b>${esc(fmtWhen(t))}</b>${t.ort ? `\n📍 ${esc(t.ort)}` : ""}${t.notiz ? `\n${esc(t.notiz)}` : ""}`;
+  if (cancelled) return `❌ <b>Abgesagt</b>\n<s>${esc(fmtWhen(t))}${t.ort ? `, ${esc(t.ort)}` : ""}</s>`;
+  const ok = ppl.slice(0, cap), wait = ppl.slice(cap);
+  const line = (p, i) => `${i + 1}. ${esc(names[p.id] || "Jemand")}${p.thema ? `: ${esc(p.thema)}` : ""}`;
+  let txt = head + `\n\n<b>Dabei (${ok.length} von ${cap}):</b>`;
+  txt += ok.length ? "\n" + ok.map(line).join("\n") : "\nNoch niemand. Sei die erste Person!";
+  if (wait.length) txt += `\n\n<b>Warteliste:</b>\n` + wait.map(line).join("\n");
+  txt += "\n\n" + (ok.length >= cap ? "Ausgebucht, die Warteliste ist offen." : `Noch ${cap - ok.length} ${cap - ok.length === 1 ? "Platz" : "Plätze"} frei. Zieh dir ein Thema und sei dabei!`);
+  return txt;
 }
 
 /* ---------- Store-Helfer ---------- */
@@ -107,11 +133,36 @@ async function confirmedFor(store, tid, signups) {
 }
 
 /* ---------- API ---------- */
-export function makeApi({ store, botToken, adminIds = [], botLink = "", groupChatId = "", send = tgSend }) {
-  const btn = botLink ? { text: "Thema ziehen und anmelden", url: botLink } : null;
-  const toGroup = (text) => (groupChatId ? send(botToken, groupChatId, text, btn) : Promise.resolve(false));
-  const freeText = (t, all) => { const cap = Math.max(1, Number(t.plaetze) || 1); const n = all.length; return n >= cap ? "Ausgebucht, Warteliste offen." : `Noch ${cap - n} von ${cap} Plätzen frei.`; };
+export function makeApi({ store, botToken, adminIds = [], botLink = "", groupChatId = "", send = tgSend, tg = (m, b) => tgCall(botToken, m, b) }) {
   const nameOf = async (id) => { const p = await store.get("profiles/" + id, { type: "json" }); return (p && p.name) || "Jemand"; };
+  // Link öffnet die Mini App direkt für dieses Treffen
+  const appLink = (tid) => { if (!botLink) return ""; if (/t\.me\/[^/?]+\/[^/?]+/.test(botLink)) return botLink.split("?")[0] + "?startapp=" + tid; return botLink; };
+  const kb = (tid) => { const u = appLink(tid); return u ? { inline_keyboard: [[{ text: "Thema wählen und anmelden", url: u }]] } : undefined; };
+  // Eine Nachricht pro Treffen in der Gruppe: neu senden oder aktualisieren
+  async function refreshGroup(tid, { cancelled = false } = {}) {
+    if (!groupChatId) return;
+    const t = await store.get("treffen/" + tid, { type: "json" }) || (cancelled ? cancelled : null);
+    if (!t) return;
+    const msg = await store.get("groupmsg/" + tid, { type: "json" });
+    let text, markup;
+    if (cancelled) { if (!msg) return; text = groupText(t, [], {}, true); }
+    else {
+      const { all } = await confirmedFor(store, tid, await listDocs(store, "signups"));
+      const names = {}; for (const p of all) names[p.id] = await nameOf(p.id);
+      text = groupText(t, all, names); markup = kb(tid);
+    }
+    if (msg && msg.id) {
+      const body = { chat_id: msg.chat || groupChatId, message_id: msg.id, text, parse_mode: "HTML", disable_web_page_preview: true };
+      if (markup) body.reply_markup = markup;
+      const r = await tg("editMessageText", body);
+      if (cancelled || (r && !r.error) || (r && /not modified/i.test(r.error))) return;
+      if (!r || !/not found|can't be edited|message to edit/i.test(r.error)) return; // nur neu senden, wenn die alte Nachricht weg ist
+      // Nachricht gelöscht oder nicht editierbar: unten weiter, neu senden
+    }
+    if (cancelled) return;
+    const r = await tg("sendMessage", { chat_id: groupChatId, text, parse_mode: "HTML", disable_web_page_preview: true, ...(markup ? { reply_markup: markup } : {}) });
+    if (r && !r.error && r.message_id) await store.setJSON("groupmsg/" + tid, { chat: groupChatId, id: r.message_id });
+  }
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
   return async function handle(req) {
     const url = new URL(req.url);
@@ -153,9 +204,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
         if (!body || typeof body !== "object") return json({ error: "bad_body" }, 400);
         const id = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
         await store.setJSON(path + "/" + id, body);
-        if (seg[0] === "treffen" && seg.length === 1 && body.datum) {
-          await toGroup(`📅 <b>Neues Treffen:</b> ${esc(fmtTreffen(body))}\n${Math.max(1, Number(body.plaetze) || 1)} Plätze. Zieh dir ein Thema und melde dich an!`);
-        }
+        if (seg[0] === "treffen" && seg.length === 1 && body.datum) await refreshGroup(id);
         return json({ id });
       }
     }
@@ -169,6 +218,8 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       if (!allowed(seg, uid, isAdmin, "write")) return json({ error: "forbidden" }, 403);
       // Wartelisten-Nachrücker merken (nur bei Abmeldungen relevant)
       const isSign = seg[0] === "signups" && seg.length === 2;
+      const isTreffen = seg[0] === "treffen" && seg.length === 2;
+      const treffenBefore = isTreffen ? await store.get(path, { type: "json" }) : null;
       let before = null, touched = [], oldDoc = {};
       if (isSign) {
         const old = (await store.get(path, { type: "json" })) || {};
@@ -184,23 +235,26 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
         let next = body;
         if (req.method === "PATCH") next = { ...((await store.get(path, { type: "json" })) || {}), ...body };
         if (JSON.stringify(next).length > 100000) return json({ error: "too_large" }, 413);
+        if (isSign) {
+          const others = (await listDocs(store, "signups")).filter((d) => d.id !== seg[1]);
+          for (const [tid, v] of Object.entries(next)) {
+            const th = signVal(v)?.thema;
+            if (th && others.some((o) => signVal(o.data && o.data[tid])?.thema === th)) return json({ error: "taken" }, 409);
+          }
+        }
         await store.setJSON(path, next);
       } else if (req.method === "DELETE") {
         await store.delete(path);
       } else return json({ error: "method" }, 405);
       if (isSign && groupChatId) {
         const newDoc = (await store.get(path, { type: "json" })) || {};
-        const all = await listDocs(store, "signups");
-        const who = await nameOf(seg[1]);
         for (const tid of new Set([...Object.keys(oldDoc), ...Object.keys(newDoc)])) {
-          const o = signVal(oldDoc[tid]), n = signVal(newDoc[tid]);
-          const t = await store.get("treffen/" + tid, { type: "json" });
-          if (!t) continue;
-          const { all: ppl } = await confirmedFor(store, tid, all);
-          if (!o && n) await toGroup(`🙋 <b>${esc(who)}</b> kommt am ${esc(fmtTreffen(t))}${n.thema ? `\nThema: <b>${esc(n.thema)}</b>` : ""}\n${freeText(t, ppl)}`);
-          else if (o && n && n.thema && n.thema !== o.thema) await toGroup(`🔄 <b>${esc(who)}</b> hat ein neues Thema für ${esc(fmtTreffen(t))}: <b>${esc(n.thema)}</b>`);
-          else if (o && !n) await toGroup(`👋 <b>${esc(who)}</b> kommt doch nicht am ${esc(fmtTreffen(t))}.${o.thema ? ` Das Thema „${esc(o.thema)}“ ist wieder frei.` : ""}\n${freeText(t, ppl)}`);
+          if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid);
         }
+      }
+      if (isTreffen && groupChatId) {
+        if (req.method === "DELETE") { if (treffenBefore) await refreshGroup(seg[1], { cancelled: treffenBefore }); }
+        else await refreshGroup(seg[1]);
       }
       if (isSign && touched.length) {
         const all = await listDocs(store, "signups");
