@@ -139,7 +139,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
   const appLink = (tid) => { if (!botLink) return ""; if (/t\.me\/[^/?]+\/[^/?]+/.test(botLink)) return botLink.split("?")[0] + "?startapp=" + tid; return botLink; };
   const kb = (tid) => { const u = appLink(tid); return u ? { inline_keyboard: [[{ text: "Thema wählen und anmelden", url: u }]] } : undefined; };
   // Eine Nachricht pro Treffen in der Gruppe: neu senden oder aktualisieren
-  async function refreshGroup(tid, { cancelled = false } = {}) {
+  async function refreshGroup(tid, { cancelled = false, bump = false } = {}) {
     if (!groupChatId) return;
     const t = await store.get("treffen/" + tid, { type: "json" }) || (cancelled ? cancelled : null);
     if (!t) return;
@@ -151,7 +151,14 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       const names = {}; for (const p of all) names[p.id] = await nameOf(p.id);
       text = groupText(t, all, names); markup = kb(tid);
     }
-    if (msg && msg.id) {
+    // Neue Anmeldung: alte Nachricht löschen und neu senden, damit sie unten im Chat steht
+    // (klappt nur, wenn der Bot Nachrichten löschen darf; sonst wie bisher bearbeiten)
+    let fresh = false;
+    if (bump && !cancelled && msg && msg.id) {
+      const d = await tg("deleteMessage", { chat_id: msg.chat || groupChatId, message_id: msg.id });
+      fresh = d === true;
+    }
+    if (msg && msg.id && !fresh) {
       const body = { chat_id: msg.chat || groupChatId, message_id: msg.id, text, parse_mode: "HTML", disable_web_page_preview: true };
       if (markup) body.reply_markup = markup;
       const r = await tg("editMessageText", body);
@@ -160,7 +167,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       // Nachricht gelöscht oder nicht editierbar: unten weiter, neu senden
     }
     if (cancelled) return;
-    const r = await tg("sendMessage", { chat_id: groupChatId, ...(groupThreadId ? { message_thread_id: Number(groupThreadId) } : {}), text, parse_mode: "HTML", disable_web_page_preview: true, ...(markup ? { reply_markup: markup } : {}) });
+    const r = await tg("sendMessage", { chat_id: groupChatId, ...(groupThreadId ? { message_thread_id: Number(groupThreadId) } : {}), ...(fresh ? { disable_notification: true } : {}), text, parse_mode: "HTML", disable_web_page_preview: true, ...(markup ? { reply_markup: markup } : {}) });
     if (r && !r.error && r.message_id) await store.setJSON("groupmsg/" + tid, { chat: groupChatId, id: r.message_id });
   }
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -174,6 +181,16 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
     const isAdmin = adminIds.includes(String(user.id));
     const name = [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username || "Jemand";
 
+    // Feedback aus der App: Bot schickt es den Admins privat
+    if (route === "feedback" && req.method === "POST") {
+      const body = await req.json().catch(() => null);
+      const text = typeof body?.text === "string" ? body.text.trim().slice(0, 2000) : "";
+      if (!text) return json({ error: "bad_body" }, 400);
+      const who = `${esc(name)}${user.username ? ` (@${esc(user.username)})` : ""}`;
+      let ok = 0;
+      for (const id of adminIds) if (await send(botToken, id, `💬 <b>Feedback zur Pitch-Runde</b>\nVon: ${who}\n\n${esc(text)}`)) ok++;
+      return ok ? json({ ok: true }) : json({ error: "unavailable" }, 503);
+    }
     if (route === "me" && req.method === "GET") {
       await store.setJSON("profiles/" + uid, { name, username: user.username || "", photo: user.photo_url || "", seen: new Date().toISOString() });
       return json({ id: uid, tgId: String(user.id), name, username: user.username || "", photo: user.photo_url || "", isAdmin });
@@ -249,7 +266,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       if (isSign && groupChatId) {
         const newDoc = (await store.get(path, { type: "json" })) || {};
         for (const tid of new Set([...Object.keys(oldDoc), ...Object.keys(newDoc)])) {
-          if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid);
+          if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid, { bump: !oldDoc[tid] && !!newDoc[tid] });
         }
       }
       // Bestätigung im privaten Chat mit dem Bot: so findet man die Mini App jederzeit wieder

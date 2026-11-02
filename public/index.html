@@ -36,7 +36,8 @@
  function ava(n){var c=(n||"?").trim().charAt(0).toUpperCase();return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#fde8dc"/><text x="20" y="26" font-family="Arial" font-size="17" font-weight="700" text-anchor="middle" fill="#a83d16">'+c+'</text></svg>')}
  var meP=null;function me(){return meP||(meP=api("GET","me").then(function(m){return {id:m.id,name:m.name,email:null,avatarUrl:m.photo||ava(m.name),isOwner:!!m.isAdmin,canEdit:!!m.isAdmin,tgId:m.tgId}}).catch(function(){return {id:null,name:"",email:null,avatarUrl:ava("?"),isOwner:false,canEdit:false}}))}
  var user={me:me,id:async function(){return (await me()).id},isOwner:async function(){return (await me()).isOwner},canEdit:async function(){return (await me()).canEdit},can:async function(){return true},
-  profiles:async function(ids){if(!ids||!ids.length)return {};return api("GET","profiles",{ids:ids.join(",")})}};
+  profiles:async function(ids){if(!ids||!ids.length)return {};return api("GET","profiles",{ids:ids.join(",")})},
+  feedback:async function(text){return api("POST","feedback",null,{text:text})}};
  window.claude={use:async function(n){return n==="db"?db:n==="user"?user:null}};
 })();
 </script>
@@ -987,6 +988,7 @@ button.nav-brand{background:none;border:0;padding:16px 0;cursor:pointer;font-fam
  .navbar .tab{padding:14px 0 12px;font-size:14px;flex:none}
  .navbar .tab .lg{display:none}.navbar .tab .sm{display:inline}
 }
+@media (max-width:400px){.tabs.navbar{gap:8px;padding-inline:16px}.navbar .nav-brand{margin-right:0}html body .navbar .tab{font-size:13px!important}.navbar .tab .count{margin-left:-2px}}
 
 /* Stepper minimal */
 .stepper .sp-step::before{top:11px;left:calc(-50% + 14px);right:calc(50% + 14px);height:1px}
@@ -1100,6 +1102,10 @@ html body #viewMine .mt-ort .pin{width:16px;height:16px}
 .tr-who li.me{background:var(--peach);color:var(--orange-text);font-weight:600}
 .tr-who li.wait{background:none;border:1px dashed var(--line);color:var(--muted)}
 /* Kurze Erklärung auf Russisch unter "So funktioniert's" */
+.faq-list{display:grid;gap:8px;margin-top:8px}
+.faq-list .ru-help{margin-top:0}
+.ru-link{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font:inherit;font-size:var(--t-md);font-weight:600;color:var(--ink);text-align:left;cursor:pointer}
+.ru-link::after{content:"→";color:var(--orange-text)}
 .ru-help{margin-top:12px;background:var(--white);border:1px solid #ece7de;border-radius:14px}
 .ru-help summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:var(--t-md);font-weight:600;color:var(--ink)}
 .ru-help summary::-webkit-details-marker{display:none}
@@ -1109,7 +1115,13 @@ html body #viewMine .mt-ort .pin{width:16px;height:16px}
 .ru-body h3{margin:14px 0 4px;font-size:var(--t-sm);font-weight:600;color:var(--orange-text)}
 .ru-body h3:first-child{margin-top:0}
 .ru-body p{margin:0}
+.ru-body p+p{margin-top:6px}
 .ru-body ol,.ru-body ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.ru-body a{color:var(--orange-text);font-weight:600}
+.ru-fb{display:grid;gap:8px;margin-top:10px}
+.ru-fb textarea{font:inherit;font-size:var(--t-md);color:var(--gr);border:1px solid #ece7de;border-radius:10px;padding:10px 12px;background:#fff;resize:vertical;min-height:80px}
+.ru-fb .save{justify-self:start}
+.ru-fb-note{margin:0;color:var(--muted)}
 .ru-body ol{list-style:decimal}.ru-body ul{list-style:disc}.ru-body li{display:list-item}.ru-body li::marker{color:var(--orange-text)}
 .tr-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .tr-act .save{white-space:nowrap}
@@ -1306,6 +1318,7 @@ html body .tr-who li.me{background:var(--peach);margin:0 -10px;padding:10px;bord
       </div>
     </div>
     <button type="button" class="tab" id="tabTreffen" aria-pressed="false"><span class="lg">Treffen</span><span class="sm">Treffen</span></button>
+    <button type="button" class="tab" id="tabFaq" aria-pressed="false" title="Вопросы и ответы"><span class="lg">FAQ</span><span class="sm">FAQ</span></button>
     <button type="button" class="tab" id="tabMine" aria-pressed="false"><img class="ava" id="ava" alt="" hidden><span class="lg">Mein Bereich</span><span class="sm">Mein Bereich</span><span class="count" id="count">0</span></button>
   </nav>
 
@@ -1320,37 +1333,7 @@ html body .tr-who li.me{background:var(--peach);margin:0 -10px;padding:10px;bord
         <li><svg class="ill" viewBox="5.0 6.6 70.0 53.8" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g transform="translate(40 32) scale(.8) translate(-43 -31)"><g filter="url(#sh2)"><rect x="3" y="3" width="80" height="56" rx="7" fill="#ffffff"/></g><rect x="10.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="19.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="28.8" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="38.2" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="47.6" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="57.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="66.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="10.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="19.4" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="1"/><rect x="28.8" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="38.2" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="47.6" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="57.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="66.9" y="19.9" width="6.4" height="6.4" rx="1.8" fill="#ffffff" stroke="#222e66" stroke-width="1.2"/><rect x="10" y="36" width="66" height="4" rx="2" fill="#d6def2"/><rect x="10" y="36" width="42" height="4" rx="2" fill="url(#g2)"/><rect x="10" y="46" width="22" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="62" y="46" width="14" height="3.5" rx="1.75" fill="#d6def2"/></g></svg><b>Ab 1 Woche vorher vorbereiten</b><span>Recherchieren, Phrasen lernen.</span></li>
         <li><svg class="ill" viewBox="-1 5 54 56" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh3" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g filter="url(#sh3)"><circle cx="26" cy="32" r="24" fill="#ffffff"/></g><circle cx="26" cy="32" r="17" fill="none" stroke="#d6def2" stroke-width="5"/><circle cx="26" cy="32" r="17" fill="none" stroke="url(#g3)" stroke-width="5" stroke-linecap="round" stroke-dasharray="66.2 106.8" transform="rotate(-90 26 32)"/><text x="26" y="35.5" text-anchor="middle" font-family="Geist,Helvetica,Arial,sans-serif" font-size="10" font-weight="600" fill="#222e66">5:00</text></svg><b>3-5 Minuten pitchen</b><span>Vor der Gruppe, dann eine Frage.</span></li>
       </ol>
-      <details class="ru-help" lang="ru">
-        <summary>Впервые здесь? Коротко по-русски</summary>
-        <div class="ru-body">
-          <h3>Что это</h3>
-          <p>Pitch-Runde — встречи, где мы говорим по-немецки о Германии — о свежих новостях и о том, что здесь знает каждый: история, привычки, праздники, Гамбург. Чтобы потом было о чём поговорить с местными: с коллегами, соседями, друзьями. Каждая берёт тему, готовит короткий рассказ и делится им с группой. Это тренировка живой речи, а не экзамен. Уровень B2–C1.</p>
-          <h3>Как это работает</h3>
-          <ol>
-            <li>Во вкладке «Treffen» выбери встречу и вытяни тему. Не нравится — тяни другую.</li>
-            <li>Нажми «Thema nehmen und anmelden»: ты записана, тема закреплена за тобой.</li>
-            <li>Готовься примерно неделю.</li>
-            <li>На встрече рассказываешь 3–5 минут, задаёшь группе один вопрос, и потом обсуждаем вместе.</li>
-          </ol>
-          <h3>Какие темы</h3>
-          <p>Свежие новости, ТВ и звёзды, Гамбург, немецкие привычки, история, праздники. Новости мы регулярно обновляем, факты проверены.</p>
-          <h3>Как готовиться</h3>
-          <p>У каждой темы есть готовый план из пяти шагов: Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe. К нему слова, фразы «как говорят немцы», типичные ошибки, видео и мини-тест.</p>
-          <h3>Не бойся</h3>
-          <ul>
-            <li>Можно выписать себе тезисы и подглядывать.</li>
-            <li>Не нужно говорить идеально: ошибки — это нормально, мы все учимся.</li>
-            <li>Не нужно быть экспертом. Достаточно рассказать, что ты узнала и что ты об этом думаешь.</li>
-          </ul>
-          <h3>Правила</h3>
-          <ul>
-            <li>Одна тема — один человек.</li>
-            <li>Если мест нет, попадаешь в лист ожидания. Освободится место — бот напишет.</li>
-            <li>Не получается прийти — нажми «Abmelden», тема освободится для других.</li>
-            <li>За день до встречи бот пришлёт напоминание.</li>
-          </ul>
-        </div>
-      </details>
+      <button type="button" class="ru-help ru-link" id="faqOpen" lang="ru">Впервые здесь? Вопросы и ответы по-русски</button>
     </section>
 
     <section class="draw-sec" aria-labelledby="pickH">
@@ -1508,6 +1491,98 @@ html body .tr-who li.me{background:var(--peach);margin:0 -10px;padding:10px;bord
         <div class="tr-fbtn"><button type="submit" class="save" id="trSubmit">Treffen anlegen</button><button type="button" class="tr-off" id="trCancel" hidden>Abbrechen</button></div>
       </form>
     </section>
+  </section>
+
+  <section id="viewFaq" class="view faq" hidden aria-labelledby="faqH" lang="ru">
+    <div class="mine-head">
+      <h1 id="faqH">Вопросы и ответы</h1>
+      <p class="mine-lead">Всё самое важное о Pitch-Runde коротко и по-русски.</p>
+    </div>
+    <div class="faq-list">
+      <details class="ru-help">
+        <summary>Что такое Pitch-Runde?</summary>
+        <div class="ru-body">
+          <p>В Pitch-Runde каждый выбирает тему, готовит короткий рассказ на немецком и делится им с группой, а потом мы вместе обсуждаем. Темы о том, что сейчас происходит в Германии, и о том, что здесь знает каждый: история, привычки, праздники, Гамбург и многое другое. Так у тебя всегда будет о чём поговорить с местными.</p>
+          <p>Это не экзамен, а дружеская тренировка. Уровень B2-C1.</p>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Как записаться на встречу?</summary>
+        <div class="ru-body">
+          <ol>
+            <li>Открой «Treffen», выбери встречу и вытяни тему. Не зацепила? Тяни другую.</li>
+            <li>Нажми «Thema nehmen und anmelden». Всё, ты записана.</li>
+            <li>Спокойно готовься, у тебя есть примерно неделя.</li>
+            <li>На встрече расскажи о теме 3-5 минут и задай группе вопрос. Дальше обсуждаем вместе.</li>
+          </ol>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Какие бывают темы?</summary>
+        <div class="ru-body">
+          <p>Свежие новости, ТВ и звёзды, Гамбург, немецкие привычки, история, праздники. Новости мы регулярно обновляем и проверяем факты.</p>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Как готовиться?</summary>
+        <div class="ru-body">
+          <p>Приложение даёт тебе опору: структуру рассказа из пяти шагов (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe), полезные словосочетания и фразы, как говорят немцы, разбор типичных ошибок, видео и мини-тест.</p>
+          <p>А сам рассказ готовишь ты. Поищи информацию о теме сама: новости, статьи, видео, всё, что найдёшь. Подумай, что хочешь рассказать и что ты об этом думаешь, и выпиши себе главное.</p>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Где найти свою тему и нужные слова?</summary>
+        <div class="ru-body">
+          <p>Во вкладке «Mein Bereich». Там всегда твоя тема для ближайшей встречи и темы, которые ты сохранила.</p>
+          <p>Слова, фразы и факты из темы можно добавить в свой словарик «Meine Lernliste»: нажми «In Lernliste speichern» у нужного слова или «Alles in meine Lernliste». Так всё под рукой, и ты всегда можешь вернуться и повторить.</p>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Я боюсь, что не справлюсь. Что делать?</summary>
+        <div class="ru-body">
+          <ul>
+            <li>Можно взять с собой тезисы и подглядывать.</li>
+            <li>Говорить идеально не нужно. Ошибки это нормально, мы все учимся.</li>
+            <li>Быть экспертом тоже не нужно. Расскажи, что узнала и что ты об этом думаешь.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Можно поменять тему?</summary>
+        <div class="ru-body">
+          <p>Да. Вытяни другую тему и нажми «Thema wechseln». Или выбери тему из списка прямо на карточке встречи во вкладке «Treffen».</p>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Что, если мест нет или я не смогу прийти?</summary>
+        <div class="ru-body">
+          <ul>
+            <li>Одна тема на одного человека.</li>
+            <li>Мест нет? Ты попадёшь в лист ожидания, а если место освободится, бот тебе напишет.</li>
+            <li>Не получается прийти? Нажми «Abmelden», и тема освободится для других.</li>
+            <li>За день до встречи бот пришлёт напоминание.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="ru-help">
+        <summary>Нужно что-то устанавливать?</summary>
+        <div class="ru-body">
+          <p>Нет. Pitch-Runde открывается прямо в Telegram. Записаться на встречу можно только там.</p>
+        </div>
+      </details>
+      <details class="ru-help" open>
+        <summary>Есть идея или что-то не работает?</summary>
+        <div class="ru-body">
+          <p>Напиши мне в личку в Telegram <a href="https://t.me/Vikii_Ka" target="_blank" rel="noopener">@Vikii_Ka</a> или оставь комментарий прямо здесь.</p>
+          <form class="ru-fb" id="fbForm">
+            <label for="fbText" class="sr">Твой комментарий</label>
+            <textarea id="fbText" rows="3" maxlength="2000" placeholder="Твоя идея или что не работает"></textarea>
+            <button type="submit" class="save" id="fbSend">Отправить</button>
+            <p class="ru-fb-note" id="fbNote" hidden></p>
+          </form>
+        </div>
+      </details>
+    </div>
   </section>
 
   <section id="viewMine" class="view mine" hidden aria-labelledby="mineH">
@@ -2330,7 +2405,7 @@ $("mineQ").addEventListener("input",()=>{paintList();paintLL()});
 
 /* ---------- Ansichten ---------- */
 function show(v){
- ["Draw","Club","Mine","Treffen"].forEach(n=>{const on=n.toLowerCase()===v;$("view"+n).hidden=!on;$("tab"+n).setAttribute("aria-pressed",on?"true":"false")});
+ ["Draw","Club","Mine","Treffen","Faq"].forEach(n=>{const on=n.toLowerCase()===v;$("view"+n).hidden=!on;$("tab"+n).setAttribute("aria-pressed",on?"true":"false")});
  confirmId=null;if(v==="treffen")paintTreffen();if(v==="mine"){paintList();paintLL()}if(v==="club"){paintClub();setTimeout(()=>$("clubQ").focus(),50)}
  window.scrollTo({top:0});
 }
@@ -2338,6 +2413,8 @@ $("tabDraw").addEventListener("click",()=>show("draw"));
 $("tabClub").addEventListener("click",()=>show("club"));
 $("tabMine").addEventListener("click",()=>show("mine"));
 $("tabTreffen").addEventListener("click",()=>show("treffen"));
+$("tabFaq").addEventListener("click",()=>show("faq"));
+$("faqOpen").addEventListener("click",()=>show("faq"));
 $("emptyDraw").addEventListener("click",()=>show("draw"));
 $("saveBtn").addEventListener("click",()=>{if(cur<0)return;const id=slug(T[cur].t);saved[id]?show("mine"):saveTopic(cur)});
 $("noteField").addEventListener("input",noteChanged);
@@ -2614,6 +2691,14 @@ $("trList").addEventListener("change",e=>{
  const sel=e.target.closest('select[data-tr="thema"]');if(!sel||!TR.me)return;
  const m=trMine(TR.me),id=sel.dataset.id;if(!m[id])return;
  m[id]={...m[id],thema:sel.value};trWriteSign(TR.me,m,sel.value?"Thema gespeichert":"Thema entfernt");
+});
+$("fbForm").addEventListener("submit",async e=>{
+ e.preventDefault();const f=$("fbText"),btn=$("fbSend"),note=$("fbNote"),text=f.value.trim();if(!text)return;
+ const say=m=>{note.hidden=false;note.textContent=m};
+ const u=window.claude?await window.claude.use("user"):null;if(!u||!(await u.id())){say("Чтобы отправить комментарий, открой Pitch-Runde в Telegram. Или напиши мне в личку.");return}
+ btn.disabled=true;
+ try{await u.feedback(text);f.value="";say("Спасибо! Твой комментарий отправлен.")}catch(_){say("Не получилось отправить. Попробуй ещё раз или напиши мне в личку.")}
+ btn.disabled=false;
 });
 function trResetForm(){const f=$("trForm");f.reset();f.zeit.value="19:00";f.plaetze.value="12";TR.editId=null;$("trAdminH").textContent="Neues Treffen anlegen";$("trSubmit").textContent="Treffen anlegen";$("trCancel").hidden=true}
 $("trCancel").addEventListener("click",trResetForm);
