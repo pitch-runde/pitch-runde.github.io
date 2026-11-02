@@ -327,21 +327,21 @@ export async function sendReminders({ store, botToken, send = tgSend, now = new 
 }
 
 /* ---------- Nach dem Treffen (täglich, für gestern) ---------- */
-// Lernstoff eines Themas aus der Seite holen (ROLL, sonst LP): 3 Begriffe, 2 Wendungen
-export function lernstoff(html, title) {
-  const table = (name) => {
-    const l = String(html || "").split("\n").find((x) => x.startsWith(`const ${name}=`));
-    try { return l ? JSON.parse(l.slice(`const ${name}=`.length).trim().replace(/;$/, "")) : {}; } catch { return {}; }
-  };
-  const d = table("ROLL")[title] || table("LP")[title] || {};
+// Lernstoff eines Themas aus themen.js (ROLL, sonst LP): 3 Begriffe, 2 Wendungen
+export function lernstoff(js, title) {
+  let d = {};
+  for (const l of String(js || "").split("\n")) {
+    if (!l.startsWith("{")) continue;
+    try { const x = JSON.parse(l.replace(/,$/, "")); if (x.T && x.T.t === title) { d = x.ROLL || x.LP || {}; break; } } catch {}
+  }
   return { B: (d.B || []).slice(0, 3), U: (d.U || []).slice(0, 2) };
 }
-export async function sendNachTreffen({ store, botToken, send = tgSend, now = new Date(), getHtml, botLink = "" }) {
+export async function sendNachTreffen({ store, botToken, send = tgSend, now = new Date(), getThemen, botLink = "" }) {
   const berlin = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
   const yesterday = berlin(new Date(now.getTime() - 24 * 3600 * 1000));
   const treffen = (await listDocs(store, "treffen")).filter((x) => x.data && x.data.datum === yesterday);
   if (!treffen.length) return 0;
-  const html = getHtml ? await getHtml().catch(() => "") : "";
+  const themen = getThemen ? await getThemen().catch(() => "") : "";
   const signups = await listDocs(store, "signups");
   const app = botLink ? botLink.split("?")[0] : "";
   let n = 0;
@@ -351,7 +351,7 @@ export async function sendNachTreffen({ store, botToken, send = tgSend, now = ne
     for (const p of all.slice(0, cap)) {
       const chat = tgIdOf(p.id);
       if (!chat || !p.thema) continue;
-      const { B, U } = lernstoff(html, p.thema);
+      const { B, U } = lernstoff(themen, p.thema);
       let msg = `👏 Danke fürs Mitmachen gestern bei der Pitch-Runde!\nDein Thema: <b>${esc(p.thema)}</b>`;
       if (B.length) msg += `\n\n<b>Zum Merken:</b>\n` + B.map(([a, b]) => `• <b>${esc(a)}</b>: ${esc(b)}`).join("\n");
       if (U.length) msg += `\n\n<b>So sagen es Deutsche:</b>\n` + U.map(([a]) => `• ${esc(a)}`).join("\n");

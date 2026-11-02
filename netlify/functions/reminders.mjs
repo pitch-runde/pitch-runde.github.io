@@ -7,7 +7,7 @@ export default async () => {
   const store = getStore({ name: "pitchrunde", consistency: "strong" });
   const site = process.env.URL || "https://pitchrunde.netlify.app";
   const n = await sendReminders({ store, botToken: process.env.BOT_TOKEN });
-  const m = await sendNachTreffen({ store, botToken: process.env.BOT_TOKEN, botLink: process.env.BOT_LINK || "", getHtml: () => fetch(site + "/").then((r) => r.text()) });
+  const m = await sendNachTreffen({ store, botToken: process.env.BOT_TOKEN, botLink: process.env.BOT_LINK || "", getThemen: () => fetch(site + "/themen.js").then((r) => r.text()) });
   console.log("Erinnerungen gesendet:", n, "· Nach dem Treffen:", m);
 };
 
