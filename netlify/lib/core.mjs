@@ -139,7 +139,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
   const appLink = (tid) => { if (!botLink) return ""; if (/t\.me\/[^/?]+\/[^/?]+/.test(botLink)) return botLink.split("?")[0] + "?startapp=" + tid; return botLink; };
   const kb = (tid) => { const u = appLink(tid); return u ? { inline_keyboard: [[{ text: "Thema wählen und anmelden", url: u }]] } : undefined; };
   // Eine Nachricht pro Treffen in der Gruppe: neu senden oder aktualisieren
-  async function refreshGroup(tid, { cancelled = false, bump = false } = {}) {
+  async function refreshGroup(tid, { cancelled = false, bump = !cancelled } = {}) {
     if (!groupChatId) return;
     const t = await store.get("treffen/" + tid, { type: "json" }) || (cancelled ? cancelled : null);
     if (!t) return;
@@ -151,7 +151,8 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       const names = {}; for (const p of all) names[p.id] = await nameOf(p.id);
       text = groupText(t, all, names); markup = kb(tid);
     }
-    // Neue Anmeldung: alte Nachricht löschen und neu senden, damit sie unten im Chat steht
+    // Jede Änderung (An-/Abmeldung, Themenwechsel, Nachrücker, Bearbeiten): alte Nachricht löschen
+    // und neu senden, damit sie unten im Chat steht
     // (klappt nur, wenn der Bot Nachrichten löschen darf; sonst wie bisher bearbeiten)
     let fresh = false;
     if (bump && !cancelled && msg && msg.id) {
@@ -266,7 +267,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       if (isSign && groupChatId) {
         const newDoc = (await store.get(path, { type: "json" })) || {};
         for (const tid of new Set([...Object.keys(oldDoc), ...Object.keys(newDoc)])) {
-          if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid, { bump: !oldDoc[tid] && !!newDoc[tid] });
+          if (JSON.stringify(oldDoc[tid]) !== JSON.stringify(newDoc[tid])) await refreshGroup(tid);
         }
       }
       // Bestätigung im privaten Chat mit dem Bot: so findet man die Mini App jederzeit wieder
