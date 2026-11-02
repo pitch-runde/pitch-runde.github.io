@@ -1244,6 +1244,29 @@ html body #card #saveBtn[aria-pressed="true"] .ic::before{content:"";position:ab
 .mt-drop[data-sure="1"]{color:#b3261e;font-weight:600}
 #myThema .saved .item .meta span:last-child{color:var(--gr)}
 html body #card #saveBtn:disabled{color:var(--muted);text-decoration:none;cursor:default}
+/* Eine Aktion: Status oben, Knopf unten */
+html body #card #saveBtn{pointer-events:none;text-decoration:none!important;cursor:default;color:var(--gr)}
+html body #card #saveBtn[aria-pressed="false"] .ic{display:none}
+html body #card #saveBtn[aria-pressed="true"]{color:#1f7a3a}
+#saveBar #sbState,#saveBar #sbPdf,#saveBar #sbRedraw{display:none!important}
+#saveBar .sb-acts{width:100%;display:block!important}
+html body #card.t-new #saveBar #sbSave{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;padding:9px 16px;line-height:1.2;text-align:center}
+html body #card.t-new #saveBar #sbSave .l1{font-size:var(--t-md);font-weight:600}
+html body #card.t-new #saveBar #sbSave .l2{font-size:var(--t-sm);font-weight:400;opacity:.85}
+html body #card.t-new #saveBar #sbSave .l2:empty{display:none}
+html body #card.t-new #saveBar.is-saved #sbSave{background:#fff;color:#1f7a3a;border:1.5px solid #1f7a3a;box-shadow:none}
+html body #card.t-new #saveBar #sbSave:disabled{background:#e6e8ee;color:var(--muted);border-color:#e6e8ee;box-shadow:none;cursor:default}
+@media (max-width:640px){html body #card .video{flex-direction:column;align-items:stretch;gap:12px;padding:10px 10px 14px}html body #card .v-thumb{width:100%}html body #card .v-play{transform:none}html body #card .v-txt{padding:0 4px}}
+.redraw-row{display:none}
+/* Treffen: Name oben, Thema darunter */
+html body .tr-who li{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"n a" "t a";column-gap:12px;row-gap:2px;align-items:center!important;padding:10px 0}
+html body .tr-who .tr-name{grid-area:n;font-weight:600}
+html body .tr-who .tr-pt{grid-area:t;color:var(--gr)}
+html body .tr-who .tr-kick,html body .tr-who .tr-swap{grid-area:a}
+html body .tr-who li.me{background:var(--peach);margin:0 -10px;padding:10px;border-radius:8px;border-bottom-color:transparent}
+.tr-swap{background:none;border:0;padding:4px 0;font:inherit;font-size:var(--t-sm);font-weight:600;color:var(--gr);text-decoration:underline;text-underline-offset:3px;cursor:pointer;white-space:nowrap}
+#card.t-new .redraw-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 0 4px;color:var(--muted);font-size:var(--t-md)}
+.redraw-link{background:none;border:0;padding:6px 0;font:inherit;font-size:var(--t-md);font-weight:600;color:var(--gr);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 #sbSave:disabled{opacity:.45;cursor:default}
 
 @media (max-width:560px){#card .card-head .head-row{flex-direction:column;align-items:flex-start;gap:6px}}
@@ -1391,11 +1414,12 @@ html body #card #saveBtn:disabled{color:var(--muted);text-decoration:none;cursor
       <p class="note-hint" id="noteHint">Notizen werden gespeichert, sobald du das Thema in Mein Bereich speicherst.</p>
     </section>
 
+    <div class="redraw-row"><span>Passt nicht?</span><button class="redraw-link" type="button" id="cardRedraw">Anderes Thema ziehen</button></div>
     <div class="savebar" id="saveBar" hidden>
       <span class="sb-state" id="sbState"></span>
       <div class="sb-acts">
-        <button type="button" class="save" id="sbSave"><span class="ic" aria-hidden="true"></span>Speichern</button>
-        <button type="button" class="sb-pdf sb-redraw" id="sbRedraw">Neu ziehen</button><button type="button" class="sb-pdf" id="sbPdf">PDF</button>
+        <button type="button" class="save" id="sbSave"><span class="l1">Thema nehmen und anmelden</span><span class="l2"></span></button>
+        <button type="button" class="sb-pdf sb-redraw" id="sbRedraw" hidden>Neu ziehen</button><button type="button" class="sb-pdf" id="sbPdf" hidden>PDF</button>
       </div>
     </div>
     <div class="pdf-row">
@@ -2482,7 +2506,7 @@ async function paintTreffen(){
   const inList=myPos>-1,onWait=myPos>=cap,free=Math.max(0,cap-ok.length);
   const taken=new Set(ppl.map(p=>p.thema).filter(Boolean));
   const nThemen=ok.filter(p=>p.thema).length;
-  const row=(p,w)=>`<li class="${p.id===TR.me?"me":""}${w?" wait":""}"><span class="tr-name">${esc(p.id===TR.me?"Du":TR.names[p.id]||"Jemand")}${w?` <em>Warteliste</em>`:""}</span><span class="tr-pt">${p.thema?esc(p.thema):`<i>noch kein Thema</i>`}</span>${TR.admin&&p.id!==TR.me?`<button type="button" class="tr-kick" data-tr="kick" data-id="${esc(t.id)}" data-u="${esc(p.id)}" aria-label="Von diesem Treffen entfernen" title="Entfernen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`:""}</li>`;
+  const row=(p,w)=>`<li class="${p.id===TR.me?"me":""}${w?" wait":""}"><span class="tr-name">${esc(p.id===TR.me?"Du":TR.names[p.id]||"Jemand")}${w?` <em>Warteliste</em>`:""}</span><span class="tr-pt">${p.thema?esc(p.thema):`<i>noch kein Thema</i>`}</span>${p.id===TR.me&&TR.write!==false?`<button type="button" class="tr-swap" data-tr="pick" data-id="${esc(t.id)}">${p.thema?"wechseln":"Thema ziehen"}</button>`:""}${TR.admin&&p.id!==TR.me?`<button type="button" class="tr-kick" data-tr="kick" data-id="${esc(t.id)}" data-u="${esc(p.id)}" aria-label="Von diesem Treffen entfernen" title="Entfernen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`:""}</li>`;
   let act="";
   if(TR.write!==false&&TR.me){
    act=inList?`<span class="tr-state${onWait?" wait":""}">${onWait?`Warteliste, Platz ${myPos-cap+1}`:"Du bist dabei"}</span><button type="button" class="tr-off" data-tr="off" data-id="${esc(t.id)}">Abmelden</button>`
@@ -2495,9 +2519,8 @@ async function paintTreffen(){
     <h2>${WT[d.getDay()]}, ${d.getDate()}. ${MO[d.getMonth()]} um ${esc(t.zeit||"")} Uhr</h2>
     <p class="tr-meta"><svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>${esc(t.ort||"")}</p>
     ${t.notiz?`<p class="tr-notiz">${esc(t.notiz)}</p>`:""}
-    <p class="tr-plaetze"><b>${free?`${free} von ${cap} Plätzen frei`:"Ausgebucht"}</b>${wait.length?`, ${wait.length} auf der Warteliste`:""}${ok.length?` · ${nThemen} ${nThemen===1?"Thema":"Themen"} gewählt`:""}</p>
+    <p class="tr-plaetze"><b>${free?`${free} von ${cap} Plätzen frei`:"Ausgebucht"}</b>${wait.length?`, ${wait.length} auf der Warteliste`:""}</p>
     <div class="tr-bar"><i style="width:${Math.min(100,ok.length/cap*100)}%"></i></div>
-    ${inList&&TR.write!==false?`<p class="tr-mine">Dein Thema: <b>${ppl[myPos].thema?esc(ppl[myPos].thema):"noch keins"}</b> <button type="button" class="tr-off" data-tr="pick" data-id="${esc(t.id)}">${ppl[myPos].thema?"Thema wechseln":"Thema ziehen"}</button></p>`:""}
     ${ppl.length?`<ul class="tr-who" aria-label="Wer kommt und mit welchem Thema">${ok.map(p=>row(p,false)).join("")}${wait.map(p=>row(p,true)).join("")}</ul>`:""}
    </div>
    <div class="tr-act">${act}</div>
@@ -2592,8 +2615,18 @@ function paintTake(){
  else if(s.k==="swap"){label=takeSure?"Wirklich wechseln?":"Thema wechseln";state=`Für ${d} hast du schon „${s.old}“. Mit diesem Thema ersetzt du es.`}
  else if(isFull(s.t)){label=`Für ${d} nehmen (Warteliste)`;state=`Das Treffen am ${d} ist voll. Mit diesem Thema kommst du auf die Warteliste.`}
  else {label=`Für ${d} nehmen`;state=`Nimm dieses Thema für das Treffen am ${d}, damit bist du auch angemeldet.`}
- lbl.textContent=label;btn.disabled=dis;btn.setAttribute("aria-pressed",mine?"true":"false");btn.title=state;
- sb.lastChild.textContent=s.k==="take"?"Thema nehmen":s.k==="swap"&&!takeSure?"Wechseln":label;sb.disabled=dis;st.textContent=state;
+ const tm=s.t?`${d} um ${esc(s.t.zeit||"")} Uhr`:"";
+ let top,l1,l2=tm;
+ if(s.k==="login"){top="Thema für ein Treffen";l1="Anmelden, um teilzunehmen";l2=""}
+ else if(s.k==="loading"){top="Treffen werden geladen …";l1="Wird geladen …";l2=""}
+ else if(s.k==="none"){top="Noch kein Treffen geplant";l1="Noch kein Treffen geplant";l2=""}
+ else if(s.k==="mine"){top=`Dein Thema am ${d}`;l1=label.includes("Warteliste")||state.includes("Warteliste")?"✓ Du stehst auf der Warteliste":"✓ Du bist angemeldet";l2=`${tm}${s.t.ort?", "+esc(s.t.ort):""}`}
+ else if(s.k==="taken"){top=`Für ${d} schon vergeben`;l1="Schon vergeben, zieh neu";}
+ else if(s.k==="swap"){top=`Nächstes Treffen: ${d}`;l1=takeSure?"Wirklich wechseln?":"Thema wechseln";l2=takeSure?"Nochmal tippen zum Bestätigen":`für ${tm}`}
+ else if(isFull(s.t)){top=`Nächstes Treffen: ${d} (voll)`;l1="Thema nehmen (Warteliste)";l2=`für ${tm}`}
+ else {top=`Nächstes Treffen: ${d}`;l1="Thema nehmen und anmelden";l2=`für ${tm}`}
+ lbl.textContent=top;btn.disabled=false;btn.tabIndex=-1;btn.setAttribute("aria-pressed",mine?"true":"false");btn.title=state;
+ sb.innerHTML=`<span class="l1">${esc(l1)}</span><span class="l2">${l2}</span>`;sb.disabled=dis;sb.setAttribute("aria-label",state);st.textContent=state;
  if(!bar.hidden)bar.classList.toggle("is-saved",mine);
 }
 paintSaveBar=function(){const bar=$("saveBar");if(cur<0||!$("card").classList.contains("t-new")){bar.hidden=true;return}bar.hidden=false;paintTake()};
@@ -2609,7 +2642,7 @@ async function doTake(){
  TR.sign={...TR.sign,[TR.me]:{...m}};paintTake();paintMine();paintCount();
  await trWriteSign(TR.me,m,`Thema genommen, du bist für ${fmtShort(t)} angemeldet.`);
 }
-document.addEventListener("click",e=>{const b=e.target.closest("#saveBtn,#sbSave");if(!b)return;e.stopPropagation();e.preventDefault();if(!b.disabled)doTake()},true);
+document.addEventListener("click",e=>{const b=e.target.closest("#sbSave");if(!b)return;e.stopPropagation();e.preventDefault();if(!b.disabled)doTake()},true);
 function paintMine(){
  const box=$("myThema");if(!box)return;
  if(TR.state==="nodb"||!TR.me){box.innerHTML=`<div class="mt-box"><p>Melde dich an, dann siehst du hier dein Thema für das nächste Treffen.</p></div>`;return}
@@ -2638,6 +2671,7 @@ const _paintTreffenOld=paintTreffen;paintTreffen=async function(){await _paintTr
 paintMine();
 
 
+$("cardRedraw").addEventListener("click",()=>$("sbRedraw").click());
 $("sbRedraw").addEventListener("click",()=>{$("drawBtn").click();setTimeout(()=>{const c=$("card");if(!c.hidden)c.scrollIntoView({behavior:"smooth",block:"start"})},1400)});
 /* ---------- Konto anbinden ---------- */
 paintWhere();paintAll();
@@ -2717,6 +2751,23 @@ paintWhere();paintAll();
  }
  function go(){fetch("/api/config").then(function(r){return r.ok?r.json():{}}).then(function(c){ui(c.botName||"")}).catch(function(){ui("")})}
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();
+})();
+</script>
+<script>
+/* Aus der Gruppe: Link mit ?startapp=<treffenId> öffnet direkt das Ziehen für dieses Treffen */
+(function(){
+ var tw=window.Telegram&&Telegram.WebApp,sp=(tw&&tw.initDataUnsafe&&tw.initDataUnsafe.start_param)||new URLSearchParams(location.search).get("treffen")||"";
+ if(!/^[A-Za-z0-9_-]{4,40}$/.test(sp))return;
+ var n=0;(function wait(){
+  if(typeof TR==="undefined"||TR.state!=="ok"){if(++n<60)setTimeout(wait,250);return}
+  var t=TR.list.find(function(x){return x.id===sp});
+  if(!t){show("treffen");return}
+  var mine=TR.me&&(TR.sign[TR.me]||{})[sp];
+  if(mine){show("treffen");return}
+  TR.target=sp;show("draw");
+  if(cur<0)$("drawBtn").click();else{var c=$("card");c.hidden=false;paintTake()}
+  toast("Zieh ein Thema für "+fmtShort(t)+" und tippe auf „Thema nehmen“.");
+ })();
 })();
 </script>
 </body></html>
