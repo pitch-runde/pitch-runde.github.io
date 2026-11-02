@@ -7,6 +7,7 @@ export default async (req) => {
     botToken: process.env.BOT_TOKEN,
     botLink: process.env.BOT_LINK || "",
     groupChatId: process.env.GROUP_CHAT_ID || "",
+    groupThreadId: process.env.GROUP_THREAD_ID || "",
     adminIds: (process.env.ADMIN_TELEGRAM_IDS || "").split(",").map((s) => s.trim()).filter(Boolean),
   });
   return handle(req);

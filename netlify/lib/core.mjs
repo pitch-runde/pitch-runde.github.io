@@ -133,7 +133,7 @@ async function confirmedFor(store, tid, signups) {
 }
 
 /* ---------- API ---------- */
-export function makeApi({ store, botToken, adminIds = [], botLink = "", groupChatId = "", send = tgSend, tg = (m, b) => tgCall(botToken, m, b) }) {
+export function makeApi({ store, botToken, adminIds = [], botLink = "", groupChatId = "", groupThreadId = "", send = tgSend, tg = (m, b) => tgCall(botToken, m, b) }) {
   const nameOf = async (id) => { const p = await store.get("profiles/" + id, { type: "json" }); return (p && p.name) || "Jemand"; };
   // Link öffnet die Mini App direkt für dieses Treffen
   const appLink = (tid) => { if (!botLink) return ""; if (/t\.me\/[^/?]+\/[^/?]+/.test(botLink)) return botLink.split("?")[0] + "?startapp=" + tid; return botLink; };
@@ -160,7 +160,7 @@ export function makeApi({ store, botToken, adminIds = [], botLink = "", groupCha
       // Nachricht gelöscht oder nicht editierbar: unten weiter, neu senden
     }
     if (cancelled) return;
-    const r = await tg("sendMessage", { chat_id: groupChatId, text, parse_mode: "HTML", disable_web_page_preview: true, ...(markup ? { reply_markup: markup } : {}) });
+    const r = await tg("sendMessage", { chat_id: groupChatId, ...(groupThreadId ? { message_thread_id: Number(groupThreadId) } : {}), text, parse_mode: "HTML", disable_web_page_preview: true, ...(markup ? { reply_markup: markup } : {}) });
     if (r && !r.error && r.message_id) await store.setJSON("groupmsg/" + tid, { chat: groupChatId, id: r.message_id });
   }
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
