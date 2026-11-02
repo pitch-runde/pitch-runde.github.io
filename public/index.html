@@ -2680,7 +2680,7 @@ $("myThema").addEventListener("click",async e=>{
   await trWriteSign(TR.me,m,"Du bist abgemeldet, dein Thema ist wieder frei.");
  }
 });
-paintCount=function(){const {thema}=myThema();$("count").textContent=Object.keys(items).length+(thema?1:0)};
+paintCount=function(){const {thema}=myThema();const ts=new Set(Object.keys(saved).filter(id=>BY.has(id)).map(id=>T[BY.get(id)].t));if(thema)ts.add(thema);$("count").textContent=ts.size};
 const _paintTreffenOld=paintTreffen;paintTreffen=async function(){await _paintTreffenOld();paintTake();paintMine();paintCount()};
 paintMine();
 
