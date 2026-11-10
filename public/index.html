@@ -1310,6 +1310,43 @@ html body .tr-who li.me{background:var(--peach);margin:0 -10px;padding:10px;bord
 .savebar .sb-acts{flex-wrap:wrap}
 .savebar.is-saved .sb-redraw{display:inline-flex}
 @media (max-width:560px){.savebar .sb-acts{width:100%;display:grid;grid-template-columns:1fr auto auto;gap:8px}.savebar.is-saved .sb-acts{grid-template-columns:1fr auto}}
+
+/* ---------- Weicher Look: viel Weiß, Flächen statt Rahmen, ein heller Akzent ---------- */
+:root{--paper:#fff;--white:#fff;--card:#fff;--orange:#e8711a;--orange-btn:#e8711a;--orange-text:#a64b0a;--on-orange:#2b1300;--peach:#fcebdc;--soft:#f5f6fb;--soft-2:#eceef7;--line:transparent;--blue-line:transparent;--peach-line:transparent}
+body{background:#fff}
+/* Keine Rahmen und Trennlinien mehr */
+html body :is(#nsOpen,#findQ,#clubQ,#mineQ,.find-res,.ru-help,.draw-sec,.filter-btn,.filter-pop,.chip,.save,.dw-go,.video,.panel,.steptabs,.steptabs button,.tl-dot,.mark,.kon-row,.savebar,.sb-pdf,.pdf-btn,.mt-box,.empty,.ll,.fc-card,.status,.tr-item,.tr-who,.tr-who li,.item,.item-del,.qz-opts button,.tr-form input,.ru-fb textarea,#noteField,#card li,.ll li,.navbar){border:0!important}
+html body .navbar .tab{border-top:0;border-left:0;border-right:0}
+html body .navbar .tab[aria-pressed="true"]{border-bottom-color:var(--orange)}
+/* Flächen statt Rahmen */
+html body :is(.draw-sec,.ru-help,.panel,.tr-item,.item,.mt-box,.empty,.ll,.fc-card){background:var(--soft);box-shadow:none}
+html body .video{background:#fff}
+html body :is(.savebar,.find-res,.filter-pop){background:#fff;box-shadow:0 10px 30px rgba(34,46,102,.12)}
+/* Eingabefelder bleiben als Fläche erkennbar */
+html body :is(#findQ,#clubQ,#mineQ,.tr-form input,.ru-fb textarea,#noteField){background:var(--soft-2)}
+html body :is(.panel,.ru-help,.tr-item) :is(input,textarea){background:#fff}
+html body :is(input,textarea,select):focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+/* Zweite Knöpfe: ruhige Fläche */
+html body :is(.filter-btn,.chip,.dw-go,.sb-pdf,.pdf-btn,.status:not([data-s="done"]),.mark){background:var(--soft-2);color:var(--gr)}
+html body .qz-opts button:not(.ok):not(.no){background:var(--soft)}
+html body .qz-opts button:not(.ok):not(.no):not(:disabled):hover{background:var(--soft-2)}
+html body :is(.filter-btn,.chip,.dw-go,.sb-pdf,.pdf-btn,.status:not([data-s="done"])):hover{background:#e1e4f2}
+html body :is(.ru-help,.tr-item,.item) :is(.chip,.status:not([data-s="done"]),.mark){background:#fff}
+html body :is(.chip[aria-pressed="true"],.mark[aria-pressed="true"]){background:var(--ink)!important;color:#fff}
+html body .filter-btn.active{background:var(--peach);color:var(--gr)}
+/* Ein Akzent: alle Hauptknöpfe gleich, dunkle Schrift für den Kontrast */
+html body :is(.draw,.save){background:var(--orange-btn);color:var(--on-orange)}
+html body :is(.draw,.save):hover{background:#f07f2a}
+html body #card.t-new #saveBar.is-saved #sbSave{background:#e6f4ea;color:#1f7a3a;border:0;box-shadow:none}
+/* Warme Beigetöne raus */
+html body :is(.tl-body,.mtag){background:var(--soft)!important}
+html body :is(.qz-bar,.tr-bar){background:var(--soft-2)!important}
+html body .tr-item .tr-bar{background:#fff!important}
+html body .tr-who{gap:6px}
+html body .tr-who li{background:#fff;border-radius:10px}
+html body .tr-who li.me{background:var(--peach)}
+/* Kartenfächer heller */
+.fan i{background:linear-gradient(135deg,#8d9cf0,#5f70d6)}
 </style>
 
 <div class="wrap">
