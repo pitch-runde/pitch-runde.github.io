@@ -1345,6 +1345,11 @@ html body .tr-item .tr-bar{background:#fff!important}
 html body .tr-who{gap:6px}
 html body .tr-who li{background:#fff;border-radius:10px}
 html body .tr-who li.me{background:var(--peach)}
+/* FAQ: Sprachen */
+.faq-langs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+#faqItems{margin-top:0}
+html body .lang-btn{border:0;border-radius:999px;background:var(--soft-2);color:var(--gr);padding:7px 14px;min-height:36px;font-size:var(--t-sm);font-weight:500;cursor:pointer}
+html body .lang-btn[aria-pressed="true"]{background:var(--ink);color:#fff}
 /* Kartenfächer: Tintenblau */
 .fan i{background:#28346e}
 .fan i:nth-child(1),.fan i:nth-child(4){background:#1f2a5c}
@@ -1365,7 +1370,7 @@ html body .tr-who li.me{background:var(--peach)}
       </div>
     </div>
     <button type="button" class="tab" id="tabTreffen" aria-pressed="false"><span class="lg">Treffen</span><span class="sm">Treffen</span></button>
-    <button type="button" class="tab" id="tabFaq" aria-pressed="false" title="Вопросы и ответы"><span class="lg">FAQ</span><span class="sm">FAQ</span></button>
+    <button type="button" class="tab" id="tabFaq" aria-pressed="false"><span class="lg">FAQ</span><span class="sm">FAQ</span></button>
     <button type="button" class="tab" id="tabMine" aria-pressed="false"><img class="ava" id="ava" alt="" hidden><span class="lg">Mein Bereich</span><span class="sm">Mein Bereich</span><span class="count" id="count">0</span></button>
   </nav>
 
@@ -1380,7 +1385,7 @@ html body .tr-who li.me{background:var(--peach)}
         <li><svg class="ill" viewBox="5.0 6.6 70.0 53.8" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g transform="translate(40 32) scale(.8) translate(-43 -31)"><g filter="url(#sh2)"><rect x="3" y="3" width="80" height="56" rx="7" fill="#ffffff"/></g><rect x="10.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="19.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.45"/><rect x="28.8" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="38.2" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.6"/><rect x="47.6" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="57.0" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.75"/><rect x="66.4" y="10.0" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="10.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="0.9"/><rect x="19.4" y="19.4" width="7.4" height="7.4" rx="2" fill="#3a4a94" opacity="1"/><rect x="28.8" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="38.2" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="47.6" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="57.0" y="19.4" width="7.4" height="7.4" rx="2" fill="#d6def2"/><rect x="66.9" y="19.9" width="6.4" height="6.4" rx="1.8" fill="#ffffff" stroke="#222e66" stroke-width="1.2"/><rect x="10" y="36" width="66" height="4" rx="2" fill="#d6def2"/><rect x="10" y="36" width="42" height="4" rx="2" fill="url(#g2)"/><rect x="10" y="46" width="22" height="3.5" rx="1.75" fill="#222e66" opacity=".85"/><rect x="62" y="46" width="14" height="3.5" rx="1.75" fill="#d6def2"/></g></svg><b>Ab 1 Woche vorher vorbereiten</b><span>Recherchieren, Phrasen lernen.</span></li>
         <li><svg class="ill" viewBox="-1 5 54 56" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="sh3" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#222e66" flood-opacity=".16"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a96c8"/><stop offset="1" stop-color="#3a4a94"/></linearGradient></defs><g filter="url(#sh3)"><circle cx="26" cy="32" r="24" fill="#ffffff"/></g><circle cx="26" cy="32" r="17" fill="none" stroke="#d6def2" stroke-width="5"/><circle cx="26" cy="32" r="17" fill="none" stroke="url(#g3)" stroke-width="5" stroke-linecap="round" stroke-dasharray="66.2 106.8" transform="rotate(-90 26 32)"/><text x="26" y="35.5" text-anchor="middle" font-family="Geist,Helvetica,Arial,sans-serif" font-size="10" font-weight="600" fill="#222e66">5:00</text></svg><b>3-5 Minuten pitchen</b><span>Vor der Gruppe, dann eine Frage.</span></li>
       </ol>
-      <button type="button" class="ru-help ru-link" id="faqOpen" lang="ru">Впервые здесь? Вопросы и ответы по-русски</button>
+      <button type="button" class="ru-help ru-link" id="faqOpen"></button>
     </section>
 
     <section class="draw-sec" aria-labelledby="pickH">
@@ -1540,92 +1545,22 @@ html body .tr-who li.me{background:var(--peach)}
     </section>
   </section>
 
-  <section id="viewFaq" class="view faq" hidden aria-labelledby="faqH" lang="ru">
+  <section id="viewFaq" class="view faq" hidden aria-labelledby="faqH">
     <div class="mine-head">
-      <h1 id="faqH">Вопросы и ответы</h1>
-      <p class="mine-lead">Всё самое важное о Pitch-Runde коротко и по-русски.</p>
+      <h1 id="faqH"></h1>
+      <p class="mine-lead" id="faqLead"></p>
+      <div class="faq-langs" id="faqLangs" role="group" aria-label="Sprache / Language"></div>
     </div>
     <div class="faq-list">
-      <details class="ru-help">
-        <summary>Что такое Pitch-Runde?</summary>
-        <div class="ru-body">
-          <p>В Pitch-Runde каждый выбирает тему, готовит короткий рассказ на немецком и делится им с группой, а потом мы вместе обсуждаем. Темы о том, что сейчас происходит в Германии, и о том, что здесь знает каждый: история, привычки, праздники, Гамбург и многое другое. Так у тебя всегда будет о чём поговорить с местными.</p>
-          <p>Это не экзамен, а дружеская тренировка. Уровень B2-C1.</p>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Как записаться на встречу?</summary>
-        <div class="ru-body">
-          <ol>
-            <li>Открой «Treffen», выбери встречу и вытяни тему. Не зацепила? Тяни другую.</li>
-            <li>Нажми «Thema nehmen und anmelden». Всё, ты записана.</li>
-            <li>Спокойно готовься, у тебя есть примерно неделя.</li>
-            <li>На встрече расскажи о теме 3-5 минут и задай группе вопрос, готовые вопросы есть в плане. Дальше обсуждаем вместе.</li>
-          </ol>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Какие бывают темы?</summary>
-        <div class="ru-body">
-          <p>Свежие новости, ТВ и звёзды, Гамбург, немецкие привычки, история, праздники. Новости мы регулярно обновляем и проверяем факты.</p>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Как готовиться?</summary>
-        <div class="ru-body">
-          <p>Приложение даёт тебе опору: структуру рассказа из пяти шагов (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe). В каждом шаге есть вопрос, который поможет подготовиться, а в последнем шаге готовые вопросы для обсуждения с группой: просто выбери один. К этому полезные словосочетания и фразы, как говорят немцы, разбор типичных ошибок, видео и мини-тест.</p>
-          <p>А сам рассказ готовишь ты. Поищи информацию о теме сама: новости, статьи, видео, всё, что найдёшь. Подумай, что хочешь рассказать и что ты об этом думаешь, и выпиши себе главное.</p>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Где найти свою тему и нужные слова?</summary>
-        <div class="ru-body">
-          <p>Во вкладке «Mein Bereich». Там всегда твоя тема для ближайшей встречи и темы, которые ты сохранила.</p>
-          <p>Слова, фразы и факты из темы можно добавить в свой словарик «Meine Lernliste»: нажми «In Lernliste speichern» у нужного слова или «Alles in meine Lernliste». Так всё под рукой, и ты всегда можешь вернуться и повторить.</p>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Я боюсь, что не справлюсь. Что делать?</summary>
-        <div class="ru-body">
-          <ul>
-            <li>Можно взять с собой тезисы и подглядывать.</li>
-            <li>Говорить идеально не нужно. Ошибки это нормально, мы все учимся.</li>
-            <li>Быть экспертом тоже не нужно. Расскажи, что узнала и что ты об этом думаешь.</li>
-          </ul>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Можно поменять тему?</summary>
-        <div class="ru-body">
-          <p>Да. Вытяни другую тему и нажми «Thema wechseln». Или выбери тему из списка прямо на карточке встречи во вкладке «Treffen».</p>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Что, если мест нет или я не смогу прийти?</summary>
-        <div class="ru-body">
-          <ul>
-            <li>Одна тема на одного человека.</li>
-            <li>Мест нет? Ты попадёшь в лист ожидания, а если место освободится, бот тебе напишет.</li>
-            <li>Не получается прийти? Нажми «Abmelden», и тема освободится для других.</li>
-            <li>За день до встречи бот пришлёт напоминание.</li>
-            <li>На следующий день после встречи бот пришлёт короткое сообщение: что запомнить и повторить.</li>
-          </ul>
-        </div>
-      </details>
-      <details class="ru-help">
-        <summary>Нужно что-то устанавливать?</summary>
-        <div class="ru-body">
-          <p>Нет. Pitch-Runde открывается прямо в Telegram. Записаться на встречу можно только там.</p>
-        </div>
-      </details>
+      <div class="faq-list" id="faqItems"></div>
       <details class="ru-help" open>
-        <summary>Есть идея или что-то не работает?</summary>
+        <summary id="fbQ"></summary>
         <div class="ru-body">
-          <p>Напиши мне в личку в Telegram <a href="https://t.me/Vikii_Ka" target="_blank" rel="noopener">@Vikii_Ka</a> или оставь комментарий прямо здесь.</p>
+          <p id="fbP"></p>
           <form class="ru-fb" id="fbForm">
-            <label for="fbText" class="sr">Твой комментарий</label>
-            <textarea id="fbText" rows="3" maxlength="2000" placeholder="Твоя идея или что не работает"></textarea>
-            <button type="submit" class="save" id="fbSend">Отправить</button>
+            <label for="fbText" class="sr" id="fbL"></label>
+            <textarea id="fbText" rows="3" maxlength="2000"></textarea>
+            <button type="submit" class="save" id="fbSend"></button>
             <p class="ru-fb-note" id="fbNote" hidden></p>
           </form>
         </div>
@@ -2421,12 +2356,26 @@ $("trList").addEventListener("change",e=>{
  const m=trMine(TR.me),id=sel.dataset.id;if(!m[id])return;
  m[id]={...m[id],thema:sel.value};trWriteSign(TR.me,m,sel.value?"Thema gespeichert":"Thema entfernt");
 });
+/* FAQ in vier Sprachen */
+const FAQ_TXT={"de":{"name":"Deutsch","open":"Neu hier? Fragen und Antworten","h":"Fragen und Antworten","lead":"Das Wichtigste zur Pitch-Runde, kurz erklärt.","items":[["Was ist die Pitch-Runde?","<p>Bei der Pitch-Runde wählt jede Person ein Thema, bereitet einen kurzen Vortrag auf Deutsch vor und erzählt davon in der Gruppe. Danach reden wir gemeinsam darüber. Die Themen drehen sich um das, was gerade in Deutschland passiert, und um das, was hier jeder kennt: Geschichte, Gewohnheiten, Feiertage, Hamburg und vieles mehr. So hast du immer etwas, worüber du mit Einheimischen reden kannst.</p><p>Das ist keine Prüfung, sondern ein freundliches Training. Niveau B2-C1.</p>"],["Wie melde ich mich für ein Treffen an?","<ol><li>Öffne „Treffen“, wähle ein Treffen und zieh ein Thema. Passt nicht? Zieh ein anderes.</li><li>Tippe auf „Thema nehmen und anmelden“. Fertig, du bist dabei.</li><li>Bereite dich in Ruhe vor, du hast etwa eine Woche Zeit.</li><li>Beim Treffen erzählst du 3-5 Minuten über dein Thema und stellst der Gruppe eine Frage, fertige Fragen findest du im Plan. Danach reden wir gemeinsam.</li></ol>"],["Welche Themen gibt es?","<p>Aktuelle Nachrichten, TV und Stars, Hamburg, deutsche Gewohnheiten, Geschichte, Feiertage. Die Nachrichten aktualisieren wir regelmäßig und prüfen die Fakten.</p>"],["Wie bereite ich mich vor?","<p>Die App gibt dir Halt: einen Aufbau in fünf Schritten (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe). In jedem Schritt hilft dir eine Frage bei der Vorbereitung, im letzten Schritt stehen fertige Fragen für die Gruppe: Wähl einfach eine aus. Dazu kommen nützliche Wendungen und Sätze, wie Deutsche wirklich reden, typische Fehler, Videos und ein kleines Quiz.</p><p>Den Vortrag selbst bereitest du vor. Such dir Infos zum Thema: Nachrichten, Artikel, Videos, alles, was du findest. Überleg dir, was du erzählen willst und was du darüber denkst, und schreib dir das Wichtigste auf.</p><p>Übersetzungen und Fehlererklärungen in den Themen gibt es bisher nur auf Russisch.</p>"],["Wo finde ich mein Thema und meine Wörter?","<p>Unter „Mein Bereich“. Dort findest du immer dein Thema fürs nächste Treffen und die Themen, die du gespeichert hast.</p><p>Wörter, Sätze und Fakten aus dem Thema kannst du in deine „Meine Lernliste“ legen: Tippe bei einem Wort auf „In Lernliste speichern“ oder auf „Alles in meine Lernliste“. So hast du alles griffbereit und kannst jederzeit wiederholen.</p>"],["Ich habe Angst, dass ich das nicht schaffe. Was tun?","<ul><li>Du darfst dir Stichpunkte mitnehmen und draufschauen.</li><li>Perfekt sprechen musst du nicht. Fehler sind normal, wir lernen alle.</li><li>Expertin musst du auch nicht sein. Erzähl einfach, was du erfahren hast und was du darüber denkst.</li></ul>"],["Kann ich mein Thema wechseln?","<p>Ja. Zieh ein anderes Thema und tippe auf „Thema wechseln“. Oder wähl ein Thema aus der Liste direkt auf der Karte des Treffens unter „Treffen“.</p>"],["Was, wenn keine Plätze frei sind oder ich nicht kommen kann?","<ul><li>Ein Thema pro Person.</li><li>Keine Plätze frei? Du kommst auf die Warteliste, und wenn ein Platz frei wird, schreibt dir der Bot.</li><li>Du kannst nicht kommen? Tippe auf „Abmelden“, dann ist dein Thema wieder frei für andere.</li><li>Einen Tag vor dem Treffen schickt dir der Bot eine Erinnerung.</li><li>Am Tag nach dem Treffen schickt dir der Bot eine kurze Nachricht: was du dir merken und wiederholen kannst.</li></ul>"],["Muss ich etwas installieren?","<p>Nein. Die Pitch-Runde öffnet sich direkt in Telegram. Anmelden kannst du dich nur dort.</p>"]],"fbQ":"Hast du eine Idee oder funktioniert etwas nicht?","fbP":"Schreib mir privat in Telegram <a href=\"https://t.me/Vikii_Ka\" target=\"_blank\" rel=\"noopener\">@Vikii_Ka</a> oder hinterlass hier einen Kommentar.","fbL":"Dein Kommentar","fbPh":"Deine Idee oder was nicht funktioniert","fbB":"Senden","fbLogin":"Um einen Kommentar zu senden, öffne die Pitch-Runde in Telegram. Oder schreib mir privat.","fbOk":"Danke! Dein Kommentar wurde gesendet.","fbErr":"Das hat nicht geklappt. Versuch es noch einmal oder schreib mir privat."},"en":{"name":"English","open":"New here? Questions and answers","h":"Questions and answers","lead":"The essentials about Pitch-Runde, in short.","items":[["What is Pitch-Runde?","<p>At Pitch-Runde, everyone picks a topic, prepares a short talk in German and shares it with the group. Then we discuss it together. The topics cover what is happening in Germany right now and what everyone here knows: history, habits, holidays, Hamburg and much more. That way you always have something to talk about with locals.</p><p>It is not an exam, just friendly practice. Level B2-C1.</p>"],["How do I sign up for a meeting?","<ol><li>Open “Treffen”, choose a meeting and draw a topic. Not for you? Draw another one.</li><li>Tap “Thema nehmen und anmelden”. Done, you are signed up.</li><li>Take your time to prepare, you have about a week.</li><li>At the meeting, talk about your topic for 3-5 minutes and ask the group a question, ready-made questions are in the plan. Then we discuss together.</li></ol>"],["What kind of topics are there?","<p>Current news, TV and celebrities, Hamburg, German habits, history, holidays. We update the news regularly and check the facts.</p>"],["How do I prepare?","<p>The app gives you a framework: a five-step structure for your talk (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe). Each step has a question to help you prepare, and the last step has ready-made questions for the group: just pick one. You also get useful phrases, the way Germans really talk, common mistakes, videos and a short quiz.</p><p>The talk itself is up to you. Look up information on your topic yourself: news, articles, videos, whatever you can find. Think about what you want to say and what you think about it, and write down the main points.</p><p>So far, translations and explanations of mistakes in the topics are only available in Russian.</p>"],["Where do I find my topic and my words?","<p>In “Mein Bereich”. Your topic for the next meeting and the topics you saved are always there.</p><p>You can add words, phrases and facts from a topic to your own vocabulary list, “Meine Lernliste”: tap “In Lernliste speichern” next to a word, or “Alles in meine Lernliste”. That way everything is at hand and you can come back and review it any time.</p>"],["I am afraid I won’t manage. What should I do?","<ul><li>You can bring notes and look at them.</li><li>You don’t have to speak perfectly. Mistakes are normal, we are all learning.</li><li>You don’t have to be an expert either. Just share what you found out and what you think about it.</li></ul>"],["Can I change my topic?","<p>Yes. Draw another topic and tap “Thema wechseln”. Or choose a topic from the list right on the meeting card in “Treffen”.</p>"],["What if there are no places left or I can’t come?","<ul><li>One topic per person.</li><li>No places left? You go on the waiting list, and if a place opens up, the bot will message you.</li><li>Can’t come? Tap “Abmelden” and your topic becomes available for others.</li><li>The bot sends you a reminder one day before the meeting.</li><li>The day after the meeting, the bot sends you a short message with what to remember and review.</li></ul>"],["Do I need to install anything?","<p>No. Pitch-Runde opens right in Telegram. You can only sign up for a meeting there.</p>"]],"fbQ":"Have an idea, or is something not working?","fbP":"Message me privately on Telegram <a href=\"https://t.me/Vikii_Ka\" target=\"_blank\" rel=\"noopener\">@Vikii_Ka</a> or leave a comment right here.","fbL":"Your comment","fbPh":"Your idea or what is not working","fbB":"Send","fbLogin":"To send a comment, open Pitch-Runde in Telegram. Or message me privately.","fbOk":"Thank you! Your comment has been sent.","fbErr":"That didn’t work. Try again or message me privately."},"uk":{"name":"Українська","open":"Вперше тут? Запитання та відповіді","h":"Запитання та відповіді","lead":"Найважливіше про Pitch-Runde коротко.","items":[["Що таке Pitch-Runde?","<p>У Pitch-Runde кожен обирає тему, готує коротку розповідь німецькою і ділиться нею з групою, а потім ми разом обговорюємо. Теми про те, що зараз відбувається в Німеччині, і про те, що тут знає кожен: історія, звички, свята, Гамбург і багато іншого. Так у тебе завжди буде про що поговорити з місцевими.</p><p>Це не іспит, а дружнє тренування. Рівень B2-C1.</p>"],["Як записатися на зустріч?","<ol><li>Відкрий «Treffen», обери зустріч і витягни тему. Не зачепила? Тягни іншу.</li><li>Натисни «Thema nehmen und anmelden». Усе, ти записана.</li><li>Спокійно готуйся, у тебе є приблизно тиждень.</li><li>На зустрічі розкажи про тему 3-5 хвилин і постав групі запитання, готові запитання є в плані. Далі обговорюємо разом.</li></ol>"],["Які бувають теми?","<p>Свіжі новини, ТБ і зірки, Гамбург, німецькі звички, історія, свята. Новини ми регулярно оновлюємо та перевіряємо факти.</p>"],["Як готуватися?","<p>Застосунок дає тобі опору: структуру розповіді з п’яти кроків (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe). У кожному кроці є запитання, яке допоможе підготуватися, а в останньому кроці готові запитання для обговорення з групою: просто обери одне. До цього корисні словосполучення та фрази, як говорять німці, розбір типових помилок, відео і міні-тест.</p><p>А саму розповідь готуєш ти. Пошукай інформацію про тему сама: новини, статті, відео, усе, що знайдеш. Подумай, що хочеш розповісти і що ти про це думаєш, і випиши собі головне.</p><p>Поки що переклади та пояснення помилок у темах є лише російською.</p>"],["Де знайти свою тему і потрібні слова?","<p>У вкладці «Mein Bereich». Там завжди твоя тема для найближчої зустрічі та теми, які ти зберегла.</p><p>Слова, фрази і факти з теми можна додати до свого словничка «Meine Lernliste»: натисни «In Lernliste speichern» біля потрібного слова або «Alles in meine Lernliste». Так усе під рукою, і ти завжди можеш повернутися і повторити.</p>"],["Я боюся, що не впораюся. Що робити?","<ul><li>Можна взяти із собою тези і підглядати.</li><li>Говорити ідеально не потрібно. Помилки це нормально, ми всі вчимося.</li><li>Бути експертом теж не потрібно. Розкажи, що дізналася і що ти про це думаєш.</li></ul>"],["Можна змінити тему?","<p>Так. Витягни іншу тему і натисни «Thema wechseln». Або обери тему зі списку просто на картці зустрічі у вкладці «Treffen».</p>"],["Що робити, якщо немає місць або я не зможу прийти?","<ul><li>Одна тема на одну людину.</li><li>Немає місць? Ти потрапиш до списку очікування, а якщо місце звільниться, бот тобі напише.</li><li>Не виходить прийти? Натисни «Abmelden», і тема звільниться для інших.</li><li>За день до зустрічі бот надішле нагадування.</li><li>Наступного дня після зустрічі бот надішле коротке повідомлення: що запам’ятати і повторити.</li></ul>"],["Чи потрібно щось встановлювати?","<p>Ні. Pitch-Runde відкривається просто в Telegram. Записатися на зустріч можна тільки там.</p>"]],"fbQ":"Є ідея або щось не працює?","fbP":"Напиши мені в особисті повідомлення в Telegram <a href=\"https://t.me/Vikii_Ka\" target=\"_blank\" rel=\"noopener\">@Vikii_Ka</a> або залиш коментар просто тут.","fbL":"Твій коментар","fbPh":"Твоя ідея або що не працює","fbB":"Надіслати","fbLogin":"Щоб надіслати коментар, відкрий Pitch-Runde у Telegram. Або напиши мені в особисті.","fbOk":"Дякую! Твій коментар надіслано.","fbErr":"Не вдалося надіслати. Спробуй ще раз або напиши мені в особисті."},"ru":{"name":"Русский","open":"Впервые здесь? Вопросы и ответы","h":"Вопросы и ответы","lead":"Всё самое важное о Pitch-Runde коротко.","items":[["Что такое Pitch-Runde?","<p>В Pitch-Runde каждый выбирает тему, готовит короткий рассказ на немецком и делится им с группой, а потом мы вместе обсуждаем. Темы о том, что сейчас происходит в Германии, и о том, что здесь знает каждый: история, привычки, праздники, Гамбург и многое другое. Так у тебя всегда будет о чём поговорить с местными.</p><p>Это не экзамен, а дружеская тренировка. Уровень B2-C1.</p>"],["Как записаться на встречу?","<ol><li>Открой «Treffen», выбери встречу и вытяни тему. Не зацепила? Тяни другую.</li><li>Нажми «Thema nehmen und anmelden». Всё, ты записана.</li><li>Спокойно готовься, у тебя есть примерно неделя.</li><li>На встрече расскажи о теме 3-5 минут и задай группе вопрос, готовые вопросы есть в плане. Дальше обсуждаем вместе.</li></ol>"],["Какие бывают темы?","<p>Свежие новости, ТВ и звёзды, Гамбург, немецкие привычки, история, праздники. Новости мы регулярно обновляем и проверяем факты.</p>"],["Как готовиться?","<p>Приложение даёт тебе опору: структуру рассказа из пяти шагов (Einstieg, Fakten, Hintergrund, Meinung, Frage an die Gruppe). В каждом шаге есть вопрос, который поможет подготовиться, а в последнем шаге готовые вопросы для обсуждения с группой: просто выбери один. К этому полезные словосочетания и фразы, как говорят немцы, разбор типичных ошибок, видео и мини-тест.</p><p>А сам рассказ готовишь ты. Поищи информацию о теме сама: новости, статьи, видео, всё, что найдёшь. Подумай, что хочешь рассказать и что ты об этом думаешь, и выпиши себе главное.</p>"],["Где найти свою тему и нужные слова?","<p>Во вкладке «Mein Bereich». Там всегда твоя тема для ближайшей встречи и темы, которые ты сохранила.</p><p>Слова, фразы и факты из темы можно добавить в свой словарик «Meine Lernliste»: нажми «In Lernliste speichern» у нужного слова или «Alles in meine Lernliste». Так всё под рукой, и ты всегда можешь вернуться и повторить.</p>"],["Я боюсь, что не справлюсь. Что делать?","<ul><li>Можно взять с собой тезисы и подглядывать.</li><li>Говорить идеально не нужно. Ошибки это нормально, мы все учимся.</li><li>Быть экспертом тоже не нужно. Расскажи, что узнала и что ты об этом думаешь.</li></ul>"],["Можно поменять тему?","<p>Да. Вытяни другую тему и нажми «Thema wechseln». Или выбери тему из списка прямо на карточке встречи во вкладке «Treffen».</p>"],["Что, если мест нет или я не смогу прийти?","<ul><li>Одна тема на одного человека.</li><li>Мест нет? Ты попадёшь в лист ожидания, а если место освободится, бот тебе напишет.</li><li>Не получается прийти? Нажми «Abmelden», и тема освободится для других.</li><li>За день до встречи бот пришлёт напоминание.</li><li>На следующий день после встречи бот пришлёт короткое сообщение: что запомнить и повторить.</li></ul>"],["Нужно что-то устанавливать?","<p>Нет. Pitch-Runde открывается прямо в Telegram. Записаться на встречу можно только там.</p>"]],"fbQ":"Есть идея или что-то не работает?","fbP":"Напиши мне в личку в Telegram <a href=\"https://t.me/Vikii_Ka\" target=\"_blank\" rel=\"noopener\">@Vikii_Ka</a> или оставь комментарий прямо здесь.","fbL":"Твой комментарий","fbPh":"Твоя идея или что не работает","fbB":"Отправить","fbLogin":"Чтобы отправить комментарий, открой Pitch-Runde в Telegram. Или напиши мне в личку.","fbOk":"Спасибо! Твой комментарий отправлен.","fbErr":"Не получилось отправить. Попробуй ещё раз или напиши мне в личку."}};
+const FAQ_ORDER=["de","en","uk","ru"],FAQ_KEY="pitchrunde.faq-lang";
+function faqDetect(){try{const s=localStorage.getItem(FAQ_KEY);if(FAQ_TXT[s])return s}catch(_){}
+ const tg=window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initDataUnsafe&&Telegram.WebApp.initDataUnsafe.user;
+ const c=String((tg&&tg.language_code)||navigator.language||"").slice(0,2).toLowerCase();return FAQ_TXT[c]?c:"ru"}
+let faqLang=faqDetect();
+function faqSet(l){faqLang=l;const t=FAQ_TXT[l];
+ $("viewFaq").lang=l;$("faqOpen").lang=l;$("faqOpen").textContent=t.open;$("faqH").textContent=t.h;$("faqLead").textContent=t.lead;$("tabFaq").title=t.h;
+ $("faqItems").innerHTML=t.items.map(([q,a])=>`<details class="ru-help"><summary>${q}</summary><div class="ru-body">${a}</div></details>`).join("");
+ $("fbQ").textContent=t.fbQ;$("fbP").innerHTML=t.fbP;$("fbL").textContent=t.fbL;$("fbText").placeholder=t.fbPh;$("fbSend").textContent=t.fbB;$("fbNote").hidden=true;
+ $("faqLangs").innerHTML=FAQ_ORDER.map(k=>`<button type="button" class="lang-btn" data-l="${k}" lang="${k}" aria-pressed="${k===l}">${FAQ_TXT[k].name}</button>`).join("")}
+$("faqLangs").addEventListener("click",e=>{const b=e.target.closest("button[data-l]");if(!b)return;faqSet(b.dataset.l);try{localStorage.setItem(FAQ_KEY,b.dataset.l)}catch(_){}});
+faqSet(faqLang);
 $("fbForm").addEventListener("submit",async e=>{
  e.preventDefault();const f=$("fbText"),btn=$("fbSend"),note=$("fbNote"),text=f.value.trim();if(!text)return;
  const say=m=>{note.hidden=false;note.textContent=m};
- const u=window.claude?await window.claude.use("user"):null;if(!u||!(await u.id())){say("Чтобы отправить комментарий, открой Pitch-Runde в Telegram. Или напиши мне в личку.");return}
+ const u=window.claude?await window.claude.use("user"):null;if(!u||!(await u.id())){say(FAQ_TXT[faqLang].fbLogin);return}
  btn.disabled=true;
- try{await u.feedback(text);f.value="";say("Спасибо! Твой комментарий отправлен.")}catch(_){say("Не получилось отправить. Попробуй ещё раз или напиши мне в личку.")}
+ try{await u.feedback(text);f.value="";say(FAQ_TXT[faqLang].fbOk)}catch(_){say(FAQ_TXT[faqLang].fbErr)}
  btn.disabled=false;
 });
 function trResetForm(){const f=$("trForm");f.reset();f.zeit.value="19:00";f.plaetze.value="12";TR.editId=null;$("trAdminH").textContent="Neues Treffen anlegen";$("trSubmit").textContent="Treffen anlegen";$("trCancel").hidden=true}
